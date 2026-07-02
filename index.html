@@ -3,312 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPI Barcode Generator</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>Team Hub - Portal Kolaborasi</title>
     
     <style>
-        * { box-sizing: border-box; }
+        /* Desain ala Notion */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
+            background-color: #ffffff;
+            color: #37352f;
             margin: 0;
-        }
-        
-        /* HEADER */
-        .main-header {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #ffffff;
-            text-align: center;
-            padding: 30px 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        .main-header h1 {
-            margin: 0;
-            font-size: 36px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .main-header p {
-            margin: 10px 0 0 0;
-            font-size: 16px;
-            color: #d1d8e0;
+            padding: 0;
         }
 
-        /* UPLOAD SECTION */
-        .upload-section {
-            background: #fff;
-            padding: 25px;
-            margin-bottom: 20px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border: 2px dashed #203a43;
-            transition: all 0.3s ease;
-        }
-        .upload-section:hover {
-            background-color: #f8fbfd;
-            border-color: #2c5364;
-        }
-        .upload-section input[type="file"] {
-            margin-top: 15px;
-            font-size: 15px;
-            cursor: pointer;
-        }
-        .upload-info {
-            font-size: 14px;
-            color: #6c757d;
-            margin-top: 10px;
-        }
-
-        /* BUTTON GENERATE DI ATAS */
-        .btn-container {
-            text-align: center;
-            margin-bottom: 30px; /* Jarak antara tombol dan kolom */
-        }
-        button {
-            padding: 14px 45px;
-            background: linear-gradient(135deg, #00b09b, #96c93d);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
+        /* --- COVER & HEADER --- */
+        .cover-image {
             width: 100%;
-            max-width: 500px;
-        }
-        button:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 176, 155, 0.6);
+            height: 30vh;
+            min-height: 200px;
+            background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop'); /* Gambar background gradient abstract */
+            background-size: cover;
+            background-position: center;
         }
 
-        /* LAYOUT 2 KOLOM */
-        .main-container {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-            border-spacing: 20px 0;
+        .header-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
         }
-        .column {
-            display: table-cell;
-            width: 50%;
-            vertical-align: top;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+
+        .page-icon {
+            font-size: 78px;
+            margin-top: -50px; /* Membuat ikon menabrak cover (overlap) */
+            background: white;
+            border-radius: 10px;
+            display: inline-block;
+            padding: 5px;
+            line-height: 1;
         }
-        .column-title {
-            font-size: 18px;
+
+        h1 {
+            font-size: 40px;
             font-weight: 700;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            color: #2d3436;
-            border-bottom: 2px solid #eee;
+            margin: 10px 0 5px 0;
         }
-        .pid-col { border-top: 6px solid #0984e3; }
-        .bin-col { border-top: 6px solid #e17055; }
 
-        textarea {
+        .subtitle {
+            color: #787774;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* --- SEARCH BAR --- */
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+            padding: 0 20px;
+        }
+
+        input[type="text"] {
             width: 100%;
-            height: 120px;
-            padding: 12px;
-            border: 1px solid #dfe6e9;
-            border-radius: 8px;
-            font-size: 14px;
-            resize: vertical;
-            margin-bottom: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #fafbfc;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            background-color: #f7f7f5;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            font-family: inherit;
         }
         
-        /* OUTPUT BARCODE & CHECKBOX */
-        .barcode-output-container {
-            margin-top: 20px;
-            border-top: 2px dashed #dfe6e9;
-            padding-top: 20px;
+        input[type="text"]:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: #2eaadc;
+            box-shadow: 0 0 0 3px rgba(46, 170, 220, 0.2);
         }
-        .barcode-item {
-            background: #fff;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #dfe6e9;
-            border-radius: 8px;
-            page-break-inside: avoid;
-            transition: background 0.2s;
+
+        /* --- LINK LIST / GALLERY --- */
+        .links-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 50px 20px;
+            display: grid;
+            gap: 15px;
         }
-        .barcode-item:hover {
-            background: #f8fbfd;
-        }
-        
-        /* Layout per baris untuk Checkbox & Barcode */
-        .barcode-row {
+
+        .link-card {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 20px; /* Jarak antara checkbox dan barcode */
+            padding: 15px 20px;
+            background: #ffffff;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .link-card:hover {
+            background: #f7f7f5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .link-emoji {
+            font-size: 28px;
+            margin-right: 15px;
+        }
+
+        .link-text {
+            flex-grow: 1;
+        }
+
+        .link-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+        }
+
+        .link-desc {
+            font-size: 14px;
+            color: #787774;
+            margin: 0;
         }
         
-        .barcode-checkbox {
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            accent-color: #00b09b; /* Warna ceklis menyesuaikan tema */
-        }
-        
-        /* MODE PRINT */
-        @media print {
-            body { background: white; padding: 0; }
-            .main-header, .upload-section, .btn-container, textarea, label, .column-title, .barcode-checkbox { 
-                display: none !important; 
-            }
-            .column { box-shadow: none; padding: 0; background: transparent; border: none; }
-            .main-container { border-spacing: 10px 0; }
-            .barcode-output-container { border-top: none; padding-top: 0; margin-top: 0; }
-            .barcode-item { border: none; margin-bottom: 30px; padding: 0; }
-            .barcode-row { gap: 0; }
+        .loading {
+            text-align: center;
+            color: #787774;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
 
-    <header class="main-header">
-        <h1>BPI Barcode Generator</h1>
-        <p>Integrated System for Pallet PID & Bin Number Management</p>
-    </header>
-
-    <div class="upload-section">
-        <label for="excelUpload"><b>📂 Upload Template Excel (.xlsx atau .xls)</b></label><br>
-        <input type="file" id="excelUpload" accept=".xlsx, .xls">
-        <div class="upload-info">Pastikan <b>Kolom A</b> untuk PID Pallet dan <b>Kolom B</b> untuk Bin No.</div>
+    <!-- Area Cover & Judul -->
+    <div class="cover-image"></div>
+    <div class="header-container">
+        <div class="page-icon">🚀</div>
+        <h1>BPI Team Hub</h1>
+        <p class="subtitle">Portal kolaborasi internal untuk akses tools dan dokumen dengan cepat.</p>
     </div>
 
-    <div class="btn-container">
-        <button onclick="generateAllBarcodes()">⚡ GENERATE ALL BARCODES</button>
+    <!-- Area Pencarian -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔍 Cari tools atau dokumen..." onkeyup="filterLinks()">
     </div>
 
-    <div class="main-container">
-        <div class="column pid-col">
-            <div class="column-title">📦 KOLOM PID PALLET</div>
-            <textarea id="pidInput" placeholder="Data PID akan muncul di sini..."></textarea>
-            <div class="barcode-output-container" id="pidOutput"></div>
-        </div>
-        
-        <div class="column bin-col">
-            <div class="column-title">📍 KOLOM BIN NUMBER</div>
-            <textarea id="binInput" placeholder="Data Bin No akan muncul di sini..."></textarea>
-            <div class="barcode-output-container" id="binOutput"></div>
-        </div>
+    <!-- Area Daftar Link (Muncul otomatis dari Google Sheets) -->
+    <div class="links-container" id="linksContainer">
+        <div class="loading">⏳ Sedang mengambil data dari Google Sheets...</div>
     </div>
 
     <script>
-        // BACA EXCEL
-        document.getElementById('excelUpload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-
-                let pidList = [];
-                let binList = [];
-
-                for (let i = 0; i < jsonData.length; i++) {
-                    const row = jsonData[i];
-                    if (!row || row.length === 0) continue;
-
-                    const pid = row[0] ? String(row[0]).trim() : '';
-                    const bin = row[1] ? String(row[1]).trim() : '';
-
-                    if (i === 0 && (pid.toLowerCase().includes('pid') || bin.toLowerCase().includes('bin'))) {
-                        continue;
-                    }
-
-                    if (pid) pidList.push(pid);
-                    if (bin) binList.push(bin);
+        // ==========================================================
+        // GANTI TEXT DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS KAMU
+        // ==========================================================
+        const csvUrl = "MASUKKAN_LINK_CSV_GOOGLE_SHEET_DI_SINI";
+        
+        // Fungsi untuk mengambil data dan merender tampilan
+        async function fetchLinks() {
+            try {
+                // Jika URL belum diganti, berikan peringatan
+                if (csvUrl === "MASUKKAN_LINK_CSV_GOOGLE_SHEET_DI_SINI") {
+                    document.getElementById('linksContainer').innerHTML = "<div class='loading'>⚠️ Silakan masukkan link CSV Google Sheets ke dalam kode HTML terlebih dahulu.</div>";
+                    return;
                 }
 
-                document.getElementById('pidInput').value = pidList.join('\n');
-                document.getElementById('binInput').value = binList.join('\n');
+                const response = await fetch(csvUrl);
+                const data = await response.text();
                 
-                // Otomatis generate setelah upload
-                generateAllBarcodes();
-            };
-            reader.readAsArrayBuffer(file);
-        });
+                // Parse CSV manual secara sederhana (pemisah koma)
+                const rows = data.split('\n');
+                let htmlContent = "";
 
-        // GENERATE BARCODE
-        function generateAllBarcodes() {
-            processColumn('pidInput', 'pidOutput', 'pid-bc');
-            processColumn('binInput', 'binOutput', 'bin-bc');
+                // Looping dari baris ke-2 (index 1) karena baris pertama adalah judul kolom
+                for (let i = 1; i < rows.length; i++) {
+                    // Memisahkan kolom dengan trik regex agar koma di dalam teks tidak ikut terpotong
+                    const cols = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                    
+                    if (cols.length >= 2) {
+                        // Membersihkan tanda kutip jika ada
+                        const title = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : '';
+                        const link = cols[1] ? cols[1].replace(/^"|"$/g, '').trim() : '#';
+                        const desc = cols[2] ? cols[2].replace(/^"|"$/g, '').trim() : '';
+                        const emoji = cols[3] ? cols[3].replace(/^"|"$/g, '').trim() : '📄';
+
+                        if (title && title !== "") {
+                            htmlContent += `
+                                <a href="${link}" target="_blank" class="link-card" data-title="${title.toLowerCase()}" data-desc="${desc.toLowerCase()}">
+                                    <div class="link-emoji">${emoji}</div>
+                                    <div class="link-text">
+                                        <p class="link-title">${title}</p>
+                                        <p class="link-desc">${desc}</p>
+                                    </div>
+                                </a>
+                            `;
+                        }
+                    }
+                }
+                
+                document.getElementById('linksContainer').innerHTML = htmlContent;
+                
+            } catch (error) {
+                document.getElementById('linksContainer').innerHTML = "<div class='loading'>❌ Gagal memuat data. Pastikan Google Sheets sudah di-Publish ke Web.</div>";
+                console.error("Error loading CSV:", error);
+            }
         }
 
-        function processColumn(inputId, outputId, prefixId) {
-            const inputData = document.getElementById(inputId).value;
-            const outputContainer = document.getElementById(outputId);
-            
-            outputContainer.innerHTML = '';
-            const lines = inputData.split('\n');
+        // Fungsi untuk fitur Live Search
+        function filterLinks() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.link-card');
 
-            lines.forEach((line, index) => {
-                const data = line.trim();
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const desc = card.getAttribute('data-desc');
                 
-                if (data) {
-                    // Wadah utama tiap barcode
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'barcode-item';
-
-                    // Wadah flex untuk menyejajarkan checkbox dan barcode
-                    const rowDiv = document.createElement('div');
-                    rowDiv.className = 'barcode-row';
-
-                    // Buat Checkbox
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'barcode-checkbox';
-
-                    // Buat SVG Barcode
-                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    svg.id = `${prefixId}-${index}`;
-                    
-                    // Masukkan ke dalam DOM
-                    rowDiv.appendChild(checkbox);
-                    rowDiv.appendChild(svg);
-                    itemDiv.appendChild(rowDiv);
-                    outputContainer.appendChild(itemDiv);
-
-                    try {
-                        JsBarcode(`#${prefixId}-${index}`, data, {
-                            format: "CODE128",
-                            lineColor: "#2d3436",
-                            width: 1.8,
-                            height: 60,
-                            displayValue: true,
-                            fontSize: 15,
-                            fontOptions: "bold",
-                            textMargin: 8
-                        });
-                    } catch (error) {
-                        console.error("Gagal generate data: " + data, error);
-                    }
+                // Cari kecocokan di judul atau deskripsi
+                if (title.includes(searchInput) || desc.includes(searchInput)) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
                 }
             });
         }
-    </script>
 
+        // Jalankan saat web dibuka
+        fetchLinks();
+    </script>
 </body>
 </html>
