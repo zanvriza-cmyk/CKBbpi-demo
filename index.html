@@ -165,7 +165,7 @@
         async function fetchLinks() {
             try {
                 // Jika URL belum diganti, berikan peringatan
-                if (csvUrl === "https://docs.google.com/spreadsheets/d/1KKqjgVhCAfcxKYVcLLFqiuuChJPi2BVkjgt0I1skHr0/edit?usp=sharing") {
+                if (csvUrl === "PASTE_LINK_CSV_KAMU_DI_SINI") {
                     document.getElementById('linksContainer').innerHTML = "<div class='loading'>⚠️ Silakan masukkan link CSV Google Sheets ke dalam kode HTML terlebih dahulu.</div>";
                     return;
                 }
@@ -206,7 +206,7 @@
                 document.getElementById('linksContainer').innerHTML = htmlContent;
                 
             } catch (error) {
-                document.getElementById('linksContainer').innerHTML = "<div class='loading'>❌ Gagal memuat data. Pastikan Google Sheets sudah di-Publish ke Web.</div>";
+                document.getElementById('linksContainer').innerHTML = "<div class='loading'>❌Failed to load data, make sure sheets link uploaded niggaa.</div>";
                 console.error("Error loading CSV:", error);
             }
         }
