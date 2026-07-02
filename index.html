@@ -159,13 +159,13 @@
         // ==========================================================
         // GANTI TEXT DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS KAMU
         // ==========================================================
-        const csvUrl = "MASUKKAN_LINK_CSV_GOOGLE_SHEET_DI_SINI";
+        const csvUrl = "https://docs.google.com/spreadsheets/d/1KKqjgVhCAfcxKYVcLLFqiuuChJPi2BVkjgt0I1skHr0/edit?usp=sharing";
         
         // Fungsi untuk mengambil data dan merender tampilan
         async function fetchLinks() {
             try {
                 // Jika URL belum diganti, berikan peringatan
-                if (csvUrl === "MASUKKAN_LINK_CSV_GOOGLE_SHEET_DI_SINI") {
+                if (csvUrl === "https://docs.google.com/spreadsheets/d/1KKqjgVhCAfcxKYVcLLFqiuuChJPi2BVkjgt0I1skHr0/edit?usp=sharing") {
                     document.getElementById('linksContainer').innerHTML = "<div class='loading'>⚠️ Silakan masukkan link CSV Google Sheets ke dalam kode HTML terlebih dahulu.</div>";
                     return;
                 }
