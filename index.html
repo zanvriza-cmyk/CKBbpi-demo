@@ -14,7 +14,6 @@
             padding: 0;
         }
 
-        /* --- COVER & HEADER --- */
         .cover-image {
             width: 100%;
             height: 30vh;
@@ -53,7 +52,6 @@
             margin-bottom: 30px;
         }
 
-        /* --- SEARCH BAR --- */
         .search-container {
             max-width: 800px;
             margin: 0 auto 30px auto;
@@ -79,7 +77,6 @@
             box-shadow: 0 0 0 3px rgba(46, 170, 220, 0.2);
         }
 
-        /* --- LINK LIST / GALLERY --- */
         .links-container {
             max-width: 800px;
             margin: 0 auto;
@@ -136,7 +133,6 @@
 </head>
 <body>
 
-    <!-- Area Cover & Judul -->
     <div class="cover-image"></div>
     <div class="header-container">
         <div class="page-icon">🚀</div>
@@ -144,12 +140,9 @@
         <p class="subtitle">Made by Zanov.</p>
     </div>
 
-    <!-- Area Pencarian -->
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="🔍 Cari tools atau dokumen..." onkeyup="filterLinks()">
     </div>
-
-    <!-- Area Daftar Link (Muncul otomatis dari Google Sheets) -->
     <div class="links-container" id="linksContainer">
         <div class="loading">⏳ Taking Data from Database...</div>
     </div>
@@ -158,11 +151,10 @@
         //drop you link here nigga
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_6E9ASMLc7I0q7LmPsucMUr7fMuNaciYvx4pR6CMUtGZKPtbYVpk1FqDs-07kE3gRdzfJaxXGDh2t/pub?gid=0&single=true&output=csv";
         
-        // Fungsi untuk mengambil data dan merender tampilan
         async function fetchLinks() {
             try {
-                // Jika URL belum diganti, berikan peringatan
-                if (csvUrl === "PASTE_LINK_CSV_KAMU_DI_SINI") {
+
+                if (csvUrl === "LINK_HERE") {
                     document.getElementById('linksContainer').innerHTML = "<div class='loading'>⚠️ Silakan masukkan link CSV Google Sheets ke dalam kode HTML terlebih dahulu.</div>";
                     return;
                 }
@@ -170,14 +162,12 @@
                 const response = await fetch(csvUrl);
                 const data = await response.text();
                 
-                // Parse CSV manual secara sederhana (pemisah koma)
                 const rows = data.split('\n');
                 let htmlContent = "";
 
-                // Looping dari baris ke-2 (index 1) karena baris pertama adalah judul kolom
                 for (let i = 1; i < rows.length; i++) {
-                    // Memisahkan kolom dengan trik regex agar koma di dalam teks tidak ikut terpotong
-                    const cols = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                    
+                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     
                     if (cols.length >= 2) {
                         // Membersihkan tanda kutip jika ada
