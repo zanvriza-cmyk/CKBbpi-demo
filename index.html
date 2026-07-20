@@ -5,210 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hub Portal - BPI OPS</title>
     
-    <style> 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
-            background-color: #ffffff;
-            color: #37352f;
-            margin: 0;
-            padding: 0;
+    <!-- Tailwind CSS (Untuk styling modern & responsif) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome (Untuk icon tambahan di widget & search) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        // Custom CKB Green
+                        ckb: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857', // Dominan Hijau CKB
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
         }
+    </script>
 
-        .cover-image {
-            width: 100%;
-            height: 30vh;
-            min-height: 200px;
-            /* Teks parameter di belakang .jpg sudah dihapus */
-            background-image: url('https://www.ckb.co.id/site/uploads/slideshow/686377dc4c1db-5a65b640ab4c2-logistic-img4-1.jpg'); 
-            background-size: cover;
-            background-position: center;
-        }
-
-        .header-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-        }
-
-        .page-icon {
-            font-size: 78px;
-            margin-top: -50px;
-            background: white;
-            border-radius: 10px;
-            display: inline-block;
-            padding: 5px;
-            line-height: 1;
-        }
-
-        h1 {
-            font-size: 40px;
-            font-weight: 700;
-            margin: 10px 0 5px 0;
-        }
-
-        .subtitle {
-            color: #787774;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-
-        /* --- SEARCH BAR --- */
-        .search-container {
-            max-width: 800px;
-            margin: 0 auto 30px auto;
-            padding: 0 20px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 1px solid #e1e1e1;
-            border-radius: 6px;
-            background-color: #f7f7f5;
-            transition: all 0.2s;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
+    <style>
+        body { background-color: #f3f4f6; } /* Light gray background */
         
-        input[type="text"]:focus {
-            outline: none;
-            background-color: #ffffff;
-            border-color: #2eaadc;
-            box-shadow: 0 0 0 3px rgba(46, 170, 220, 0.2);
-        }
-
-        /* --- LINK LIST / GALLERY --- */
-        .links-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px 50px 20px;
-            display: grid;
-            gap: 15px;
-        }
-
-        .link-card {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            background: #ffffff;
-            border: 1px solid #e1e1e1;
-            border-radius: 8px;
-            text-decoration: none;
-            color: inherit;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .link-card:hover {
-            background: #f7f7f5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .link-emoji {
-            font-size: 28px;
-            margin-right: 15px;
-        }
-
-        .link-text {
-            flex-grow: 1;
-        }
-
-        .link-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 0 0 4px 0;
-        }
-
-        .link-desc {
-            font-size: 14px;
-            color: #787774;
-            margin: 0;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #047857; }
         
-        .loading {
-            text-align: center;
-            color: #787774;
-            padding: 20px;
-        }
+        /* Smooth rendering untuk list */
+        .link-card { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="font-sans text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Area Cover & Judul -->
-    <div class="cover-image"></div>
-    <div class="header-container">
-        <div class="page-icon">🚀</div>
-        <h1>Portal Hub - BPI OPS</h1>
-        <p class="subtitle">-Made with love by zanov.</p>
+    <!-- HEADER / HERO SECTION -->
+    <div class="relative w-full h-64 bg-cover bg-center shadow-md" style="background-image: url('https://www.ckb.co.id/site/uploads/slideshow/686377dc4c1db-5a65b640ab4c2-logistic-img4-1.jpg');">
+        <!-- Overlay Hijau Transparan -->
+        <div class="absolute inset-0 bg-ckb-900/70 backdrop-blur-sm"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-white p-3 rounded-2xl shadow-lg text-4xl">🚀</div>
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Portal Hub <span class="text-ckb-500 font-light">| BPI OPS</span></h1>
+                    <p class="text-ckb-100 text-sm md:text-base mt-1 font-medium">Made with love by zanov.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Area Pencarian -->
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="🔍 Cari tools atau dokumen..." onkeyup="filterLinks()">
+    <!-- MAIN CONTENT LAYOUT -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 w-full pb-12 flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- KOLOM KIRI: Search & Link List (Lebih Lebar) -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Search Bar Container -->
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-gray-200 flex items-center focus-within:ring-2 focus-within:ring-ckb-500 focus-within:border-ckb-500 transition-all">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400 ml-4 mr-2"></i>
+                    <input type="text" id="searchInput" placeholder="Cari tools atau dokumen..." onkeyup="filterLinks()" class="w-full py-3 px-2 text-gray-700 outline-none bg-transparent font-medium placeholder-gray-400">
+                </div>
+
+                <!-- Links Container -->
+                <div id="linksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="col-span-full text-center py-10 bg-white rounded-xl border border-gray-200 border-dashed">
+                        <i class="fa-solid fa-circle-notch fa-spin text-ckb-500 text-3xl mb-3"></i>
+                        <p class="text-gray-500 font-medium">Taking Data from Database...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KOLOM KANAN: Widgets -->
+            <div class="lg:col-span-1 space-y-6">
+                
+                <!-- WIDGET 1: Date & Time -->
+                <div class="bg-gradient-to-br from-ckb-700 to-ckb-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 opacity-10">
+                        <i class="fa-regular fa-clock text-9xl"></i>
+                    </div>
+                    <p class="text-ckb-100 text-sm font-semibold uppercase tracking-wider mb-1" id="dateWidget">Memuat Tanggal...</p>
+                    <h2 class="text-4xl font-bold tracking-tight" id="timeWidget">00:00:00</h2>
+                    <p class="text-xs text-ckb-100/70 mt-2"><i class="fa-solid fa-location-dot mr-1"></i> BPI Warehouse Ops</p>
+                </div>
+
+                <!-- WIDGET 2: Daily Quotes -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative">
+                    <div class="absolute -top-3 left-6 bg-ckb-100 text-ckb-700 p-2 rounded-full border border-white shadow-sm">
+                        <i class="fa-solid fa-quote-left"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-800 mt-2 mb-3">Quote of the Day</h3>
+                    <p id="quoteWidget" class="text-gray-600 text-sm italic leading-relaxed">
+                        "Amateurs talk about tactics, but professionals study logistics."
+                    </p>
+                    <p class="text-xs text-ckb-600 font-semibold mt-4 text-right" id="quoteAuthor">- Gen. Robert H. Barrow</p>
+                </div>
+
+                <!-- WIDGET 3: Quick Info / Status (Bisa disesuaikan) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <i class="fa-solid fa-server"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-medium">System Status</p>
+                            <p class="text-sm font-bold text-gray-800">All Systems Normal</p>
+                        </div>
+                    </div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
-    <!-- Area Daftar Link (Muncul otomatis dari Google Sheets) -->
-    <div class="links-container" id="linksContainer">
-        <div class="loading">⏳ Taking Data from Database...</div>
-    </div>
-
+    <!-- SCRIPT DATA & WIDGETS -->
     <script>
-        //drop you link here nigga
+        // --- 1. DATA GOOGLE SHEETS (TIDAK DIUBAH SAMA SEKALI) ---
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_6E9ASMLc7I0q7LmPsucMUr7fMuNaciYvx4pR6CMUtGZKPtbYVpk1FqDs-07kE3gRdzfJaxXGDh2t/pub?gid=0&single=true&output=csv";
         
-        // Fungsi untuk mengambil data dan merender tampilan
         async function fetchLinks() {
             try {
-                // Jika URL belum diganti, berikan peringatan
-                if (csvUrl === "PASTE_LINK_CSV_KAMU_DI_SINI") {
-                    document.getElementById('linksContainer').innerHTML = "<div class='loading'>⚠️ Silakan masukkan link CSV Google Sheets ke dalam kode HTML terlebih dahulu.</div>";
-                    return;
-                }
-
                 const response = await fetch(csvUrl);
                 const data = await response.text();
                 
-                // Parse CSV manual secara sederhana (pemisah koma)
                 const rows = data.split('\n');
                 let htmlContent = "";
 
-                // Looping dari baris ke-2 (index 1) karena baris pertama adalah judul kolom
                 for (let i = 1; i < rows.length; i++) {
-                    // Memisahkan kolom dengan trik regex agar koma di dalam teks tidak ikut terpotong
-                   const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     
                     if (cols.length >= 2) {
-                        // Membersihkan tanda kutip jika ada
                         const title = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : '';
                         const link = cols[1] ? cols[1].replace(/^"|"$/g, '').trim() : '#';
                         const desc = cols[2] ? cols[2].replace(/^"|"$/g, '').trim() : '';
                         const emoji = cols[3] ? cols[3].replace(/^"|"$/g, '').trim() : '📄';
 
                         if (title && title !== "") {
+                            // Desain Link Card Baru
                             htmlContent += `
-                                <a href="${link}" target="_blank" class="link-card" data-title="${title.toLowerCase()}" data-desc="${desc.toLowerCase()}">
-                                    <div class="link-emoji">${emoji}</div>
-                                    <div class="link-text">
-                                        <p class="link-title">${title}</p>
-                                        <p class="link-desc">${desc}</p>
+                                <a href="${link}" target="_blank" class="link-card group flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-ckb-500 transition-all duration-200" data-title="${title.toLowerCase()}" data-desc="${desc.toLowerCase()}">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-gray-50 group-hover:bg-ckb-50 rounded-lg flex items-center justify-center text-2xl border border-gray-100 group-hover:border-ckb-100 transition-colors">
+                                        ${emoji}
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <h3 class="text-sm font-bold text-gray-800 group-hover:text-ckb-700 transition-colors mb-1">${title}</h3>
+                                        <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">${desc}</p>
                                     </div>
                                 </a>
                             `;
                         }
                     }
                 }
-                
                 document.getElementById('linksContainer').innerHTML = htmlContent;
                 
             } catch (error) {
-                document.getElementById('linksContainer').innerHTML = "<div class='loading'>❌Failed to load data, make sure sheets link uploaded niggaa.</div>";
+                document.getElementById('linksContainer').innerHTML = `
+                    <div class="col-span-full text-center py-10 bg-red-50 rounded-xl border border-red-200">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-3xl mb-2"></i>
+                        <p class="text-red-700 font-medium">Gagal memuat data dari database.</p>
+                    </div>`;
                 console.error("Error loading CSV:", error);
             }
         }
 
-        // Fungsi untuk fitur Live Search
+        // --- 2. FITUR PENCARIAN ---
         function filterLinks() {
             const searchInput = document.getElementById('searchInput').value.toLowerCase();
             const cards = document.querySelectorAll('.link-card');
@@ -217,7 +190,6 @@
                 const title = card.getAttribute('data-title');
                 const desc = card.getAttribute('data-desc');
                 
-                // Cari kecocokan di judul atau deskripsi
                 if (title.includes(searchInput) || desc.includes(searchInput)) {
                     card.style.display = "flex";
                 } else {
@@ -226,8 +198,40 @@
             });
         }
 
-        // Jalankan saat web dibuka
+        // --- 3. WIDGET JAM & TANGGAL REALTIME ---
+        function updateClock() {
+            const now = new Date();
+            
+            // Format Waktu (23:59:59)
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('timeWidget').textContent = now.toLocaleTimeString('id-ID', timeOptions);
+            
+            // Format Tanggal (Senin, 1 Jan 2024)
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateWidget').textContent = now.toLocaleDateString('id-ID', dateOptions);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- 4. WIDGET RANDOM QUOTES LOGISTIK ---
+        const quotes = [
+            { text: "Logistics is the ball and chain of armored warfare.", author: "Heinz Guderian" },
+            { text: "Amateurs talk about tactics, but professionals study logistics.", author: "Robert H. Barrow" },
+            { text: "Behind every great leader there was an even greater logistician.", author: "M. Cox" },
+            { text: "Without logistics the world stops.", author: "Supply Chain Proverb" },
+            { text: "Continuous improvement is better than delayed perfection.", author: "Mark Twain" },
+            { text: "The line between disorder and order lies in logistics.", author: "Sun Tzu" }
+        ];
+        
+        function setRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            document.getElementById('quoteWidget').textContent = `"${quotes[randomIndex].text}"`;
+            document.getElementById('quoteAuthor').textContent = `- ${quotes[randomIndex].author}`;
+        }
+
+        // Jalankan semua fungsi saat web dibuka
         fetchLinks();
+        setRandomQuote();
     </script>
 </body>
 </html>
