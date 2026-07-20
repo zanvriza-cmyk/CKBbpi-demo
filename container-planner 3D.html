@@ -3,127 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Container Load Planner (2D & 3D)</title>
+    <title>Pro Cargo Load Planner</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Three.js & OrbitControls untuk 3D View -->
+    <!-- Three.js & OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <style>
-        .grid-bg {
-            background-image: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        #threeCanvasContainer { width: 100%; height: 400px; cursor: grab; }
-        #threeCanvasContainer:active { cursor: grabbing; }
+        /* Agar canvas 3D mengambil seluruh sisa layar dengan mulus */
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen p-6">
+<body class="bg-gray-100 font-sans flex h-screen">
 
-    <div class="max-w-7xl mx-auto">
-        <header class="mb-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+    <!-- PANEL KIRI: Data & Kalkulasi (Width 30%) -->
+    <div class="w-full md:w-1/3 bg-white shadow-2xl flex flex-col h-full z-10 border-r border-gray-200">
+        
+        <!-- Header -->
+        <div class="p-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-truck-fast text-green-600 mr-2"></i>Container Load Planner (2D & 3D Integrated)</h1>
-                <p class="text-gray-500 text-sm mt-1">Multi-view cargo generator with automated stacking engine.</p>
+                <h1 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-cube text-green-600 mr-2"></i>LoadPlanner <span class="font-light">PRO</span></h1>
+                <p class="text-xs text-gray-500 mt-1">3D Stacking & Calculation Engine</p>
             </div>
-            <button onclick="window.print()" class="text-gray-500 hover:text-green-600 transition">
-                <i class="fa-solid fa-print text-xl"></i>
-            </button>
-        </header>
+            <button onclick="clearAll()" class="text-xs font-semibold text-red-500 hover:text-red-700 bg-red-50 px-3 py-1 rounded transition">Reset</button>
+        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Scrollable Content -->
+        <div class="flex-grow overflow-y-auto p-5 space-y-6">
             
-            <!-- Panel Kiri: Input Data -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-6">
+            <!-- 1. Calculation Summary (Dashboard Style) -->
+            <div class="bg-gray-800 rounded-xl p-4 text-white shadow-inner">
+                <h2 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider"><i class="fa-solid fa-chart-pie mr-2"></i>Utilization Summary</h2>
                 
-                <!-- Container Settings -->
-                <div>
-                    <h2 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-box-open mr-2"></i>Container Dimensions (cm)</h2>
+                <div class="flex justify-between items-end mb-1">
+                    <span class="text-3xl font-bold" id="utilizationText">0%</span>
+                    <span class="text-xs text-gray-400 mb-1">Volume Used</span>
+                </div>
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mb-4">
+                    <div id="utilizationBar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-sm border-t border-gray-700 pt-3">
+                    <div>
+                        <p class="text-gray-400 text-xs">Container Vol.</p>
+                        <p class="font-semibold" id="contVolText">0 m³</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs">Cargo Vol.</p>
+                        <p class="font-semibold text-green-400" id="cargoVolText">0 m³</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Container Settings -->
+            <div>
+                <h2 class="font-bold text-gray-700 mb-2 text-sm"><i class="fa-solid fa-truck mr-2"></i>Container Size (cm)</h2>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[10px] text-gray-500 uppercase">Length</label>
+                        <input type="number" id="contL" value="590" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none font-semibold text-gray-700" onchange="generate3D()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-gray-500 uppercase">Width</label>
+                        <input type="number" id="contW" value="235" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none font-semibold text-gray-700" onchange="generate3D()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-gray-500 uppercase">Height</label>
+                        <input type="number" id="contH" value="239" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none font-semibold text-gray-700" onchange="generate3D()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Add Cargo Form -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h2 class="font-bold text-gray-700 mb-3 text-sm"><i class="fa-solid fa-plus-circle mr-2"></i>Add Cargo</h2>
+                <div class="space-y-3">
+                    <input type="text" id="itemName" placeholder="Item Name (e.g., Engine Part)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
                     <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-xs text-gray-500">Length (L)</label>
-                            <input type="number" id="contL" value="590" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500">Width (W)</label>
-                            <input type="number" id="contW" value="235" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500">Height (H)</label>
-                            <input type="number" id="contH" value="239" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none">
-                        </div>
+                        <input type="number" id="itemL" placeholder="L (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                        <input type="number" id="itemW" placeholder="W (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                        <input type="number" id="itemH" placeholder="H (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
                     </div>
-                </div>
-
-                <!-- Add Item -->
-                <div>
-                    <h2 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-cube mr-2"></i>Add Cargo Item</h2>
-                    <div class="space-y-3">
-                        <input type="text" id="itemName" placeholder="Item Name (e.g. Pallet A)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
-                        <div class="grid grid-cols-3 gap-2">
-                            <input type="number" id="itemL" placeholder="L (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
-                            <input type="number" id="itemW" placeholder="W (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
-                            <input type="number" id="itemH" placeholder="H (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="itemQty" placeholder="Qty" value="1" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
-                            <input type="color" id="itemColor" value="#16a34a" class="w-full h-[38px] p-1 border rounded cursor-pointer">
-                        </div>
-                        <button onclick="addItem()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition shadow">
-                            Add to Cargo List
-                        </button>
+                    <div class="grid grid-cols-2 gap-2 items-center">
+                        <input type="number" id="itemQty" placeholder="Qty" value="1" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                        <input type="color" id="itemColor" value="#22c55e" class="w-full h-[38px] p-0 border rounded cursor-pointer">
                     </div>
+                    <button onclick="addItem()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition shadow-md text-sm">
+                        Add to Load Plan
+                    </button>
                 </div>
-
-                <!-- Item List -->
-                <div class="flex-grow overflow-auto max-h-40">
-                    <h2 class="font-bold text-gray-700 mb-2">Item List</h2>
-                    <ul id="itemList" class="text-sm space-y-2"></ul>
-                </div>
-                
-                <button onclick="generateAllPlans()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-lg shadow-md transition flex justify-center items-center gap-2 mt-4">
-                    <i class="fa-solid fa-calculator"></i> Generate Load Plan (2D & 3D)
-                </button>
             </div>
 
-            <!-- Panel Kanan: Visualisasi 2D & 3D -->
-            <div class="lg:col-span-2 flex flex-col gap-6">
-                
-                <!-- 3D Interactive View (Utama) -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="font-bold text-gray-700"><i class="fa-solid fa-cube mr-2 text-green-600"></i>3D Interactive View</h2>
-                        <span class="text-xs text-gray-400">Putar dengan Klik Kiri + Geser | Zoom dengan Scroll</span>
-                    </div>
-                    <div id="threeCanvasContainer" class="border-2 border-gray-800 rounded bg-gray-900 overflow-hidden relative"></div>
-                </div>
-
-                <!-- Top View Canvas (2D) -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h2 class="font-bold text-gray-700 mb-4"><i class="fa-solid fa-arrow-down-up-across-line mr-2"></i>Top-Down View (Floor Plan)</h2>
-                    <div class="overflow-auto border-2 border-gray-800 rounded bg-gray-100 relative grid-bg">
-                        <canvas id="topCanvas" width="600" height="250"></canvas>
-                    </div>
-                </div>
-
+            <!-- 4. Cargo List -->
+            <div>
+                <h2 class="font-bold text-gray-700 mb-2 text-sm flex justify-between">
+                    <span><i class="fa-solid fa-list mr-2"></i>Cargo List</span>
+                    <span id="totalItemsText" class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">0 Items</span>
+                </h2>
+                <ul id="itemList" class="space-y-2">
+                    <!-- List items will be injected here -->
+                </ul>
             </div>
+            
+        </div>
+    </div>
+
+    <!-- PANEL KANAN: 3D Visualization (Width 70%) -->
+    <div class="w-full md:w-2/3 h-full relative bg-gray-900" id="threeCanvasContainer">
+        <!-- Overlay Controls Info -->
+        <div class="absolute top-4 right-4 bg-black bg-opacity-50 text-white text-xs px-3 py-2 rounded-lg pointer-events-none z-10 flex gap-4">
+            <span><i class="fa-solid fa-mouse mr-1"></i> Left Click: Rotate</span>
+            <span><i class="fa-solid fa-up-down mr-1"></i> Scroll: Zoom</span>
         </div>
     </div>
 
     <script>
         let items = [];
-        const scale2D = 1.0; 
-
-        // --- SETUP THREE.JS (3D ENGINE) ---
+        
+        // --- 1. SETUP THREE.JS ---
         const container3D = document.getElementById('threeCanvasContainer');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x111827); // Gray-900
+        scene.background = new THREE.Color(0x1e293b); // Tailwind slate-800 (elegan)
+        
+        // Tambahkan grid lantai biar berasa "pabrik"
+        const gridHelper = new THREE.GridHelper(100, 50, 0x475569, 0x334155);
+        gridHelper.position.y = -12;
+        scene.add(gridHelper);
 
         const camera = new THREE.PerspectiveCamera(45, container3D.clientWidth / container3D.clientHeight, 0.1, 1000);
-        camera.position.set(60, 40, 80);
+        camera.position.set(50, 40, 70);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(container3D.clientWidth, container3D.clientHeight);
@@ -133,17 +147,19 @@
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
 
-        // Pencahayaan
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        // Pencahayaan Premium
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(30, 60, 30);
+        dirLight.position.set(20, 50, 30);
         scene.add(dirLight);
 
-        let cargoGroup = new THREE.Group(); // Wadah untuk menampung objek kardus 3D
+        let cargoGroup = new THREE.Group();
         scene.add(cargoGroup);
 
+        // --- 2. LOGIKA APLIKASI ---
+
         function addItem() {
-            const name = document.getElementById('itemName').value || 'Item';
+            const name = document.getElementById('itemName').value || 'Cargo Box';
             const l = parseFloat(document.getElementById('itemL').value);
             const w = parseFloat(document.getElementById('itemW').value);
             const h = parseFloat(document.getElementById('itemH').value);
@@ -151,143 +167,153 @@
             const color = document.getElementById('itemColor').value;
 
             if (!l || !w || !h) {
-                alert("Mohon masukkan dimensi (L, W, H) dengan benar!");
+                alert("Mohon lengkapi dimensi L, W, H.");
                 return;
             }
 
             for(let i=0; i<qty; i++) {
-                items.push({ id: Date.now() + i, name, l, w, h, color });
+                items.push({ id: Date.now() + Math.random(), name, l, w, h, color });
             }
             
+            updateUI();
+        }
+
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            updateUI();
+        }
+
+        function clearAll() {
+            if(confirm("Hapus semua data kargo?")) {
+                items = [];
+                updateUI();
+            }
+        }
+
+        function updateUI() {
             updateItemList();
-            generateAllPlans(); // Otomatis generate saat item ditambah
+            generate3D();
         }
 
         function updateItemList() {
             const list = document.getElementById('itemList');
             list.innerHTML = '';
             
-            const grouped = items.reduce((acc, curr) => {
-                if(!acc[curr.name]) acc[curr.name] = { count: 0, color: curr.color, l: curr.l, w: curr.w, h: curr.h };
-                acc[curr.name].count += 1;
-                return acc;
-            }, {});
+            if(items.length === 0) {
+                list.innerHTML = '<li class="text-xs text-gray-400 text-center italic py-4">No cargo added yet.</li>';
+                document.getElementById('totalItemsText').innerText = "0 Items";
+                return;
+            }
 
-            for (const [name, data] of Object.entries(grouped)) {
+            document.getElementById('totalItemsText').innerText = `${items.length} Items`;
+
+            items.forEach(item => {
                 list.innerHTML += `
-                    <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100">
+                    <li class="flex justify-between items-center bg-white p-2 rounded border border-gray-100 shadow-sm text-sm">
                         <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full" style="background-color: ${data.color}"></span>
-                            <span class="font-medium">${name} (x${data.count})</span>
+                            <span class="w-3 h-3 rounded-full" style="background-color: ${item.color}"></span>
+                            <div>
+                                <p class="font-medium text-gray-700">${item.name}</p>
+                                <p class="text-[10px] text-gray-400">${item.l} x ${item.w} x ${item.h} cm</p>
+                            </div>
                         </div>
-                        <span class="text-gray-500 text-xs">${data.l}x${data.w}x${data.h} cm</span>
+                        <button onclick="deleteItem(${item.id})" class="text-red-400 hover:text-red-600 px-2 transition"><i class="fa-solid fa-trash-can"></i></button>
                     </li>
                 `;
-            }
+            });
         }
 
-        function generateAllPlans() {
-            const cL = parseFloat(document.getElementById('contL').value);
-            const cW = parseFloat(document.getElementById('contW').value);
-            const cH = parseFloat(document.getElementById('contH').value);
+        // --- 3. GENERATE 3D & CALCULATIONS ---
+        function generate3D() {
+            // Ambil dimensi kontainer
+            const cL = parseFloat(document.getElementById('contL').value) || 590;
+            const cW = parseFloat(document.getElementById('contW').value) || 235;
+            const cH = parseFloat(document.getElementById('contH').value) || 239;
 
-            // --- 1. RENDER 2D TOP VIEW ---
-            const topCanvas = document.getElementById('topCanvas');
-            const ctxTop = topCanvas.getContext('2d');
-            topCanvas.width = cL * scale2D;
-            topCanvas.height = cW * scale2D;
-            ctxTop.clearRect(0, 0, topCanvas.width, topCanvas.height);
-
-            let curX_2D = 0, curY_2D = 0, rowMaxW_2D = 0;
-
-            // --- 2. RENDER 3D VIEW ---
             // Bersihkan objek 3D sebelumnya
             while(cargoGroup.children.length > 0){ 
                 cargoGroup.remove(cargoGroup.children[0]); 
             }
 
-            // Buat ulang kontainer kerangka 3D sesuai ukuran input
-            const scale3D = 0.1; // Skala perkecil agar pas di layar 3D
-            const boxGeo = new THREE.BoxGeometry(cL * scale3D, cH * scale3D, cW * scale3D);
+            // Skala agar 3D tidak terlalu besar di koordinat
+            const scale = 0.1; 
+            
+            // Buat kerangka Kontainer
+            const boxGeo = new THREE.BoxGeometry(cL * scale, cH * scale, cW * scale);
             const edges = new THREE.EdgesGeometry(boxGeo);
-            const wireframe = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x22c55e }));
-            wireframe.position.set(0, (cH * scale3D) / 2, 0);
+            const wireframe = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x94a3b8 })); // Warna silver
+            wireframe.position.set(0, (cH * scale) / 2, 0);
             cargoGroup.add(wireframe);
 
-            // Posisi awal penempatan di 3D (mulai dari pojok kiri-bawah-belakang kontainer)
-            let curX_3D = -(cL * scale3D) / 2;
-            let curY_3D = 0;
-            let curZ_3D = -(cW * scale3D) / 2;
-            let rowMaxH_3D = 0;
-            let rowMaxZ_3D = 0;
+            // Logika Penempatan (Mulai dari pojok belakang)
+            let curX = -(cL * scale) / 2;
+            let curY = 0;
+            let curZ = -(cW * scale) / 2;
+            let rowMaxH = 0;
+            let rowMaxZ = 0;
 
-            // --- LOOPING PENEMPATAN BARANG ---
+            let totalCargoVol = 0;
+
             items.forEach(item => {
                 let l = item.l, w = item.w, h = item.h;
 
-                // Auto-rotate jika tinggi barang melebihi kontainer
-                if (h > cH) {
-                    let temp = h; h = l; l = temp;
+                // Hitung Volume kargo (dalam meter kubik)
+                totalCargoVol += (l * w * h) / 1000000; 
+
+                // Auto-rotate (Tidurkan barang jika terlalu tinggi)
+                if (h > cH) { let temp = h; h = l; l = temp; }
+
+                const bL = l * scale, bW = w * scale, bH = h * scale;
+
+                // Stacking Logic
+                if (curX + bL > (cL * scale) / 2) {
+                    curX = -(cL * scale) / 2;
+                    curZ += rowMaxZ;
+                    rowMaxZ = 0;
+                }
+                if (curZ + bW > (cW * scale) / 2) {
+                    curZ = -(cW * scale) / 2;
+                    curY += rowMaxH;
+                    rowMaxH = 0;
+                    curX = -(cL * scale) / 2;
                 }
 
-                // A. Eksekusi 2D Top View
-                if (curX_2D + l > cL) {
-                    curX_2D = 0;
-                    curY_2D += rowMaxW_2D;
-                    rowMaxW_2D = 0;
-                }
-                if (curY_2D + w <= cW) {
-                    ctxTop.fillStyle = item.color;
-                    ctxTop.globalAlpha = 0.8;
-                    ctxTop.fillRect(curX_2D * scale2D, curY_2D * scale2D, l * scale2D, w * scale2D);
-                    ctxTop.strokeRect(curX_2D * scale2D, curY_2D * scale2D, l * scale2D, w * scale2D);
-                    rowMaxW_2D = Math.max(rowMaxW_2D, w);
-                    curX_2D += l;
-                }
-
-                // B. Eksekusi 3D View
-                const bL = l * scale3D;
-                const bH = h * scale3D;
-                const bW = w * scale3D;
-
-                if (curX_3D + bL > (cL * scale3D) / 2) {
-                    curX_3D = -(cL * scale3D) / 2;
-                    curZ_3D += rowMaxZ_3D;
-                    rowMaxZ_3D = 0;
-                }
-                if (curZ_3D + bW > (cW * scale3D) / 2) {
-                    curZ_3D = -(cW * scale3D) / 2;
-                    curY_3D += rowMaxH_3D;
-                    rowMaxH_3D = 0;
-                    curX_3D = -(cL * scale3D) / 2;
-                }
-
-                // Buat kotak 3D
+                // Render Mesh Kardus
                 const geo = new THREE.BoxGeometry(bL, bH, bW);
-                const mat = new THREE.MeshLambertMaterial({ color: item.color, transparent: true, opacity: 0.9 });
+                const mat = new THREE.MeshLambertMaterial({ color: item.color });
                 const mesh = new THREE.Mesh(geo, mat);
 
-                // Garis putih tepi kotak 3D
                 const boxEdges = new THREE.EdgesGeometry(geo);
-                const boxLine = new THREE.LineSegments(boxEdges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 }));
+                const boxLine = new THREE.LineSegments(boxEdges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 }));
                 mesh.add(boxLine);
 
-                // Set posisi di dalam kontainer 3D
-                mesh.position.set(
-                    curX_3D + (bL / 2),
-                    curY_3D + (bH / 2),
-                    curZ_3D + (bW / 2)
-                );
-
+                mesh.position.set(curX + (bL/2), curY + (bH/2), curZ + (bW/2));
                 cargoGroup.add(mesh);
 
-                rowMaxZ_3D = Math.max(rowMaxZ_3D, bW);
-                rowMaxH_3D = Math.max(rowMaxH_3D, bH);
-                curX_3D += bL;
+                // Update posisi
+                rowMaxZ = Math.max(rowMaxZ, bW);
+                rowMaxH = Math.max(rowMaxH, bH);
+                curX += bL;
             });
+
+            // Update Kalkulasi Dashboard
+            const totalContVol = (cL * cW * cH) / 1000000; // m3
+            const utilPercent = totalContVol > 0 ? ((totalCargoVol / totalContVol) * 100).toFixed(1) : 0;
+            
+            document.getElementById('contVolText').innerText = totalContVol.toFixed(2) + " m³";
+            document.getElementById('cargoVolText').innerText = totalCargoVol.toFixed(2) + " m³";
+            document.getElementById('utilizationText').innerText = utilPercent + "%";
+            document.getElementById('utilizationBar').style.width = Math.min(utilPercent, 100) + "%";
+            
+            // Ubah warna bar jika overcapacity
+            if(utilPercent > 100) {
+                document.getElementById('utilizationBar').classList.replace('bg-green-500', 'bg-red-500');
+            } else {
+                document.getElementById('utilizationBar').classList.replace('bg-red-500', 'bg-green-500');
+            }
         }
 
-        // --- ANIMATION LOOP THREE.JS ---
+        // --- 4. ANIMATION LOOP ---
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
@@ -295,12 +321,15 @@
         }
         animate();
 
-        // Responsive window
+        // Auto-resize canvas saat window berubah
         window.addEventListener('resize', () => {
             camera.aspect = container3D.clientWidth / container3D.clientHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(container3D.clientWidth, container3D.clientHeight);
         });
+
+        // Initialize pertama kali
+        generate3D();
     </script>
 </body>
 </html>
