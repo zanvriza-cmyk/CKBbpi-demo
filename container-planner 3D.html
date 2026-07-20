@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Load Planner (2D & 3D)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js & OrbitControls untuk 3D View -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+        .grid-bg {
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        #threeCanvasContainer { width: 100%; height: 400px; cursor: grab; }
+        #threeCanvasContainer:active { cursor: grabbing; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen p-6">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-truck-fast text-green-600 mr-2"></i>Container Load Planner (2D & 3D Integrated)</h1>
+                <p class="text-gray-500 text-sm mt-1">Multi-view cargo generator with automated stacking engine.</p>
+            </div>
+            <button onclick="window.print()" class="text-gray-500 hover:text-green-600 transition">
+                <i class="fa-solid fa-print text-xl"></i>
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Panel Kiri: Input Data -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-6">
+                
+                <!-- Container Settings -->
+                <div>
+                    <h2 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-box-open mr-2"></i>Container Dimensions (cm)</h2>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-500">Length (L)</label>
+                            <input type="number" id="contL" value="590" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500">Width (W)</label>
+                            <input type="number" id="contW" value="235" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500">Height (H)</label>
+                            <input type="number" id="contH" value="239" class="w-full p-2 border rounded text-sm focus:ring-green-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Item -->
+                <div>
+                    <h2 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-cube mr-2"></i>Add Cargo Item</h2>
+                    <div class="space-y-3">
+                        <input type="text" id="itemName" placeholder="Item Name (e.g. Pallet A)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="itemL" placeholder="L (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                            <input type="number" id="itemW" placeholder="W (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                            <input type="number" id="itemH" placeholder="H (cm)" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="itemQty" placeholder="Qty" value="1" class="w-full p-2 border rounded text-sm outline-none focus:border-green-500">
+                            <input type="color" id="itemColor" value="#16a34a" class="w-full h-[38px] p-1 border rounded cursor-pointer">
+                        </div>
+                        <button onclick="addItem()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition shadow">
+                            Add to Cargo List
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Item List -->
+                <div class="flex-grow overflow-auto max-h-40">
+                    <h2 class="font-bold text-gray-700 mb-2">Item List</h2>
+                    <ul id="itemList" class="text-sm space-y-2"></ul>
+                </div>
+                
+                <button onclick="generateAllPlans()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-lg shadow-md transition flex justify-center items-center gap-2 mt-4">
+                    <i class="fa-solid fa-calculator"></i> Generate Load Plan (2D & 3D)
+                </button>
+            </div>
+
+            <!-- Panel Kanan: Visualisasi 2D & 3D -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                
+                <!-- 3D Interactive View (Utama) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold text-gray-700"><i class="fa-solid fa-cube mr-2 text-green-600"></i>3D Interactive View</h2>
+                        <span class="text-xs text-gray-400">Putar dengan Klik Kiri + Geser | Zoom dengan Scroll</span>
+                    </div>
+                    <div id="threeCanvasContainer" class="border-2 border-gray-800 rounded bg-gray-900 overflow-hidden relative"></div>
+                </div>
+
+                <!-- Top View Canvas (2D) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h2 class="font-bold text-gray-700 mb-4"><i class="fa-solid fa-arrow-down-up-across-line mr-2"></i>Top-Down View (Floor Plan)</h2>
+                    <div class="overflow-auto border-2 border-gray-800 rounded bg-gray-100 relative grid-bg">
+                        <canvas id="topCanvas" width="600" height="250"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let items = [];
+        const scale2D = 1.0; 
+
+        // --- SETUP THREE.JS (3D ENGINE) ---
+        const container3D = document.getElementById('threeCanvasContainer');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x111827); // Gray-900
+
+        const camera = new THREE.PerspectiveCamera(45, container3D.clientWidth / container3D.clientHeight, 0.1, 1000);
+        camera.position.set(60, 40, 80);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container3D.clientWidth, container3D.clientHeight);
+        container3D.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Pencahayaan
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(30, 60, 30);
+        scene.add(dirLight);
+
+        let cargoGroup = new THREE.Group(); // Wadah untuk menampung objek kardus 3D
+        scene.add(cargoGroup);
+
+        function addItem() {
+            const name = document.getElementById('itemName').value || 'Item';
+            const l = parseFloat(document.getElementById('itemL').value);
+            const w = parseFloat(document.getElementById('itemW').value);
+            const h = parseFloat(document.getElementById('itemH').value);
+            const qty = parseInt(document.getElementById('itemQty').value) || 1;
+            const color = document.getElementById('itemColor').value;
+
+            if (!l || !w || !h) {
+                alert("Mohon masukkan dimensi (L, W, H) dengan benar!");
+                return;
+            }
+
+            for(let i=0; i<qty; i++) {
+                items.push({ id: Date.now() + i, name, l, w, h, color });
+            }
+            
+            updateItemList();
+            generateAllPlans(); // Otomatis generate saat item ditambah
+        }
+
+        function updateItemList() {
+            const list = document.getElementById('itemList');
+            list.innerHTML = '';
+            
+            const grouped = items.reduce((acc, curr) => {
+                if(!acc[curr.name]) acc[curr.name] = { count: 0, color: curr.color, l: curr.l, w: curr.w, h: curr.h };
+                acc[curr.name].count += 1;
+                return acc;
+            }, {});
+
+            for (const [name, data] of Object.entries(grouped)) {
+                list.innerHTML += `
+                    <li class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full" style="background-color: ${data.color}"></span>
+                            <span class="font-medium">${name} (x${data.count})</span>
+                        </div>
+                        <span class="text-gray-500 text-xs">${data.l}x${data.w}x${data.h} cm</span>
+                    </li>
+                `;
+            }
+        }
+
+        function generateAllPlans() {
+            const cL = parseFloat(document.getElementById('contL').value);
+            const cW = parseFloat(document.getElementById('contW').value);
+            const cH = parseFloat(document.getElementById('contH').value);
+
+            // --- 1. RENDER 2D TOP VIEW ---
+            const topCanvas = document.getElementById('topCanvas');
+            const ctxTop = topCanvas.getContext('2d');
+            topCanvas.width = cL * scale2D;
+            topCanvas.height = cW * scale2D;
+            ctxTop.clearRect(0, 0, topCanvas.width, topCanvas.height);
+
+            let curX_2D = 0, curY_2D = 0, rowMaxW_2D = 0;
+
+            // --- 2. RENDER 3D VIEW ---
+            // Bersihkan objek 3D sebelumnya
+            while(cargoGroup.children.length > 0){ 
+                cargoGroup.remove(cargoGroup.children[0]); 
+            }
+
+            // Buat ulang kontainer kerangka 3D sesuai ukuran input
+            const scale3D = 0.1; // Skala perkecil agar pas di layar 3D
+            const boxGeo = new THREE.BoxGeometry(cL * scale3D, cH * scale3D, cW * scale3D);
+            const edges = new THREE.EdgesGeometry(boxGeo);
+            const wireframe = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x22c55e }));
+            wireframe.position.set(0, (cH * scale3D) / 2, 0);
+            cargoGroup.add(wireframe);
+
+            // Posisi awal penempatan di 3D (mulai dari pojok kiri-bawah-belakang kontainer)
+            let curX_3D = -(cL * scale3D) / 2;
+            let curY_3D = 0;
+            let curZ_3D = -(cW * scale3D) / 2;
+            let rowMaxH_3D = 0;
+            let rowMaxZ_3D = 0;
+
+            // --- LOOPING PENEMPATAN BARANG ---
+            items.forEach(item => {
+                let l = item.l, w = item.w, h = item.h;
+
+                // Auto-rotate jika tinggi barang melebihi kontainer
+                if (h > cH) {
+                    let temp = h; h = l; l = temp;
+                }
+
+                // A. Eksekusi 2D Top View
+                if (curX_2D + l > cL) {
+                    curX_2D = 0;
+                    curY_2D += rowMaxW_2D;
+                    rowMaxW_2D = 0;
+                }
+                if (curY_2D + w <= cW) {
+                    ctxTop.fillStyle = item.color;
+                    ctxTop.globalAlpha = 0.8;
+                    ctxTop.fillRect(curX_2D * scale2D, curY_2D * scale2D, l * scale2D, w * scale2D);
+                    ctxTop.strokeRect(curX_2D * scale2D, curY_2D * scale2D, l * scale2D, w * scale2D);
+                    rowMaxW_2D = Math.max(rowMaxW_2D, w);
+                    curX_2D += l;
+                }
+
+                // B. Eksekusi 3D View
+                const bL = l * scale3D;
+                const bH = h * scale3D;
+                const bW = w * scale3D;
+
+                if (curX_3D + bL > (cL * scale3D) / 2) {
+                    curX_3D = -(cL * scale3D) / 2;
+                    curZ_3D += rowMaxZ_3D;
+                    rowMaxZ_3D = 0;
+                }
+                if (curZ_3D + bW > (cW * scale3D) / 2) {
+                    curZ_3D = -(cW * scale3D) / 2;
+                    curY_3D += rowMaxH_3D;
+                    rowMaxH_3D = 0;
+                    curX_3D = -(cL * scale3D) / 2;
+                }
+
+                // Buat kotak 3D
+                const geo = new THREE.BoxGeometry(bL, bH, bW);
+                const mat = new THREE.MeshLambertMaterial({ color: item.color, transparent: true, opacity: 0.9 });
+                const mesh = new THREE.Mesh(geo, mat);
+
+                // Garis putih tepi kotak 3D
+                const boxEdges = new THREE.EdgesGeometry(geo);
+                const boxLine = new THREE.LineSegments(boxEdges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 }));
+                mesh.add(boxLine);
+
+                // Set posisi di dalam kontainer 3D
+                mesh.position.set(
+                    curX_3D + (bL / 2),
+                    curY_3D + (bH / 2),
+                    curZ_3D + (bW / 2)
+                );
+
+                cargoGroup.add(mesh);
+
+                rowMaxZ_3D = Math.max(rowMaxZ_3D, bW);
+                rowMaxH_3D = Math.max(rowMaxH_3D, bH);
+                curX_3D += bL;
+            });
+        }
+
+        // --- ANIMATION LOOP THREE.JS ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive window
+        window.addEventListener('resize', () => {
+            camera.aspect = container3D.clientWidth / container3D.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container3D.clientWidth, container3D.clientHeight);
+        });
+    </script>
+</body>
+</html>
