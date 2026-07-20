@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPI WMS Digital Twin - FEFO Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #f3f4f6; }
+        #canvas-container { width: 100%; height: 100%; cursor: crosshair; }
+        #canvas-container:active { cursor: grabbing; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-sans flex h-screen">
+
+    <!-- PANEL KIRI: Dashboard UI -->
+    <div class="w-full md:w-[350px] bg-white shadow-2xl flex flex-col h-full z-10 border-r border-gray-200 absolute md:relative">
+        
+        <div class="p-5 border-b border-gray-200 bg-emerald-700 text-white">
+            <h1 class="text-xl font-bold"><i class="fa-solid fa-boxes-stacked mr-2"></i>BPI Twin <span class="text-xs bg-emerald-500 px-2 py-1 rounded ml-1">FEFO</span></h1>
+            <p class="text-xs text-emerald-100 mt-1">Smart Racking & Expiry Tracker</p>
+        </div>
+
+        <div class="p-4 flex-grow overflow-y-auto">
+            
+            <!-- Global Action Buttons -->
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <button onclick="toggleFefoView()" id="btnFefo" class="bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 font-bold py-2 px-3 rounded text-xs transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-fire"></i> FEFO Heatmap
+                </button>
+                <button onclick="deployNewRack()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 font-bold py-2 px-3 rounded text-xs transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Deploy Rack
+                </button>
+            </div>
+
+            <!-- Pesan Instruksi -->
+            <div id="instructionPanel" class="text-center py-6">
+                <i class="fa-solid fa-hand-pointer text-4xl text-emerald-300 mb-3 animate-bounce"></i>
+                <p class="text-gray-500 text-sm font-medium">Klik kargo di rak untuk melihat detail FEFO & Kapasitas.</p>
+            </div>
+
+            <!-- Detail & Edit Panel -->
+            <div id="binInfoPanel" class="hidden opacity-0 transition-opacity duration-300 space-y-4">
+                
+                <div class="flex justify-between items-start border-b pb-3">
+                    <div>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wide">Location ID</p>
+                        <p id="infoId" class="text-2xl font-bold text-emerald-700 font-mono">A1-00</p>
+                        <p id="infoZone" class="text-xs font-semibold text-amber-600 mt-1"><i class="fa-solid fa-tag mr-1"></i>Replenishment Zone</p>
+                    </div>
+                </div>
+
+                <!-- Form Edit Data -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs font-bold text-gray-600 uppercase">Item SKU</label>
+                        <input type="text" id="editSku" class="w-full p-2 border rounded-md text-sm font-semibold text-gray-800 outline-none focus:border-emerald-500">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs font-bold text-gray-600 uppercase">Batch No.</label>
+                            <input type="text" id="editBatch" class="w-full p-2 border rounded-md text-sm font-semibold text-gray-800 outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-600 uppercase">Expiry Date</label>
+                            <input type="date" id="editExp" class="w-full p-2 border rounded-md text-sm font-semibold text-gray-800 outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs font-bold text-gray-600 uppercase">Cap (%)</label>
+                            <input type="number" id="editCap" min="0" max="100" class="w-full p-2 border rounded-md text-sm font-semibold text-gray-800 outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-600 uppercase">Mark Status</label>
+                            <select id="editStatus" class="w-full p-2 border rounded-md text-sm font-semibold text-gray-800 outline-none focus:border-emerald-500">
+                                <option value="empty">Empty (Abu)</option>
+                                <option value="available">Avail (Hijau)</option>
+                                <option value="replenish">Replenish (Kuning)</option>
+                                <option value="full">Full (Merah)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="saveBinData()" class="w-full mt-2 bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 rounded-lg transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Update Data & 3D
+                    </button>
+                    <p id="saveSuccess" class="text-xs text-emerald-600 text-center hidden font-bold mt-1">Data updated successfully!</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PANEL KANAN: 3D Visualization -->
+    <div class="flex-grow h-full relative bg-gray-900" id="canvas-container">
+        <!-- Floating Label -->
+        <div id="floatingLabel" class="absolute hidden pointer-events-none transform -translate-x-1/2 -translate-y-full pb-2 z-20 transition-all duration-75">
+            <div class="bg-black/80 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-1 rounded shadow-lg border border-gray-600 flex flex-col items-center">
+                <span id="floatId" class="font-bold text-emerald-400">A1-00</span>
+                <span id="floatSku" class="text-gray-300">SKU</span>
+                <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-black/80"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SETUP 3D ENGINE ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1e293b);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(20, 40, 80);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.05; 
+
+        // --- 2. PENCAHAYAAN ---
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(20, 50, 30);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // --- 3. LANTAI GUDANG ---
+        const floorGeo = new THREE.PlaneGeometry(300, 300);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+        
+        const gridHelper = new THREE.GridHelper(300, 150, 0x475569, 0x1e293b);
+        gridHelper.position.y = 0.1;
+        scene.add(gridHelper);
+
+        // --- 4. SISTEM RAK & KARGO ---
+        const clickableBins = []; 
+        let currentRackCount = 0; // Penghitung jumlah lorong
+        let isFefoMode = false;
+        
+        // Warna Garis Tepi (Status)
+        const edgeColors = {
+            'empty': 0x64748b,      // Abu-abu
+            'available': 0x10b981,  // Hijau
+            'replenish': 0xf59e0b,  // Kuning
+            'full': 0xef4444        // Merah
+        };
+        const kraftColor = 0xa67c52; // Warna Coklat Kardus Seragam
+
+        const binW = 4, binH = 3, binD = 4;
+        const gapX = 0.5, gapY = 0.8; 
+        const cols = 8, levels = 4;
+
+        function createRackFrame(startX, startZ) {
+            const frameGroup = new THREE.Group();
+            const matMetal = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.6, roughness: 0.4 });
+            
+            const totalWidth = (cols * binW) + ((cols - 1) * gapX);
+            const totalHeight = (levels * binH) + ((levels) * gapY);
+            
+            for(let i=0; i<=cols; i++) {
+                const px = startX - (binW/2) + (i * (binW + gapX)) - (gapX/2);
+                const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.2, totalHeight, binD), matMetal);
+                pillar.position.set(px, totalHeight/2, startZ);
+                pillar.castShadow = true;
+                frameGroup.add(pillar);
+            }
+            
+            for(let l=0; l<levels; l++) {
+                const py = (l * (binH + gapY)) + 0.4;
+                const shelf = new THREE.Mesh(new THREE.BoxGeometry(totalWidth + gapX, 0.2, binD), matMetal);
+                shelf.position.set(startX + (totalWidth/2) - (binW/2), py, startZ);
+                shelf.castShadow = true; shelf.receiveShadow = true;
+                frameGroup.add(shelf);
+            }
+            scene.add(frameGroup);
+        }
+
+        // Generator Tanggal Expired Acak
+        function getRandomExpDate() {
+            const today = new Date();
+            const randomDays = Math.floor(Math.random() * 120) - 10; // -10 sampai 110 hari ke depan
+            today.setDate(today.getDate() + randomDays);
+            return today.toISOString().split('T')[0];
+        }
+
+        function populateCargo(startX, startZ, rackName) {
+            for (let c = 0; c < cols; c++) {
+                for (let l = 0; l < levels; l++) {
+                    const zone = (l === 0) ? 'Replenishment Zone' : 'Putaway Zone';
+                    
+                    const statKeys = Object.keys(edgeColors);
+                    const initStatus = statKeys[Math.floor(Math.random() * statKeys.length)];
+                    const isEmpty = initStatus === 'empty';
+                    
+                    const initSku = isEmpty ? '-' : `SKU-${Math.floor(Math.random()*9000)+1000}`;
+                    const expDate = isEmpty ? '' : getRandomExpDate();
+
+                    // BOX UTAMA (Selalu Coklat Kraft)
+                    const geo = new THREE.BoxGeometry(binW, binH, binD - 0.5);
+                    const mat = new THREE.MeshStandardMaterial({ 
+                        color: kraftColor,
+                        transparent: true,
+                        opacity: isEmpty ? 0.3 : 1 // Kardus kosong dibuat agak transparan dari awal
+                    });
+                    const bin = new THREE.Mesh(geo, mat);
+                    
+                    // GARIS NEON (Warna Status)
+                    const edges = new THREE.EdgesGeometry(geo);
+                    const lineMat = new THREE.LineBasicMaterial({ 
+                        color: edgeColors[initStatus], 
+                        linewidth: 2 
+                    });
+                    const line = new THREE.LineSegments(edges, lineMat);
+                    line.name = "statusEdge"; // Diberi nama agar mudah diakses saat edit
+                    bin.add(line);
+
+                    const posX = startX + (c * (binW + gapX));
+                    const posY = (binH / 2) + (l * (binH + gapY)) + 0.5;
+                    const posZ = startZ;
+                    
+                    bin.position.set(posX, posY, posZ);
+                    bin.castShadow = true;
+
+                    bin.userData = {
+                        id: `Rack ${rackName}-${(c+1).toString().padStart(2, '0')}-L${l+1}`,
+                        zone: zone,
+                        sku: initSku,
+                        batch: isEmpty ? '-' : `BTH-${Math.floor(Math.random()*999)}`,
+                        expDate: expDate,
+                        capacity: isEmpty ? 0 : Math.floor(Math.random() * 100),
+                        status: initStatus
+                    };
+
+                    scene.add(bin);
+                    clickableBins.push(bin);
+                }
+            }
+        }
+
+        // --- 5. LOGIKA TOMBOL "DEPLOY RACK" ---
+        function deployNewRack() {
+            const startX = -20;
+            // Hitung Z baru (Spasi antar lorong adalah 10)
+            const startZ = -5 + (currentRackCount * 12); 
+            const rackName = String.fromCharCode(65 + currentRackCount); // A, B, C, D...
+            
+            createRackFrame(startX, startZ);
+            populateCargo(startX, startZ, rackName);
+            
+            currentRackCount++;
+        }
+
+        // Generate 2 Lorong Awal (Rak A dan Rak B)
+        deployNewRack(); 
+        deployNewRack();
+
+
+        // --- 6. LOGIKA FEFO HEATMAP ---
+        function toggleFefoView() {
+            isFefoMode = !isFefoMode;
+            const btn = document.getElementById('btnFefo');
+            
+            if (isFefoMode) {
+                btn.classList.replace('bg-amber-100', 'bg-red-600');
+                btn.classList.replace('text-amber-800', 'text-white');
+                btn.innerHTML = `<i class="fa-solid fa-fire"></i> FEFO: ON`;
+                
+                const today = new Date();
+                
+                clickableBins.forEach(bin => {
+                    if(bin.userData.status === 'empty') {
+                        bin.material.opacity = 0.05; // Hampir hilang
+                        bin.getObjectByName("statusEdge").material.opacity = 0.1;
+                        return;
+                    }
+
+                    const exp = new Date(bin.userData.expDate);
+                    const diffTime = exp - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+                    if (diffDays < 30 && diffDays >= 0) {
+                        // Kritis (Mendekati Expired) -> Nyala Merah
+                        bin.material.color.setHex(0xef4444);
+                        bin.material.opacity = 1;
+                        bin.getObjectByName("statusEdge").material.color.setHex(0xffffff);
+                    } else if (diffDays < 0) {
+                        // Sudah Expired -> Hitam
+                        bin.material.color.setHex(0x000000);
+                        bin.material.opacity = 1;
+                    } else {
+                        // Aman -> Transparan
+                        bin.material.color.setHex(kraftColor);
+                        bin.material.opacity = 0.15;
+                        bin.getObjectByName("statusEdge").material.opacity = 0.2;
+                    }
+                });
+
+            } else {
+                // Kembalikan ke Mode Normal
+                btn.classList.replace('bg-red-600', 'bg-amber-100');
+                btn.classList.replace('text-white', 'text-amber-800');
+                btn.innerHTML = `<i class="fa-solid fa-fire"></i> FEFO Heatmap`;
+                
+                clickableBins.forEach(bin => {
+                    bin.material.color.setHex(kraftColor);
+                    bin.material.opacity = bin.userData.status === 'empty' ? 0.3 : 1;
+                    
+                    const edge = bin.getObjectByName("statusEdge");
+                    edge.material.color.setHex(edgeColors[bin.userData.status]);
+                    edge.material.opacity = 1;
+                });
+            }
+        }
+
+
+        // --- 7. INTERAKSI & EDIT LOGIC ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let selectedBin = null;
+
+        function onMouseClick(event) {
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(clickableBins);
+
+            if (intersects.length > 0) {
+                if (selectedBin) selectedBin.material.emissive.setHex(0x000000);
+                
+                selectedBin = intersects[0].object;
+                selectedBin.material.emissive.setHex(0x444444); // Glow
+
+                const data = selectedBin.userData;
+                
+                document.getElementById('instructionPanel').classList.add('hidden');
+                const panel = document.getElementById('binInfoPanel');
+                panel.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('opacity-0'), 50);
+
+                document.getElementById('infoId').innerText = data.id;
+                const zoneEl = document.getElementById('infoZone');
+                zoneEl.innerHTML = `<i class="fa-solid fa-tag mr-1"></i>${data.zone}`;
+                zoneEl.className = data.zone === 'Replenishment Zone' ? "text-xs font-semibold text-amber-600 mt-1" : "text-xs font-semibold text-blue-600 mt-1";
+
+                // Populate Form
+                document.getElementById('editSku').value = data.sku;
+                document.getElementById('editBatch').value = data.batch;
+                document.getElementById('editExp').value = data.expDate;
+                document.getElementById('editCap').value = data.capacity;
+                document.getElementById('editStatus').value = data.status;
+                
+                document.getElementById('saveSuccess').classList.add('hidden');
+            }
+        }
+        window.addEventListener('click', onMouseClick);
+
+        function saveBinData() {
+            if(!selectedBin) return;
+
+            // Simpan ke metadata
+            selectedBin.userData.sku = document.getElementById('editSku').value;
+            selectedBin.userData.batch = document.getElementById('editBatch').value;
+            selectedBin.userData.expDate = document.getElementById('editExp').value;
+            selectedBin.userData.capacity = parseInt(document.getElementById('editCap').value);
+            const newStatus = document.getElementById('editStatus').value;
+            selectedBin.userData.status = newStatus;
+
+            // Update Tampilan (Opasitas & Warna Garis)
+            selectedBin.material.opacity = newStatus === 'empty' ? 0.3 : 1;
+            const edge = selectedBin.getObjectByName("statusEdge");
+            edge.material.color.setHex(edgeColors[newStatus]);
+
+            // Jika FEFO mode menyala, paksa reset ke normal dulu biar warnanya sinkron
+            if(isFefoMode) toggleFefoView(); 
+
+            const notif = document.getElementById('saveSuccess');
+            notif.classList.remove('hidden');
+            setTimeout(() => notif.classList.add('hidden'), 2000);
+        }
+
+        // --- 8. FLOATING TEXT ---
+        const floatUI = document.getElementById('floatingLabel');
+        const floatId = document.getElementById('floatId');
+        const floatSku = document.getElementById('floatSku');
+
+        function updateFloatingLabel() {
+            if(selectedBin && !isFefoMode) { // Sembunyikan label kalau mode FEFO aktif
+                const vector = new THREE.Vector3();
+                selectedBin.getWorldPosition(vector);
+                vector.y += (binH / 2) + 1; 
+                vector.project(camera);
+
+                const x = (vector.x * .5 + .5) * container.clientWidth;
+                const y = (vector.y * -.5 + .5) * container.clientHeight;
+
+                floatUI.style.left = `${x}px`;
+                floatUI.style.top = `${y}px`;
+                floatId.innerText = selectedBin.userData.id;
+                floatSku.innerText = selectedBin.userData.sku;
+                floatUI.classList.remove('hidden');
+            } else {
+                floatUI.classList.add('hidden');
+            }
+        }
+
+        // --- 9. ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            updateFloatingLabel(); 
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+</body>
+</html>
