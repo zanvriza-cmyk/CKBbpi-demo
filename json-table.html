@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Data Converter - BPI OPS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Corporate Typography: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Professional Iconography -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ExcelJS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        
+        /* High Density Corporate Table Styling */
+        .corporate-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .corporate-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e1;
+            text-align: left;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .corporate-table td {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid #cbd5e1;
+            font-size: 0.8125rem;
+            color: #334155;
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .corporate-table tbody tr:hover td {
+            background-color: #f1f5f9;
+        }
+        
+        /* Custom Scrollbar for Dense Data */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar (Corporate Standard) -->
+    <header class="w-full bg-slate-900 text-white shadow-sm z-20">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="font-bold text-sm tracking-wide flex items-center gap-3">
+                <i class="fa-solid fa-server text-emerald-500"></i>
+                BPI OPS <span class="font-normal text-slate-400">|</span> JSON Data Converter
+            </div>
+            <div class="text-xs font-semibold bg-slate-800 border border-slate-700 px-3 py-1 rounded-md uppercase tracking-wider text-slate-300">
+                Utility Tools
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-7xl mx-auto px-4 py-6 flex-grow flex flex-col gap-4">
+        
+        <!-- Input Section -->
+        <div class="bg-white border border-slate-200 rounded-md shadow-sm p-4 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                    <i class="fa-solid fa-code text-slate-500"></i> Raw JSON Input
+                </h2>
+                <div class="flex gap-2">
+                    <button onclick="formatJSON()" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-md transition-colors">
+                        <i class="fa-solid fa-align-left mr-1"></i> Format
+                    </button>
+                    <button onclick="clearInput()" class="px-3 py-1.5 text-xs font-medium bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-md transition-colors">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Clear
+                    </button>
+                </div>
+            </div>
+            
+            <textarea id="jsonInput" rows="8" class="w-full p-3 text-sm font-mono bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-y mb-4 placeholder-slate-400" placeholder='Paste your JSON array or object here...&#10;[&#10;  { "id": 1, "sku": "ITM-001", "qty": 50 },&#10;  { "id": 2, "sku": "ITM-002", "qty": 120 }&#10;]'></textarea>
+            
+            <button onclick="generateTable()" class="w-full sm:w-auto self-end px-5 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition-colors shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-table"></i> Generate Table View
+            </button>
+            
+            <!-- Alert Box -->
+            <div id="alertBox" class="hidden mt-3 p-3 text-sm rounded-md flex items-center gap-2 font-medium">
+                <i class="fa-solid fa-circle-info"></i>
+                <span id="alertMessage"></span>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="bg-white border border-slate-200 rounded-md shadow-sm p-4 flex flex-col flex-grow min-h-[300px]">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-slate-500"></i> Data Preview
+                    </h2>
+                    <span id="rowCount" class="hidden text-xs font-semibold bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-md"></span>
+                </div>
+                
+                <button id="exportBtn" onclick="exportToExcel()" class="hidden px-4 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white rounded-md transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-file-excel text-emerald-400"></i> Export to Excel
+                </button>
+            </div>
+            
+            <div class="border border-slate-300 rounded-sm overflow-x-auto overflow-y-auto max-h-[500px] flex-grow bg-slate-50 relative" id="tableContainer">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-table-cells text-3xl mb-2 opacity-50"></i>
+                    <p class="text-xs font-medium uppercase tracking-wide">No data generated yet</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentData = [];
+
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            
+            alertBox.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'border-red-200', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+            alertBox.classList.add('border');
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-50', 'text-red-700', 'border-red-200');
+                alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>${message}</span>`;
+            } else {
+                alertBox.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+            }
+            
+            setTimeout(() => {
+                alertBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        function clearInput() {
+            document.getElementById('jsonInput').value = '';
+            currentData = [];
+            resetTable();
+        }
+
+        function formatJSON() {
+            const inputEl = document.getElementById('jsonInput');
+            const raw = inputEl.value.trim();
+            if (!raw) return;
+            
+            try {
+                const parsed = JSON.parse(raw);
+                inputEl.value = JSON.stringify(parsed, null, 4);
+            } catch (e) {
+                showAlert('Invalid JSON format. Cannot beautify.');
+            }
+        }
+
+        function resetTable() {
+            const container = document.getElementById('tableContainer');
+            document.getElementById('exportBtn').classList.add('hidden');
+            document.getElementById('rowCount').classList.add('hidden');
+            
+            container.innerHTML = `
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-table-cells text-3xl mb-2 opacity-50"></i>
+                    <p class="text-xs font-medium uppercase tracking-wide">No data generated yet</p>
+                </div>
+            `;
+        }
+
+       function generateTable() {
+            const raw = document.getElementById('jsonInput').value.trim();
+            if (!raw) {
+                showAlert('Please input JSON data first.');
+                return;
+            }
+
+            try {
+                let parsed = JSON.parse(raw);
+                
+                // --- SMART API UNWRAPPER ---
+                // Deteksi apakah JSON dibungkus (envelope) seperti {"status": "success", "data": [...]}
+                if (!Array.isArray(parsed) && typeof parsed === 'object' && parsed !== null) {
+                    
+                    // Cari semua property yang isinya Array
+                    let arrayKeys = Object.keys(parsed).filter(k => Array.isArray(parsed[k]));
+                    
+                    // Prioritaskan key standar API ('data', 'items', 'results')
+                    if (parsed.data && Array.isArray(parsed.data)) {
+                        parsed = parsed.data;
+                    } else if (parsed.items && Array.isArray(parsed.items)) {
+                        parsed = parsed.items;
+                    } else if (parsed.results && Array.isArray(parsed.results)) {
+                        parsed = parsed.results;
+                    } else if (arrayKeys.length === 1) {
+                        // Kalau cuma ada 1 array di dalam object, ambil itu sebagai data utama
+                        parsed = parsed[arrayKeys[0]];
+                    } else {
+                        // Fallback jika tidak ada array (jadikan 1 baris)
+                        parsed = [parsed]; 
+                    }
+                }
+                // -----------------------------
+                
+                // Normalisasi akhir, pastikan formatnya Array
+                if (!Array.isArray(parsed)) {
+                    parsed = [parsed];
+                }
+                
+                if (parsed.length === 0) {
+                    showAlert('JSON Array is empty.', 'error');
+                    return;
+                }
+
+                // Ratakan (flatten) object ke dalam 1 level untuk tabel
+                currentData = parsed.map(flattenObject);
+                renderTable();
+                
+            } catch (e) {
+                showAlert(`Parsing Error: ${e.message}`);
+            }
+        }
+
+        // Helper to stringify nested objects/arrays for flat table display
+        function flattenObject(obj) {
+            const flattened = {};
+            for (let key in obj) {
+                if (obj[key] !== null && typeof obj[key] === 'object') {
+                    flattened[key] = JSON.stringify(obj[key]);
+                } else {
+                    flattened[key] = obj[key];
+                }
+            }
+            return flattened;
+        }
+
+        function renderTable() {
+            const container = document.getElementById('tableContainer');
+            
+            // Extract all unique headers
+            let headers = [];
+            currentData.forEach(row => {
+                Object.keys(row).forEach(key => {
+                    if (!headers.includes(key)) headers.push(key);
+                });
+            });
+
+            // Build HTML
+            let html = '<table class="corporate-table"><thead><tr>';
+            
+            // Auto-width for row numbers
+            html += `<th style="width: 50px; text-align: center;">#</th>`;
+            
+            headers.forEach(h => {
+                html += `<th>${h}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            currentData.forEach((row, index) => {
+                html += `<tr>`;
+                html += `<td style="text-align: center; color: #64748b; font-family: monospace;">${index + 1}</td>`;
+                
+                headers.forEach(h => {
+                    let val = row[h];
+                    if (val === undefined || val === null) val = '';
+                    
+                    // Escape HTML to prevent XSS
+                    const safeVal = String(val).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    html += `<td title="${safeVal}">${safeVal}</td>`;
+                });
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+
+            // Show UI Elements
+            document.getElementById('exportBtn').classList.remove('hidden');
+            
+            const countBadge = document.getElementById('rowCount');
+            countBadge.innerText = `${currentData.length} Rows`;
+            countBadge.classList.remove('hidden');
+        }
+
+        async function exportToExcel() {
+            if (!currentData || currentData.length === 0) return;
+
+            try {
+                const wb = new ExcelJS.Workbook();
+                wb.creator = "BPI OPS";
+                const ws = wb.addWorksheet('Data Export');
+
+                // Generate Columns
+                let headers = [];
+                currentData.forEach(row => {
+                    Object.keys(row).forEach(key => {
+                        if (!headers.includes(key)) headers.push(key);
+                    });
+                });
+
+                ws.columns = headers.map(h => ({
+                    header: h.toUpperCase(),
+                    key: h,
+                    width: 25 // Default corporate width
+                }));
+
+                // Add Data
+                ws.addRows(currentData);
+
+                // Styling Headers
+                ws.getRow(1).font = { bold: true, color: { argb: 'FF334155' } };
+                ws.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
+                ws.getRow(1).border = {
+                    bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+                };
+
+                // Add cell borders for all data
+                ws.eachRow((row, rowNumber) => {
+                    row.eachCell((cell) => {
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                            left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                            bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                            right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+                        };
+                        // Top align for text wrapping if needed
+                        cell.alignment = { vertical: 'top', wrapText: false };
+                    });
+                });
+
+                // Generate Download
+                const buffer = await wb.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '').slice(0, 15);
+                a.download = `Data_Export_${timestamp}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                showAlert('Data successfully exported to Excel.', 'success');
+
+            } catch (error) {
+                showAlert(`Export Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
