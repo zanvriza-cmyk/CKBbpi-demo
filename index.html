@@ -3,275 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Uang Jalan - CKB Logistics</title>
+    <title>Hub Portal - BPI OPS</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    
+    <!-- Tailwind CSS (Untuk styling modern & responsif) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome (Untuk icon tambahan di widget & search) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
+                        // Custom CKB Green
                         ckb: {
-                            ink: '#14251B',
-                            dark: '#183528',
-                            main: '#22543D',
-                            mid: '#2F6B4F',
-                            pale: '#F3F7F4',
-                            border: '#C7D6CC',
-                            muted: '#52665B'
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857', // Dominan Hijau CKB
+                            800: '#065f46',
+                            900: '#064e3b',
                         }
-                    },
-                    fontFamily: { sans: ['Inter', 'Segoe UI', 'Arial', 'sans-serif'] }
+                    }
                 }
             }
         }
     </script>
-    <style>
-        * { box-sizing: border-box; }
-        body { letter-spacing: -0.01em; }
-        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 2px; }
-        .menu-btn { border-radius: 6px; }
-        .module-card { border-radius: 8px; transition: border-color .15s ease, background .15s ease; }
-        .module-card:hover { border-color: #22543D; background: #F8FAF9; }
-        .flat-icon { width: 36px; height: 36px; border: 1px solid #C7D6CC; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#22543D; background:#F3F7F4; }
-        iframe { color-scheme: light; }
 
-        /* Clara password gate - lightweight protection for GitHub Pages prototype */
-        body.locked > aside,
-        body.locked > div.flex-1 { display: none !important; }
-        #authGate { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #F5F7F6 0%, #FFFFFF 55%, #F3F7F4 100%); }
-        #authGate.hidden { display: none !important; }
-        .auth-card { width: min(420px, calc(100vw - 32px)); background: #fff; border: 1px solid #E1E8E3; border-radius: 14px; box-shadow: 0 18px 42px rgba(20,37,27,.12); overflow: hidden; }
-        .auth-head { padding: 22px 24px 18px; border-bottom: 1px solid #E1E8E3; display: flex; align-items: center; gap: 12px; background: #F8FAF9; }
-        .auth-logo { width: 40px; height: 40px; border-radius: 8px; background: #22543D; color: #fff; display: flex; align-items: center; justify-content: center; }
-        .auth-title { font-weight: 800; color: #14251B; line-height: 1.15; }
-        .auth-subtitle { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #66766C; font-weight: 800; margin-top: 2px; }
-        .auth-body { padding: 22px 24px 24px; }
-        .auth-label { display: block; font-size: 12px; font-weight: 800; color: #33483B; margin-bottom: 8px; }
-        .auth-input { width: 100%; height: 42px; border: 1px solid #C7D6CC; border-radius: 8px; padding: 0 12px; outline: none; font-size: 14px; color: #14251B; background: #fff; }
-        .auth-input:focus { border-color: #22543D; box-shadow: 0 0 0 3px rgba(34,84,61,.12); }
-        .auth-btn { width: 100%; height: 42px; margin-top: 12px; border: 0; border-radius: 8px; background: #22543D; color: #fff; font-weight: 800; cursor: pointer; }
-        .auth-btn:hover { background: #183528; }
-        .auth-error { min-height: 18px; margin-top: 10px; font-size: 12px; color: #B42318; font-weight: 700; }
-        .auth-note { margin-top: 14px; font-size: 11px; color: #66766C; line-height: 1.55; }
+    <style>
+        body { background-color: #f3f4f6; } /* Light gray background */
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #047857; }
+        
+        /* Smooth rendering untuk list */
+        .link-card { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="locked bg-[#F5F7F6] text-slate-800 h-screen flex overflow-hidden font-sans">
+<body class="font-sans text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Password Gate - lightweight prototype access control -->
-    <div id="authGate" aria-label="Password gate">
-        <div class="auth-card">
-            <div class="auth-head">
-                <div class="auth-logo"><i class="fa-solid fa-anchor text-sm"></i></div>
+    <!-- HEADER / HERO SECTION -->
+    <div class="relative w-full h-64 bg-cover bg-center shadow-md" style="background-image: url('https://www.ckb.co.id/site/uploads/slideshow/686377dc4c1db-5a65b640ab4c2-logistic-img4-1.jpg');">
+        <!-- Overlay Hijau Transparan -->
+        <div class="absolute inset-0 bg-ckb-900/70 backdrop-blur-sm"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-white p-3 rounded-2xl shadow-lg text-4xl">🚀</div>
                 <div>
-                    <div class="auth-title">Sistem Uang Jalan</div>
-                    <div class="auth-subtitle">CKB Logistics Access</div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Portal Hub <span class="text-ckb-500 font-light">| BPI OPS</span></h1>
+                    <p class="text-ckb-100 text-sm md:text-base mt-1 font-medium">Made with love by zanov.</p>
                 </div>
-            </div>
-            <div class="auth-body">
-                <label class="auth-label" for="authPassword">Password</label>
-                <input id="authPassword" class="auth-input" type="password" placeholder="Masukkan password..." autocomplete="current-password">
-                <button class="auth-btn" type="button" onclick="unlockSUJPortal()">Masuk</button>
-                <div id="authError" class="auth-error"></div>
-                <div class="auth-note">This page is protected for prototype preview. Please contact the project owner if access is required.</div>
             </div>
         </div>
     </div>
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-ckb-ink text-slate-300 flex flex-col flex-shrink-0 border-r border-black/20">
-        <div class="h-16 flex items-center px-5 border-b border-white/10 bg-[#102018] shrink-0">
-            <div class="w-8 h-8 rounded-md bg-ckb-main flex items-center justify-center text-white mr-3">
-                <i class="fa-solid fa-anchor text-sm"></i>
-            </div>
-            <div>
-                <div class="text-white font800 font-bold text-sm leading-tight">Sistem Uang Jalan</div>
-                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-[.16em]">CKB Logistics</div>
-            </div>
-        </div>
-        <nav class="flex-1 overflow-y-auto sidebar-scroll py-5 px-3">
-            <div class="px-3 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-[.16em]">Main</div>
-            <button id="btnOverview" onclick="loadApp('welcome','Overview Sistem Uang Jalan',this)" class="menu-btn menu-active w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-white bg-ckb-main mb-1">
-                <i class="fa-solid fa-chart-line w-5 text-center"></i><span>Dashboard</span>
-            </button>
-            <div class="px-3 mt-5 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-[.16em]">Modules</div>
-            <button id="btnDashboard" onclick="loadApp('SUJ-Dashboard_corporate.html','Create Surat Uang jalan',this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white mb-1">
-                <i class="fa-solid fa-file-invoice w-5 text-center"></i><span>Create SUJ</span>
-            </button>
-            <button id="btnTarif" onclick="loadApp('SUJ-tarif.html','Kelola Master Tarif',this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white mb-1">
-                <i class="fa-solid fa-table-list w-5 text-center"></i><span>Kelola Master Tarif</span>
-            </button>
-            <button id="btnJalur" onclick="loadApp('SUJ-Jalur.html','Kelola Jalur Rute',this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white mb-1">
-                <i class="fa-solid fa-route w-5 text-center"></i><span>Kelola Jalur</span>
-            </button>
-        </nav>
-        <div class="p-4 border-t border-white/10 text-[11px] text-slate-500 leading-relaxed">
-            <div class="font-bold text-slate-400">Internal Build</div>
-            <div>CKB BPI OPS Demo</div>
-            <div>&copy; 2026</div>
-        </div>
-    </aside>
-
-    <!-- Main -->
-    <div class="flex-1 flex flex-col min-w-0">
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-7 shrink-0">
-            <div class="flex items-center gap-2 text-sm">
-                <span class="text-slate-400 font-semibold"><i class="fa-solid fa-house-chimney mr-1"></i>BPI Portal</span>
-                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
-                <span id="pageTitle" class="text-slate-800 font-bold">Overview Sistem Uang Jalan</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <div id="currentDate" class="text-xs text-slate-500 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-md"></div>
-                <div class="h-6 w-px bg-slate-200"></div>
-                <div class="flex items-center gap-3">
-                    <div class="text-right">
-                        <div class="text-sm font-bold text-slate-800 leading-tight">Zaki</div>
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Business Process & System Officer</div>
-                    </div>
-                    <div class="w-9 h-9 rounded-md bg-ckb-pale border border-ckb-border flex items-center justify-center text-ckb-main font-bold">Z</div>
-                </div>
-            </div>
-        </header>
-        <main class="flex-1 overflow-hidden p-5">
-            <section id="welcomeScreen" class="w-full h-full overflow-y-auto bg-white border border-slate-200 rounded-lg">
-                <div class="border-b border-slate-200 px-7 py-6 bg-white">
-                    <div class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[.16em] font-bold text-ckb-main bg-ckb-pale border border-ckb-border px-3 py-1 rounded-md mb-4">
-                        <i class="fa-solid fa-circle-nodes"></i> -
-                    </div>
-                    <h1 class="text-3xl font-extrabold text-ckb-ink tracking-tight">Sistem Uang Jalan</h1>
-                    <p class="mt-2 text-sm text-ckb-muted max-w-3xl leading-relaxed">Halo Warrior! Selamat Datang di SUJ! Portal untuk membuat Surat Uang Jalan, mengelola standar biaya operasional, dan mengatur jalur rute Armada.</p>
-                    <div class="flex flex-wrap gap-2 mt-5">
-                        <button onclick="openModule('dashboard')" class="inline-flex items-center gap-2 bg-ckb-main text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-ckb-dark"><i class="fa-solid fa-file-invoice"></i>Buat SUJ</button>
-                        <button onclick="openModule('tarif')" class="inline-flex items-center gap-2 bg-white border border-ckb-border text-ckb-main px-4 py-2 rounded-md text-sm font-bold hover:bg-ckb-pale"><i class="fa-solid fa-table-list"></i>Master Tarif</button>
-                        <button onclick="openModule('jalur')" class="inline-flex items-center gap-2 bg-white border border-ckb-border text-ckb-main px-4 py-2 rounded-md text-sm font-bold hover:bg-ckb-pale"><i class="fa-solid fa-route"></i>Master Jalur</button>
-                    </div>
+    <!-- MAIN CONTENT LAYOUT -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 w-full pb-12 flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- KOLOM KIRI: Search & Link List (Lebih Lebar) -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Search Bar Container -->
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-gray-200 flex items-center focus-within:ring-2 focus-within:ring-ckb-500 focus-within:border-ckb-500 transition-all">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400 ml-4 mr-2"></i>
+                    <input type="text" id="searchInput" placeholder="Cari tools atau dokumen..." onkeyup="filterLinks()" class="w-full py-3 px-2 text-gray-700 outline-none bg-transparent font-medium placeholder-gray-400">
                 </div>
 
-                <div class="p-7">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <article class="module-card border border-slate-200 bg-white p-5">
-                            <div class="flat-icon mb-4"><i class="fa-solid fa-file-invoice"></i></div>
-                            <h2 class="font-extrabold text-slate-900">Dashboard Surat Uang Jalan</h2>
-                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Create SUJ, pilih rute, kendaraan, delivery type, safety factor, BBM composition, dan lihat breakdown biaya.</p>
-                            <ul class="text-xs text-slate-600 mt-4 space-y-2">
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Create and Calculate SUJ</li>
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Review</li>
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Export</li>
-                            </ul>
-                            <button onclick="openModule('dashboard')" class="mt-5 w-full rounded-md bg-ckb-main text-white py-2 text-sm font-bold hover:bg-ckb-dark">Open Dashboard</button>
-                        </article>
-
-                        <article class="module-card border border-slate-200 bg-white p-5">
-                            <div class="flat-icon mb-4"><i class="fa-solid fa-table-list"></i></div>
-                            <h2 class="font-extrabold text-slate-900">Kelola Master Tarif</h2>
-                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Maintain tarif tol, ferry, BBM, fixed cost, crew, standar uang makan, dan rule komposisi BBM.</p>
-                            <ul class="text-xs text-slate-600 mt-4 space-y-2">
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Master Standarisasi Uang Makan</li>
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Master BBM Composition Rule</li>
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>History perubahan master</li>
-                            </ul>
-                            <button onclick="openModule('tarif')" class="mt-5 w-full rounded-md border border-ckb-border text-ckb-main py-2 text-sm font-bold hover:bg-ckb-pale">Open Master Tarif</button>
-                        </article>
-
-                        <article class="module-card border border-slate-200 bg-white p-5">
-                            <div class="flat-icon mb-4"><i class="fa-solid fa-route"></i></div>
-                            <h2 class="font-extrabold text-slate-900">Kelola Jalur Rute</h2>
-                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Maintain rute, KM, leadtime, uang jalan dasar, susunan ruas tol, dan penyeberangan untuk setiap tujuan.</p>
-                            <ul class="text-xs text-slate-600 mt-4 space-y-2">
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Route path per destination</li>
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Ordered toll and crossing</li>
-                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Sync to Dashboard</li>
-                            </ul>
-                            <button onclick="openModule('jalur')" class="mt-5 w-full rounded-md border border-ckb-border text-ckb-main py-2 text-sm font-bold hover:bg-ckb-pale">Open Master Jalur</button>
-                        </article>
+                <!-- Links Container -->
+                <div id="linksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="col-span-full text-center py-10 bg-white rounded-xl border border-gray-200 border-dashed">
+                        <i class="fa-solid fa-circle-notch fa-spin text-ckb-500 text-3xl mb-3"></i>
+                        <p class="text-gray-500 font-medium">Taking Data from Database...</p>
                     </div>
+                </div>
+            </div>
 
-                    <div class="mt-6 border border-slate-200 rounded-lg bg-slate-50 p-5">
-                        <h2 class="font-extrabold text-slate-900 mb-3">Process Overview</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
-                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">01</div><b>Maintain Tarif</b><p class="text-xs text-slate-500 mt-1">Tarif, BBM, FC, crew, meal standard.</p></div>
-                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">02</div><b>Maintain Jalur</b><p class="text-xs text-slate-500 mt-1">KM, LT, toll, crossing.</p></div>
-                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">03</div><b>Create SUJ</b><p class="text-xs text-slate-500 mt-1">Route, vehicle, delivery type.</p></div>
-                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">04</div><b>Calculate</b><p class="text-xs text-slate-500 mt-1">Safety factor, BBM, meal.</p></div>
-                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">05</div><b>Export</b><p class="text-xs text-slate-500 mt-1">Breakdown PDF/Excel.</p></div>
+            <!-- KOLOM KANAN: Widgets -->
+            <div class="lg:col-span-1 space-y-6">
+                
+                <!-- WIDGET 1: Date & Time -->
+                <div class="bg-gradient-to-br from-ckb-700 to-ckb-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 opacity-10">
+                        <i class="fa-regular fa-clock text-9xl"></i>
+                    </div>
+                    <p class="text-ckb-100 text-sm font-semibold uppercase tracking-wider mb-1" id="dateWidget">Memuat Tanggal...</p>
+                    <h2 class="text-4xl font-bold tracking-tight" id="timeWidget">00:00:00</h2>
+                    <p class="text-xs text-ckb-100/70 mt-2"><i class="fa-solid fa-location-dot mr-1"></i> BPI - Ops</p>
+                </div>
+
+                <!-- WIDGET 2: Daily Quotes -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative">
+                    <div class="absolute -top-3 left-6 bg-ckb-100 text-ckb-700 p-2 rounded-full border border-white shadow-sm">
+                        <i class="fa-solid fa-quote-left"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-800 mt-2 mb-3">Quote of the Day</h3>
+                    <p id="quoteWidget" class="text-gray-600 text-sm italic leading-relaxed">
+                        "Amateurs talk about tactics, but professionals study logistics."
+                    </p>
+                    <p class="text-xs text-ckb-600 font-semibold mt-4 text-right" id="quoteAuthor">- Gen. Robert H. Barrow</p>
+                </div>
+
+                <!-- WIDGET 3: Quick Info / Status (Bisa disesuaikan) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <i class="fa-solid fa-server"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-medium">System Status</p>
+                            <p class="text-sm font-bold text-gray-800">All Systems Normal</p>
                         </div>
                     </div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
-            </section>
-            <iframe id="appFrame" class="hidden w-full h-full rounded-lg border border-slate-200 bg-white" src="about:blank"></iframe>
-        </main>
+
+            </div>
+        </div>
     </div>
 
-
+    <!-- SCRIPT DATA & WIDGETS -->
     <script>
-        // Lightweight GitHub Pages password gate. This prevents casual access only.
-        const SUJ_PASSWORD_HASH = "e25974cd57966c58104d1826ec81a28a2f623eba023daaa34f1d37916015edb1"; // SHA-256 for default password: CKB2026
-        async function sha256Hex(text) {
-            const data = new TextEncoder().encode(text);
-            const digest = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-        function openSUJPortal() {
-            sessionStorage.setItem('suj_portal_unlocked', '1');
-            document.body.classList.remove('locked');
-            document.getElementById('authGate')?.classList.add('hidden');
-        }
-        async function unlockSUJPortal() {
-            const input = document.getElementById('authPassword');
-            const error = document.getElementById('authError');
-            const value = (input?.value || '').trim();
-            if (!value) { error.textContent = 'Password wajib diisi.'; input?.focus(); return; }
+        // --- 1. DATA GOOGLE SHEETS (TIDAK DIUBAH SAMA SEKALI) ---
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_6E9ASMLc7I0q7LmPsucMUr7fMuNaciYvx4pR6CMUtGZKPtbYVpk1FqDs-07kE3gRdzfJaxXGDh2t/pub?gid=0&single=true&output=csv";
+        
+        async function fetchLinks() {
             try {
-                const hash = await sha256Hex(value);
-                if (hash === SUJ_PASSWORD_HASH) { openSUJPortal(); }
-                else { error.textContent = 'Password salah. Silakan coba lagi.'; input.value = ''; input.focus(); }
-            } catch (e) {
-                error.textContent = 'Browser tidak mendukung verifikasi password.';
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                
+                const rows = data.split('\n');
+                let htmlContent = "";
+
+                for (let i = 1; i < rows.length; i++) {
+                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    
+                    if (cols.length >= 2) {
+                        const title = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : '';
+                        const link = cols[1] ? cols[1].replace(/^"|"$/g, '').trim() : '#';
+                        const desc = cols[2] ? cols[2].replace(/^"|"$/g, '').trim() : '';
+                        const emoji = cols[3] ? cols[3].replace(/^"|"$/g, '').trim() : '📄';
+
+                        if (title && title !== "") {
+                            // Desain Link Card Baru
+                            htmlContent += `
+                                <a href="${link}" target="_blank" class="link-card group flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-ckb-500 transition-all duration-200" data-title="${title.toLowerCase()}" data-desc="${desc.toLowerCase()}">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-gray-50 group-hover:bg-ckb-50 rounded-lg flex items-center justify-center text-2xl border border-gray-100 group-hover:border-ckb-100 transition-colors">
+                                        ${emoji}
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <h3 class="text-sm font-bold text-gray-800 group-hover:text-ckb-700 transition-colors mb-1">${title}</h3>
+                                        <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">${desc}</p>
+                                    </div>
+                                </a>
+                            `;
+                        }
+                    }
+                }
+                document.getElementById('linksContainer').innerHTML = htmlContent;
+                
+            } catch (error) {
+                document.getElementById('linksContainer').innerHTML = `
+                    <div class="col-span-full text-center py-10 bg-red-50 rounded-xl border border-red-200">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-3xl mb-2"></i>
+                        <p class="text-red-700 font-medium">Gagal memuat data dari database.</p>
+                    </div>`;
+                console.error("Error loading CSV:", error);
             }
         }
-        document.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('suj_portal_unlocked') === '1') openSUJPortal();
-            const input = document.getElementById('authPassword');
-            input?.focus();
-            input?.addEventListener('keydown', e => { if (e.key === 'Enter') unlockSUJPortal(); });
-        });
-    </script>
-    <script>
-        const dateOptions = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
-        const modules = {
-            overview: { url:'welcome', title:'Overview Sistem Uang Jalan', btn:'btnOverview' },
-            dashboard: { url:'SUJ-Dashboard.html', title:'Dashboard Surat Uang Jalan', btn:'btnDashboard' },
-            tarif: { url:'SUJ-tarif.html', title:'Kelola Master Tarif', btn:'btnTarif' },
-            jalur: { url:'SUJ-Jalur.html', title:'Kelola Jalur Rute', btn:'btnJalur' }
-        };
-        function openModule(key){ const m=modules[key]; if(m) loadApp(m.url,m.title,document.getElementById(m.btn)); }
-        function loadApp(url,title,element){
-            document.querySelectorAll('.menu-btn').forEach(btn=>{
-                btn.classList.remove('bg-ckb-main','text-white');
-                btn.classList.add('text-slate-300','hover:bg-white/5','hover:text-white');
+
+        // --- 2. FITUR PENCARIAN ---
+        function filterLinks() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.link-card');
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const desc = card.getAttribute('data-desc');
+                
+                if (title.includes(searchInput) || desc.includes(searchInput)) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
             });
-            if(element){
-                element.classList.add('bg-ckb-main','text-white');
-                element.classList.remove('text-slate-300','hover:bg-white/5','hover:text-white');
-            }
-            document.getElementById('pageTitle').innerText = title;
-
-            const welcome = document.getElementById('welcomeScreen');
-            const frame = document.getElementById('appFrame');
-
-            if(url === 'welcome'){
-                frame.classList.add('hidden');
-                frame.src = 'about:blank';
-                welcome.classList.remove('hidden');
-            } else {
-                welcome.classList.add('hidden');
-                frame.classList.remove('hidden');
-                frame.src = url;
-            }
         }
+
+        // --- 3. WIDGET JAM & TANGGAL REALTIME ---
+        function updateClock() {
+            const now = new Date();
+            
+            // Format Waktu (23:59:59)
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('timeWidget').textContent = now.toLocaleTimeString('id-ID', timeOptions);
+            
+            // Format Tanggal (Senin, 1 Jan 2024)
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateWidget').textContent = now.toLocaleDateString('id-ID', dateOptions);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- 4. WIDGET RANDOM QUOTES LOGISTIK ---
+        const quotes = [
+            { text: "Logistics is the ball and chain of armored warfare.", author: "Heinz Guderian" },
+            { text: "Amateurs talk about tactics, but professionals study logistics.", author: "Robert H. Barrow" },
+            { text: "Behind every great leader there was an even greater logistician.", author: "M. Cox" },
+            { text: "Without logistics the world stops.", author: "Supply Chain Proverb" },
+            { text: "Continuous improvement is better than delayed perfection.", author: "Mark Twain" },
+            { text: "The line between disorder and order lies in logistics.", author: "Sun Tzu" },
+            { text: "No, AI Won't Take My Job, People With AI will.", author: "zanov" }
+        ];
+        
+        function setRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            document.getElementById('quoteWidget').textContent = `"${quotes[randomIndex].text}"`;
+            document.getElementById('quoteAuthor').textContent = `- ${quotes[randomIndex].author}`;
+        }
+
+        // Jalankan semua fungsi saat web dibuka
+        fetchLinks();
+        setRandomQuote();
     </script>
 </body>
 </html>
