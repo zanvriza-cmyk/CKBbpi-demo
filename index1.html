@@ -37,9 +37,49 @@
         .module-card:hover { border-color: #22543D; background: #F8FAF9; }
         .flat-icon { width: 36px; height: 36px; border: 1px solid #C7D6CC; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#22543D; background:#F3F7F4; }
         iframe { color-scheme: light; }
+
+        /* Clara password gate - lightweight protection for GitHub Pages prototype */
+        body.locked > aside,
+        body.locked > div.flex-1 { display: none !important; }
+        #authGate { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #F5F7F6 0%, #FFFFFF 55%, #F3F7F4 100%); }
+        #authGate.hidden { display: none !important; }
+        .auth-card { width: min(420px, calc(100vw - 32px)); background: #fff; border: 1px solid #E1E8E3; border-radius: 14px; box-shadow: 0 18px 42px rgba(20,37,27,.12); overflow: hidden; }
+        .auth-head { padding: 22px 24px 18px; border-bottom: 1px solid #E1E8E3; display: flex; align-items: center; gap: 12px; background: #F8FAF9; }
+        .auth-logo { width: 40px; height: 40px; border-radius: 8px; background: #22543D; color: #fff; display: flex; align-items: center; justify-content: center; }
+        .auth-title { font-weight: 800; color: #14251B; line-height: 1.15; }
+        .auth-subtitle { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #66766C; font-weight: 800; margin-top: 2px; }
+        .auth-body { padding: 22px 24px 24px; }
+        .auth-label { display: block; font-size: 12px; font-weight: 800; color: #33483B; margin-bottom: 8px; }
+        .auth-input { width: 100%; height: 42px; border: 1px solid #C7D6CC; border-radius: 8px; padding: 0 12px; outline: none; font-size: 14px; color: #14251B; background: #fff; }
+        .auth-input:focus { border-color: #22543D; box-shadow: 0 0 0 3px rgba(34,84,61,.12); }
+        .auth-btn { width: 100%; height: 42px; margin-top: 12px; border: 0; border-radius: 8px; background: #22543D; color: #fff; font-weight: 800; cursor: pointer; }
+        .auth-btn:hover { background: #183528; }
+        .auth-error { min-height: 18px; margin-top: 10px; font-size: 12px; color: #B42318; font-weight: 700; }
+        .auth-note { margin-top: 14px; font-size: 11px; color: #66766C; line-height: 1.55; }
     </style>
 </head>
-<body class="bg-[#F5F7F6] text-slate-800 h-screen flex overflow-hidden font-sans">
+<body class="locked bg-[#F5F7F6] text-slate-800 h-screen flex overflow-hidden font-sans">
+
+    <!-- Password Gate - lightweight prototype access control -->
+    <div id="authGate" aria-label="Password gate">
+        <div class="auth-card">
+            <div class="auth-head">
+                <div class="auth-logo"><i class="fa-solid fa-anchor text-sm"></i></div>
+                <div>
+                    <div class="auth-title">Sistem Uang Jalan</div>
+                    <div class="auth-subtitle">CKB Logistics Access</div>
+                </div>
+            </div>
+            <div class="auth-body">
+                <label class="auth-label" for="authPassword">Password</label>
+                <input id="authPassword" class="auth-input" type="password" placeholder="Masukkan password..." autocomplete="current-password">
+                <button class="auth-btn" type="button" onclick="unlockSUJPortal()">Masuk</button>
+                <div id="authError" class="auth-error"></div>
+                <div class="auth-note">This page is protected for prototype preview. Please contact the project owner if access is required.</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="w-64 bg-ckb-ink text-slate-300 flex flex-col flex-shrink-0 border-r border-black/20">
         <div class="h-16 flex items-center px-5 border-b border-white/10 bg-[#102018] shrink-0">
@@ -164,6 +204,40 @@
         </main>
     </div>
 
+
+    <script>
+        // Lightweight GitHub Pages password gate. This prevents casual access only.
+        const SUJ_PASSWORD_HASH = "e25974cd57966c58104d1826ec81a28a2f623eba023daaa34f1d37916015edb1"; // SHA-256 for default password: CKB2026
+        async function sha256Hex(text) {
+            const data = new TextEncoder().encode(text);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        function openSUJPortal() {
+            sessionStorage.setItem('suj_portal_unlocked', '1');
+            document.body.classList.remove('locked');
+            document.getElementById('authGate')?.classList.add('hidden');
+        }
+        async function unlockSUJPortal() {
+            const input = document.getElementById('authPassword');
+            const error = document.getElementById('authError');
+            const value = (input?.value || '').trim();
+            if (!value) { error.textContent = 'Password wajib diisi.'; input?.focus(); return; }
+            try {
+                const hash = await sha256Hex(value);
+                if (hash === SUJ_PASSWORD_HASH) { openSUJPortal(); }
+                else { error.textContent = 'Password salah. Silakan coba lagi.'; input.value = ''; input.focus(); }
+            } catch (e) {
+                error.textContent = 'Browser tidak mendukung verifikasi password.';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('suj_portal_unlocked') === '1') openSUJPortal();
+            const input = document.getElementById('authPassword');
+            input?.focus();
+            input?.addEventListener('keydown', e => { if (e.key === 'Enter') unlockSUJPortal(); });
+        });
+    </script>
     <script>
         const dateOptions = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
         document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
