@@ -97,12 +97,127 @@
     .ticker-track { animation: ticker 26s linear infinite; }
     @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     .modal-backdrop { backdrop-filter: blur(6px); }
+
+
+    /* Dark Mode */
+    body.dark-mode {
+      background:
+        radial-gradient(circle at 10% 10%, rgba(34,84,61,.28), transparent 30%),
+        radial-gradient(circle at 90% 0%, rgba(183,121,31,.12), transparent 30%),
+        linear-gradient(180deg, #08120D 0%, #102018 52%, #0B1611 100%);
+      color: #E7F1EA;
+    }
+    body.dark-mode .bg-white,
+    body.dark-mode .glass,
+    body.dark-mode .tool-card,
+    body.dark-mode .quick-card {
+      background: rgba(16,32,24,.78) !important;
+      border-color: rgba(199,214,204,.18) !important;
+      color: #E7F1EA !important;
+      box-shadow: 0 18px 44px rgba(0,0,0,.28);
+    }
+    body.dark-mode header {
+      background: rgba(8,18,13,.80) !important;
+      border-color: rgba(199,214,204,.16) !important;
+    }
+    body.dark-mode .text-ckb-ink,
+    body.dark-mode .text-slate-900,
+    body.dark-mode .text-slate-800,
+    body.dark-mode .font-black,
+    body.dark-mode h1,
+    body.dark-mode h2,
+    body.dark-mode h3 {
+      color: #F3F7F4 !important;
+    }
+    body.dark-mode .text-ckb-muted,
+    body.dark-mode .text-slate-500,
+    body.dark-mode .text-slate-600,
+    body.dark-mode .text-gray-500,
+    body.dark-mode .text-gray-600 {
+      color: #A9B8AE !important;
+    }
+    body.dark-mode .bg-ckb-pale,
+    body.dark-mode .bg-slate-50,
+    body.dark-mode .bg-gray-50,
+    body.dark-mode .hover\:bg-ckb-pale:hover {
+      background: rgba(34,84,61,.28) !important;
+    }
+    body.dark-mode .border-ckb-line,
+    body.dark-mode .border-slate-200,
+    body.dark-mode .border-gray-200 {
+      border-color: rgba(199,214,204,.18) !important;
+    }
+    body.dark-mode input {
+      background: rgba(8,18,13,.72) !important;
+      border-color: rgba(199,214,204,.20) !important;
+      color: #F3F7F4 !important;
+    }
+    body.dark-mode input::placeholder { color: #8FA196 !important; }
+    body.dark-mode .category-pill {
+      background: rgba(16,32,24,.92) !important;
+      color: #A9B8AE !important;
+      border-color: rgba(199,214,204,.18) !important;
+    }
+    body.dark-mode .category-pill.active {
+      background: #2F6B4F !important;
+      color: #FFFFFF !important;
+      border-color: #2F6B4F !important;
+    }
+    body.dark-mode .hero-grid {
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.09);
+    }
+    body.dark-mode .ticker-track,
+    body.dark-mode .bg-white\/80 {
+      color: #A9B8AE !important;
+    }
+    body.dark-mode .shimmer {
+      background: linear-gradient(90deg, rgba(34,84,61,.30) 0%, rgba(47,107,79,.42) 45%, rgba(34,84,61,.30) 90%);
+      background-size: 220% 100%;
+    }
+    .theme-toggle {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid rgba(199,214,204,.72);
+      background: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      padding: 3px;
+      cursor: pointer;
+      transition: background .2s ease, border-color .2s ease;
+    }
+    .theme-toggle .knob {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #22543D;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      transition: transform .22s ease, background .22s ease;
+    }
+    body.dark-mode .theme-toggle {
+      background: rgba(16,32,24,.88);
+      border-color: rgba(199,214,204,.20);
+    }
+    body.dark-mode .theme-toggle .knob {
+      transform: translateX(20px);
+      background: #B7791F;
+    }
+
   </style>
 </head>
 <body>
   <div class="noise"></div>
   <div class="aurora"></div>
   <div class="aurora two"></div>
+
+  <button id="themeToggleMobile" class="md:hidden fixed bottom-5 right-5 z-50 w-12 h-12 rounded-2xl bg-ckb-main text-white shadow-glow flex items-center justify-center" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
+    <i id="themeIconMobile" class="fa-solid fa-moon"></i>
+  </button>
 
   <div class="relative z-10 min-h-screen">
     <!-- Top Navigation -->
@@ -119,6 +234,7 @@
         </div>
         <div class="hidden md:flex items-center gap-2 text-xs font-bold text-ckb-muted">
           <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-ckb-line"><span class="w-2 h-2 rounded-full bg-green-500 status-dot"></span> Live Portal</span>
+          <button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="knob"><i id="themeIcon" class="fa-solid fa-moon"></i></span></button>
           <button onclick="openCommandPalette()" class="px-3 py-1.5 rounded-full bg-ckb-main text-white hover:bg-ckb-forest transition"><i class="fa-solid fa-magnifying-glass mr-1"></i> Quick Search</button>
         </div>
       </div>
@@ -525,11 +641,35 @@
       return String(str || '').replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
     }
 
+
+    function applyTheme(theme) {
+      const isDark = theme === 'dark';
+      document.body.classList.toggle('dark-mode', isDark);
+      document.getElementById('themeIcon')?.classList.toggle('fa-moon', !isDark);
+      document.getElementById('themeIcon')?.classList.toggle('fa-sun', isDark);
+      document.getElementById('themeIconMobile')?.classList.toggle('fa-moon', !isDark);
+      document.getElementById('themeIconMobile')?.classList.toggle('fa-sun', isDark);
+      localStorage.setItem('bpi_theme', theme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.contains('dark-mode');
+      applyTheme(isDark ? 'light' : 'dark');
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('bpi_theme');
+      if (savedTheme) { applyTheme(savedTheme); return; }
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(prefersDark ? 'dark' : 'light');
+    }
+
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandPalette(); }
       if (e.key === 'Escape') closeCommandPalette();
     });
 
+    initTheme();
     setInterval(updateClock, 1000);
     updateClock();
     setRandomQuote();
