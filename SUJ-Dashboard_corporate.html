@@ -1,0 +1,3598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Uang Jalan v13 — PT Cipta Krida Bahari</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Instrument+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{
+  --bg:#f4faf6;--bg2:#ffffff;--sidebar:#ffffff;--hdr:#ffffff;
+  --amber:#0a7c3e;--amber2:#12a854;--amber-pale:#f0faf4;--amber-light:#c6ecd8;
+  --coral:#057a35;--teal:#16a34a;--teal-pale:#dcfce7;--blue:#2563eb;
+  --text:#0d1f15;--text2:#2d4a36;--muted:#5a7a65;--border:#d1e8da;--border2:#e2f2e9;
+  --card:#ffffff;--success:#16a34a;--danger:#dc2626;--warning:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+  --radius:12px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;}
+body{font-family:"Sora",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 50% at 100% 0%,rgba(10,124,62,.07) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 40% at 0% 100%,rgba(22,163,74,.05) 0%,transparent 50%);}
+
+header{position:sticky;top:0;z-index:200;background:var(--hdr);border-bottom:2px solid var(--amber-light);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;height:62px;flex-shrink:0;
+  box-shadow:0 2px 12px rgba(10,124,62,.08);}
+.logo{display:flex;align-items:center;gap:.7rem;}
+.logo-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--amber),var(--amber2));
+  display:flex;align-items:center;justify-content:center;font-size:1.15rem;box-shadow:0 2px 8px rgba(10,124,62,.3);}
+.logo-t1{font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:.3px;line-height:1.1;}
+.logo-t2{font-size:.62rem;color:var(--amber);font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.hdr-r{display:flex;align-items:center;gap:.6rem;}
+.hdate{font-family:"Instrument Mono",monospace;font-size:.75rem;color:var(--muted);
+  background:var(--bg);border:1px solid var(--border);padding:4px 11px;border-radius:20px;}
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;border-radius:var(--radius-sm);
+  font-size:.82rem;font-family:"Sora",sans-serif;cursor:pointer;border:1.5px solid transparent;transition:all .18s;font-weight:600;}
+.btn-amber{background:var(--amber);color:#fff;border-color:var(--amber);}
+.btn-amber:hover{background:#057a35;border-color:#057a35;transform:translateY(-1px);box-shadow:0 4px 12px rgba(10,124,62,.3);}
+.btn-outline{background:transparent;color:var(--amber);border-color:var(--amber-light);}
+.btn-outline:hover{background:var(--amber-pale);border-color:var(--amber);}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{border-color:var(--danger);color:var(--danger);}
+
+/* EXPORT DROPDOWN */
+.export-dd{position:relative;display:inline-flex;}
+.export-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;
+  border:1.5px solid var(--border2);border-radius:var(--radius);min-width:185px;
+  box-shadow:0 8px 28px rgba(0,0,0,.13);z-index:300;overflow:hidden;display:none;
+  animation:fadeUp .15s ease;}
+.export-dd.open .export-menu{display:block;}
+.export-item{display:flex;align-items:center;gap:.55rem;padding:.6rem 1rem;
+  font-size:.84rem;font-weight:600;color:var(--text2);cursor:pointer;transition:background .14s;
+  border-bottom:1px solid var(--border2);}
+.export-item:last-child{border-bottom:none;}
+.export-item:hover{background:var(--amber-pale);color:var(--amber);}
+.export-item .ei-icon{font-size:1rem;}
+
+.app{display:flex;flex:1;position:relative;z-index:1;min-height:0;}
+
+/* SIDEBAR */
+.sidebar{width:460px;flex-shrink:0;background:var(--sidebar);border-right:2px solid var(--border2);
+  display:flex;flex-direction:column;height:calc(100vh - 62px);position:sticky;top:62px;}
+.sb-head{padding:.9rem 1.4rem .8rem;border-bottom:1.5px solid var(--border2);
+  background:linear-gradient(135deg,var(--amber-pale),#fff);}
+.sb-title{font-size:.82rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);}
+.sb-sub{font-size:.74rem;color:var(--muted);margin-top:2px;}
+.sb-body{flex:1;overflow-y:auto;padding:1.1rem 1.3rem 2.5rem;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+
+/* FORM */
+.fsec{margin-bottom:1.1rem;background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--radius);
+  padding:.9rem 1rem;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.fsec-lbl{font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--amber);
+  margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;}
+.fsec-lbl::after{content:"";flex:1;height:1.5px;background:var(--amber-light);}
+.fg{margin-bottom:.75rem;}.fg:last-child{margin-bottom:0;}
+.flabel{display:block;font-size:.82rem;font-weight:600;color:var(--text2);margin-bottom:.32rem;}
+input,select,textarea{width:100%;background:#f7fdf9;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);padding:.6rem .9rem;font-family:"Sora",sans-serif;font-size:.92rem;outline:none;
+  transition:border-color .18s,background .18s,box-shadow .18s;}
+input:focus,select:focus,textarea:focus{border-color:var(--amber);background:#fff;box-shadow:0 0 0 3px rgba(10,124,62,.12);}
+input::placeholder{color:#c0b4a4;}
+select option{background:#fff;color:var(--text);}
+
+/* FUEL TYPE SELECTOR — Dual Fuel Mode */
+.fuel-mix-wrap{margin-bottom:.65rem;}
+
+/* Dua kartu sejajar dengan input persen */
+.fuel-cards{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.65rem;}
+.fuel-card{display:flex;flex-direction:column;align-items:center;padding:.6rem .4rem .5rem;
+  border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;text-align:center;
+  border:2px solid transparent;transition:all .2s;position:relative;}
+.fuel-card.subsidi{background:#f0fdf4;border-color:#86efac;color:#15803d;}
+.fuel-card.nonsubsidi{background:#fefce8;border-color:#fde68a;color:#854d0e;}
+.fuel-card.active-s{background:#dcfce7;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.1);}
+.fuel-card.active-n{background:#fef9c3;border-color:#92400e;box-shadow:0 0 0 3px rgba(146,64,14,.1);}
+.fuel-card .fi{font-size:1.25rem;margin-bottom:2px;}
+.fuel-card .fname{font-size:.78rem;font-weight:700;line-height:1.2;}
+.fuel-card .fprice{font-size:.65rem;font-family:"Instrument Mono",monospace;font-weight:500;margin-top:2px;opacity:.8;}
+/* Input persen di dalam kartu */
+.fuel-pct-inp-wrap{display:flex;align-items:center;gap:2px;margin-top:.4rem;
+  background:#fff;border-radius:6px;padding:2px 5px;border:1.5px solid currentColor;opacity:.7;}
+.fuel-pct-inp-wrap:focus-within{opacity:1;}
+.fuel-pct-inp{width:38px;border:none;background:transparent;font-family:"Instrument Mono",monospace;
+  font-size:.95rem;font-weight:800;text-align:right;outline:none;color:inherit;padding:0;}
+.fuel-pct-sym{font-size:.85rem;font-weight:700;color:inherit;}
+
+/* Slider bar */
+.fuel-slider-section{margin-bottom:.5rem;}
+.fuel-slider-hint{display:flex;align-items:center;justify-content:center;gap:.4rem;
+  font-size:.7rem;color:var(--muted);margin-bottom:.4rem;font-weight:500;}
+.fuel-slider-hint .drag-icon{font-size:.9rem;animation:nudge 2s ease-in-out infinite;}
+@keyframes nudge{0%,100%{transform:translateX(0);}30%{transform:translateX(-4px);}60%{transform:translateX(4px);}80%{transform:translateX(-2px);}}
+.fuel-track-outer{position:relative;height:16px;display:flex;align-items:center;}
+.fuel-track{position:absolute;inset:3px 0;border-radius:10px;
+  background:linear-gradient(to right,#dcfce7 0%,#dcfce7 var(--pct-s),#fef9c3 var(--pct-s),#fef9c3 100%);
+  border:1.5px solid var(--border);transition:background .1s;}
+.fuel-track-fill-s{position:absolute;left:0;top:3px;bottom:3px;
+  background:linear-gradient(to right,#16a34a,#4ade80);border-radius:10px 0 0 10px;
+  transition:width .1s;pointer-events:none;}
+.fuel-track-fill-n{position:absolute;right:0;top:3px;bottom:3px;
+  background:linear-gradient(to left,#92400e,#ca8a04);border-radius:0 10px 10px 0;
+  transition:width .1s;pointer-events:none;}
+input[type=range].fuel-range{position:absolute;inset:0;width:100%;opacity:0;cursor:grab;
+  -webkit-appearance:none;appearance:none;margin:0;height:100%;z-index:5;}
+input[type=range].fuel-range:active{cursor:grabbing;}
+.fuel-thumb-vis{position:absolute;top:50%;width:22px;height:22px;border-radius:50%;
+  background:#fff;border:2.5px solid var(--amber);box-shadow:0 2px 8px rgba(10,124,62,.35);
+  transform:translate(-50%,-50%);pointer-events:none;z-index:4;transition:left .08s,box-shadow .15s;}
+input[type=range].fuel-range:active ~ .fuel-thumb-vis{box-shadow:0 0 0 5px rgba(10,124,62,.18),0 2px 8px rgba(10,124,62,.3);}
+
+/* Preset tombol cepat */
+.fuel-presets{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem;}
+.fuel-preset-btn{flex:1;min-width:0;padding:.3rem .3rem;border-radius:6px;border:1.5px solid var(--border);
+  background:var(--bg);font-size:.68rem;font-weight:700;cursor:pointer;font-family:"Sora",sans-serif;
+  color:var(--text2);transition:all .15s;white-space:nowrap;text-align:center;}
+.fuel-preset-btn:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-pale);}
+.fuel-preset-btn.active{border-color:var(--amber);background:var(--amber-pale);color:var(--amber);}
+
+/* VEHICLE GRID - 2 cols */
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;}
+.vopt{position:relative;}
+.vopt input[type=radio]{opacity:0;position:absolute;width:0;height:0;}
+.vopt label{display:flex;flex-direction:column;align-items:center;padding:.8rem .5rem;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  cursor:pointer;font-size:.85rem;color:var(--muted);gap:.3rem;transition:all .18s;font-weight:600;}
+.vopt label .vi{font-size:1.6rem;}
+.vopt input:checked+label{border-color:var(--amber);background:var(--amber-pale);color:var(--amber);
+  box-shadow:0 0 0 3px rgba(10,124,62,.1);}
+.vopt label .vprice{font-size:.7rem;font-family:"Instrument Mono",monospace;color:var(--teal);font-weight:500;margin-top:2px;}
+
+/* AUTOCOMPLETE */
+.ac-box{position:relative;}
+#acList{position:fixed;background:#fff;border:1.5px solid var(--amber-light);border-radius:var(--radius);
+  z-index:9999;max-height:260px;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.15);display:none;min-width:180px;}
+.ac-item{padding:.55rem .85rem;font-size:.88rem;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid var(--border2);color:var(--text2);}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover,.ac-item.hi{background:var(--amber-pale);color:var(--amber);}
+.ac-isl{font-size:.62rem;color:var(--muted);background:var(--bg);padding:1px 7px;border-radius:10px;
+  flex-shrink:0;border:1px solid var(--border);}
+.ac-match{font-weight:700;color:var(--amber);}
+.atag{font-size:.62rem;color:var(--teal);background:var(--teal-pale);padding:2px 7px;border-radius:10px;
+  margin-left:.3rem;font-weight:700;border:1px solid rgba(22,163,74,.2);}
+.atag.found{color:var(--success);background:#dcfce7;border-color:rgba(22,163,74,.25);}
+.atag.notfound{color:var(--warning);background:#fef3c7;border-color:rgba(217,119,6,.25);}
+
+/* ROUTE PREVIEW */
+.rp-box{display:flex;align-items:center;gap:.5rem;background:var(--teal-pale);
+  border:1.5px solid rgba(22,163,74,.25);border-radius:var(--radius-sm);padding:.55rem .8rem;margin-bottom:.55rem;}
+.rp-city{font-family:"Sora",sans-serif;font-size:.88rem;font-weight:700;white-space:nowrap;color:var(--text);}
+.rp-line{flex:1;height:1.5px;background:linear-gradient(90deg,var(--teal),rgba(22,163,74,.1));}
+.rp-info{font-size:.72rem;color:var(--teal);font-family:"Instrument Mono",monospace;text-align:right;white-space:nowrap;font-weight:500;}
+
+/* PRICE PREVIEW BOX */
+.price-preview{background:linear-gradient(135deg,var(--amber-pale),#f0faf4);
+  border:2px solid var(--amber-light);border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:.3rem;}
+.pp-label{font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.pp-rows{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.pp-item{text-align:center;background:#fff;border-radius:var(--radius-sm);padding:.55rem .4rem;border:1px solid var(--border2);}
+.pp-item-lbl{font-size:.62rem;color:var(--muted);font-weight:600;margin-bottom:3px;}
+.pp-item-val{font-family:"Instrument Mono",monospace;font-size:.95rem;color:var(--amber);font-weight:700;}
+.pp-item-val.pp-total{font-size:1.1rem;color:var(--amber);}
+.pp-item-val.pp-pp{font-size:1rem;color:var(--teal);}
+.pp-notfound{text-align:center;color:var(--muted);font-size:.82rem;padding:.5rem 0;}
+
+/* EXTRA COSTS */
+.xrow{display:flex;gap:.4rem;margin-bottom:.45rem;align-items:center;}
+.xrow input{flex:1;}.xrow input.xd{flex:1.6;}
+.ibtn{width:32px;height:32px;border-radius:var(--radius-sm);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;transition:all .15s;}
+.ibtn-add{background:var(--teal-pale);color:var(--teal);border:1.5px solid rgba(22,163,74,.25);}
+.ibtn-add:hover{background:var(--teal);color:#fff;}
+.ibtn-del{background:rgba(220,38,38,.08);color:var(--danger);border:1.5px solid rgba(220,38,38,.18);}
+.ibtn-del:hover{background:var(--danger);color:#fff;}
+
+.btn-submit{width:100%;padding:.9rem;background:linear-gradient(135deg,var(--amber),var(--amber2));
+  color:#fff;font-family:"Sora",sans-serif;font-size:1rem;font-weight:800;letter-spacing:.5px;
+  border:none;border-radius:var(--radius);cursor:pointer;transition:all .22s;margin-top:.65rem;
+  box-shadow:0 4px 16px rgba(10,124,62,.25);}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(10,124,62,.4);}
+.btn-reset{width:100%;padding:.5rem;background:transparent;color:var(--muted);font-size:.85rem;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;
+  margin-top:.45rem;font-family:"Sora",sans-serif;font-weight:500;transition:all .18s;}
+.btn-reset:hover{border-color:var(--danger);color:var(--danger);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.dash{flex:1;overflow:auto;padding:1.2rem 1.5rem;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;flex-wrap:wrap;gap:.6rem;}
+.sec-ttl{font-size:1rem;font-weight:800;letter-spacing:.3px;display:flex;align-items:center;gap:.5rem;color:var(--text);}
+.sec-cnt{font-size:.72rem;background:var(--amber-pale);color:var(--amber);padding:3px 10px;border-radius:20px;font-weight:700;border:1px solid var(--amber-light);}
+.fbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+.fbar input{width:185px;padding:.4rem .7rem;font-size:.82rem;}
+.fbar select{width:145px;padding:.4rem .7rem;font-size:.82rem;}
+
+/* TABLE */
+.twrap{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl thead tr{background:var(--bg);}
+.tbl th{font-size:.71rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  padding:.65rem .85rem;text-align:left;border-bottom:1.5px solid var(--border2);white-space:nowrap;}
+.tbl th.r{text-align:right;}
+.tbl td{padding:.7rem .85rem;font-size:.92rem;border-bottom:1px solid var(--border2);vertical-align:middle;color:var(--text);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tbody tr:hover td{background:var(--amber-pale);}
+.tbl td.r{text-align:right;font-family:"Instrument Mono",monospace;white-space:nowrap;}
+.total-c{color:var(--amber);font-size:1rem;font-weight:800;white-space:nowrap;font-family:"Instrument Mono",monospace;}
+.total-pp{color:var(--teal);font-size:1rem;font-weight:700;white-space:nowrap;font-family:"Instrument Mono",monospace;}
+.vtag{display:inline-block;font-size:.63rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;padding:3px 8px;border-radius:20px;}
+.v-lowbed{background:#dbeafe;color:#1d4ed8;}
+.v-selfloader{background:#f3e8ff;color:#7c3aed;}
+
+/* LOW BED SUB-TYPE: Hino / Iveco */
+#lbSubWrap{margin-top:.65rem;animation:fadeSlideIn .2s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.lb-sub-lbl{font-size:.62rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  color:#93c5fd;margin-bottom:.3rem;display:flex;align-items:center;gap:.35rem;}
+.lb-sub-lbl::after{content:"";flex:1;height:1px;background:#dbeafe;}
+.lb-subopts{display:flex;gap:.35rem;}
+.lb-sopt{position:relative;}
+.lb-sopt input[type=radio]{opacity:0;position:absolute;width:0;height:0;}
+.lb-sopt label{display:inline-flex;align-items:center;gap:.28rem;padding:.22rem .55rem;
+  background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:20px;
+  cursor:pointer;font-size:.72rem;color:#3b82f6;transition:all .18s;font-weight:700;white-space:nowrap;}
+.lb-sopt label .lbi{font-size:.8rem;}
+.lb-sopt input:checked+label{border-color:#2563eb;background:#dbeafe;color:#1d4ed8;
+  box-shadow:0 0 0 2px rgba(37,99,235,.15);}
+.sbadge{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:700;padding:4px 11px;border-radius:20px;}
+.sj{background:#dcfce7;color:var(--success);}.sp{background:#fef3c7;color:var(--warning);}.ss{background:#f1f5f9;color:#64748b;}
+.act-cell{display:flex;gap:.3rem;justify-content:flex-end;min-width:95px;}
+.aBtn{width:32px;height:32px;border-radius:var(--radius-sm);border:none;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .15s;flex-shrink:0;}
+.ab-v{background:var(--teal-pale);color:var(--teal);}.ab-v:hover{background:var(--teal);color:#fff;}
+.ab-e{background:var(--amber-pale);color:var(--amber);}.ab-e:hover{background:var(--amber);color:#fff;}
+.ab-d{background:rgba(220,38,38,.08);color:var(--danger);}.ab-d:hover{background:var(--danger);color:#fff;}
+.trow-total td{background:var(--amber-pale)!important;border-top:2px solid var(--amber-light)!important;font-weight:700;}
+.empty{text-align:center;padding:3.5rem 2rem;color:var(--muted);}
+.empty .ei{font-size:3rem;opacity:.25;margin-bottom:.75rem;}
+.empty p{font-size:.88rem;font-weight:500;}.empty small{font-size:.74rem;color:var(--border);}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(26,18,8,.35);backdrop-filter:blur(6px);
+  z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg2);border:1.5px solid var(--border2);border-radius:16px;
+  width:760px;max-width:96vw;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 80px rgba(0,0,0,.18);animation:fadeUp .22s ease;}
+.m-head{padding:1.2rem 1.5rem .9rem;border-bottom:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,var(--amber-pale),#fff);}
+.m-title{font-size:1.3rem;font-weight:800;color:var(--text);letter-spacing:.2px;}
+.m-close{width:32px;height:32px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
+  cursor:pointer;background:var(--bg);color:var(--muted);font-size:1rem;
+  display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.m-close:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+.m-body{padding:1.5rem;}
+.m-route{display:flex;align-items:center;gap:1rem;background:var(--amber-pale);
+  border:1.5px solid var(--amber-light);border-radius:var(--radius);padding:1rem 1.3rem;margin-bottom:1.2rem;}
+.mr-city{font-size:1.4rem;font-weight:800;color:var(--text);}
+.mr-line{flex:1;height:2px;background:linear-gradient(90deg,var(--amber),rgba(10,124,62,.1));border-radius:2px;}
+.dtbl{width:100%;border-collapse:collapse;margin-top:.5rem;}
+.dtbl th{font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  padding:.6rem 1rem;text-align:left;border-bottom:1.5px solid var(--border2);background:var(--bg);}
+.dtbl th:last-child{text-align:right;}
+.dtbl td{padding:.7rem 1rem;font-size:.95rem;border-bottom:1px solid var(--border2);color:var(--text);}
+.dtbl td:last-child{text-align:right;font-family:"Instrument Mono",monospace;color:var(--amber);font-weight:600;}
+.dtbl tr:last-child td{border-bottom:none;}
+.dtbl .dtot td{background:var(--amber-pale)!important;border-top:2px solid var(--amber-light)!important;
+  color:var(--amber)!important;font-weight:800!important;font-size:1rem!important;}
+.dtbl .dtot-pp td{background:var(--teal-pale)!important;border-top:2px solid rgba(22,163,74,.2)!important;
+  color:var(--teal)!important;font-weight:800!important;font-size:1.05rem!important;}
+.dbadge{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;padding:3px 9px;border-radius:10px;margin-right:.4rem;}
+.db-base{background:var(--amber-pale);color:var(--amber);}
+.db-escort{background:rgba(220,38,38,.08);color:var(--danger);}
+.db-extra{background:#f3e8ff;color:#7c3aed;}
+.db-disc{background:rgba(220,38,38,.08);color:var(--danger);}
+.db-solar{background:#fef9c3;color:#854d0e;}
+.db-crew{background:#e0f2fe;color:#075985;}
+.db-tol{background:#f3f4f6;color:#374151;}
+.db-cross{background:#ecfdf5;color:#065f46;}
+.db-ops{background:#f5f3ff;color:#5b21b6;}
+.m-foot{padding:.9rem 1.5rem;border-top:1.5px solid var(--border2);display:flex;gap:.5rem;justify-content:flex-end;background:var(--bg);}
+
+/* MAP PICKER MODAL */
+.map-modal-bg{position:fixed;inset:0;background:rgba(26,18,8,.45);backdrop-filter:blur(8px);
+  z-index:600;display:none;align-items:center;justify-content:center;}
+.map-modal-bg.open{display:flex;}
+.map-modal{background:var(--bg2);border:1.5px solid var(--border2);border-radius:16px;
+  width:820px;max-width:97vw;max-height:94vh;display:flex;flex-direction:column;
+  box-shadow:0 28px 90px rgba(0,0,0,.22);animation:fadeUp .22s ease;overflow:hidden;}
+.map-modal-head{padding:1rem 1.4rem .8rem;border-bottom:1.5px solid var(--border2);
+  background:linear-gradient(135deg,var(--amber-pale),#fff);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.map-modal-title{font-size:1.1rem;font-weight:800;color:var(--text);}
+.map-search-bar{display:flex;gap:.5rem;padding:.75rem 1.1rem;border-bottom:1.5px solid var(--border2);
+  background:#f7fdf9;flex-shrink:0;}
+.map-search-bar input{flex:1;padding:.55rem .9rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:.9rem;font-family:"Sora",sans-serif;background:#fff;outline:none;
+  transition:border-color .18s;}
+.map-search-bar input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(10,124,62,.1);}
+.map-search-btn{padding:.55rem 1rem;background:var(--amber);color:#fff;border:none;border-radius:var(--radius-sm);
+  cursor:pointer;font-size:.85rem;font-weight:700;font-family:"Sora",sans-serif;
+  transition:all .18s;white-space:nowrap;}
+.map-search-btn:hover{background:#057a35;}
+#mapContainer{flex:1;min-height:400px;position:relative;}
+#leafletMap{width:100%;height:100%;min-height:400px;}
+.map-info-bar{padding:.6rem 1.1rem;border-top:1.5px solid var(--border2);background:#f7fdf9;
+  display:flex;align-items:center;gap:.75rem;flex-shrink:0;flex-wrap:wrap;}
+.map-pin-info{flex:1;font-size:.82rem;color:var(--text2);min-width:0;}
+.map-pin-coords{font-family:"Instrument Mono",monospace;font-size:.75rem;color:var(--muted);}
+.map-pin-addr{font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.map-spm-match{font-size:.72rem;background:var(--amber-pale);color:var(--amber);padding:2px 8px;
+  border-radius:8px;font-weight:700;border:1px solid var(--amber-light);white-space:nowrap;}
+.map-modal-foot{padding:.8rem 1.1rem;border-top:1.5px solid var(--border2);
+  display:flex;gap:.5rem;justify-content:flex-end;background:var(--bg);flex-shrink:0;}
+.map-tip{font-size:.72rem;color:var(--muted);text-align:center;padding:.3rem .8rem;
+  background:var(--teal-pale);border-top:1px solid rgba(22,163,74,.15);}
+
+/* TERJAWAB HINTS */
+.hint-box{background:var(--teal-pale);border:1.5px solid rgba(22,163,74,.2);border-radius:var(--radius-sm);
+  padding:.55rem .85rem;font-size:.77rem;color:var(--teal);font-weight:500;margin-top:.45rem;line-height:1.5;}
+.hint-toll{background:var(--amber-pale);border:1.5px solid var(--amber-light);color:var(--amber);}
+
+/* OSRM distance indicator */
+.osrm-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;font-weight:600;
+  padding:2px 8px;border-radius:10px;margin-left:.4rem;vertical-align:middle;}
+.osrm-loading{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;animation:osPulse 1.2s ease infinite;}
+.osrm-ok{background:#dcfce7;color:#15803d;border:1px solid rgba(22,163,74,.25);}
+.osrm-diff{background:#fef3c7;color:#92400e;border:1px solid rgba(217,119,6,.25);}
+.osrm-err{background:#fee2e2;color:#991b1b;border:1px solid rgba(239,68,68,.2);}
+@keyframes osPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+.km-ref-box{background:linear-gradient(135deg,#f0fdf4,#fff);border:1.5px solid rgba(22,163,74,.2);
+  border-radius:var(--radius-sm);padding:.5rem .8rem;margin-bottom:.45rem;font-size:.76rem;}
+.km-ref-inner{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.km-ref-spm{font-weight:700;color:var(--amber);font-family:"Instrument Mono",monospace;}
+.km-ref-sep{color:var(--muted);}
+.km-ref-osrm{font-weight:700;font-family:"Instrument Mono",monospace;}
+.km-ref-note{font-size:.68rem;color:var(--muted);margin-top:3px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.au{animation:fadeUp .28s ease forwards;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+
+/* =========================================================
+   CORPORATE UI OVERRIDE - SUJ Dashboard
+   Clara revision: flat, clean, muted green, enterprise density
+   ========================================================= */
+:root{
+  --bg:#f5f7f6;
+  --bg2:#ffffff;
+  --sidebar:#ffffff;
+  --hdr:#ffffff;
+
+  --amber:#22543D;
+  --amber2:#2F6B4F;
+  --amber-pale:#F3F7F4;
+  --amber-light:#C7D6CC;
+
+  --coral:#22543D;
+  --teal:#2F6B4F;
+  --teal-pale:#EEF5F0;
+  --blue:#24527A;
+
+  --text:#14251B;
+  --text2:#33483B;
+  --muted:#66766C;
+  --border:#C7D6CC;
+  --border2:#E1E8E3;
+  --card:#ffffff;
+
+  --success:#2F6B4F;
+  --danger:#B42318;
+  --warning:#8A5B12;
+
+  --shadow:none;
+  --radius:8px;
+  --radius-sm:6px;
+}
+
+html{font-size:14px;}
+body{
+  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+  background:var(--bg) !important;
+  color:var(--text);
+  letter-spacing:-.01em;
+}
+body::before{display:none !important;}
+*,button,input,select,textarea{
+  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+}
+
+/* Header */
+header{
+  height:58px;
+  padding:0 1.25rem;
+  border-bottom:1px solid #dbe3de;
+  box-shadow:none;
+  background:#fff;
+}
+.logo{gap:.65rem;}
+.logo-mark{
+  width:34px;height:34px;
+  border-radius:6px;
+  background:var(--amber);
+  box-shadow:none;
+  font-size:1rem;
+  filter:grayscale(1);
+}
+.logo-t1{font-size:.98rem;font-weight:800;color:var(--text);letter-spacing:-.02em;}
+.logo-t2{font-size:.58rem;color:var(--muted);letter-spacing:1.6px;font-weight:700;}
+.hdate{
+  border-radius:6px;
+  background:#f8faf9;
+  border:1px solid var(--border2);
+  color:var(--muted);
+  padding:5px 10px;
+  font-size:.72rem;
+  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+}
+
+/* Buttons */
+.btn,.btn-submit,.btn-reset,.aBtn,.ibtn,.fuel-preset-btn,.map-search-btn{
+  border-radius:6px !important;
+  box-shadow:none !important;
+  transform:none !important;
+  transition:background .12s ease,border-color .12s ease,color .12s ease;
+}
+.btn-amber,.btn-submit,.map-search-btn{
+  background:var(--amber) !important;
+  color:#fff !important;
+  border-color:var(--amber) !important;
+  background-image:none !important;
+}
+.btn-amber:hover,.btn-submit:hover,.map-search-btn:hover{
+  background:#183528 !important;
+  border-color:#183528 !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+.btn-outline,.btn-ghost,.btn-reset{
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  color:var(--text2) !important;
+}
+.btn-outline:hover,.btn-ghost:hover,.btn-reset:hover{
+  background:var(--amber-pale) !important;
+  border-color:var(--amber) !important;
+  color:var(--amber) !important;
+}
+
+/* Layout */
+.app{background:var(--bg);}
+.sidebar{
+  width:430px;
+  top:58px;
+  height:calc(100vh - 58px);
+  border-right:1px solid #dbe3de;
+  background:#fff;
+}
+.sb-head{
+  background:#fff !important;
+  border-bottom:1px solid var(--border2);
+  padding:.85rem 1.15rem;
+}
+.sb-title{font-size:.72rem;color:var(--amber);letter-spacing:1.3px;font-weight:800;}
+.sb-sub{font-size:.72rem;color:var(--muted);}
+.sb-body{padding:1rem 1.1rem 2rem;}
+.dash{padding:1rem 1.25rem;}
+
+/* Form Sections */
+.fsec{
+  background:#fff;
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:.85rem .95rem;
+  box-shadow:none;
+  margin-bottom:.9rem;
+}
+.fsec-lbl{
+  font-size:.65rem;
+  letter-spacing:1.5px;
+  color:var(--amber);
+  font-weight:800;
+  margin-bottom:.7rem;
+}
+.fsec-lbl::after{height:1px;background:var(--border2);}
+.flabel{font-size:.78rem;font-weight:700;color:var(--text2);}
+.fg{margin-bottom:.65rem;}
+
+/* Inputs */
+input,select,textarea{
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  border-radius:6px !important;
+  padding:.55rem .75rem;
+  color:var(--text);
+  font-size:.85rem;
+  box-shadow:none !important;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--amber) !important;
+  box-shadow:0 0 0 2px rgba(34,84,61,.10) !important;
+  background:#fff !important;
+}
+input::placeholder,textarea::placeholder{color:#98a49d;}
+
+/* Vehicle / fuel controls */
+.vgrid,.fuel-cards{gap:.45rem;}
+.vopt label,.fuel-card,.pp-item,.fuel-preset-btn{
+  border-radius:6px !important;
+  box-shadow:none !important;
+}
+.vopt label{
+  background:#fff;
+  border:1px solid var(--border);
+  color:var(--text2);
+  padding:.72rem .45rem;
+}
+.vopt label .vi,.fuel-card .fi,.fsec-lbl,.sec-ttl,.map-modal-title,.m-title{
+  filter:grayscale(1);
+}
+.vopt input:checked+label{
+  background:var(--amber-pale);
+  border-color:var(--amber);
+  color:var(--amber);
+  box-shadow:none;
+}
+.vopt label .vprice{color:var(--muted);font-size:.66rem;}
+.lb-sopt label{
+  border-radius:4px;
+  background:#fff;
+  border:1px solid var(--border);
+  color:var(--text2);
+}
+.lb-sopt input:checked+label{
+  background:var(--amber-pale);
+  border-color:var(--amber);
+  color:var(--amber);
+  box-shadow:none;
+}
+.lb-sub-lbl{color:var(--muted);letter-spacing:1.2px;}
+.lb-sub-lbl::after{background:var(--border2);}
+
+/* Fuel cards made more neutral */
+.fuel-card.subsidi,.fuel-card.nonsubsidi{
+  background:#fff;
+  border:1px solid var(--border);
+  color:var(--text2);
+}
+.fuel-card.active-s,.fuel-card.active-n{
+  background:var(--amber-pale);
+  border-color:var(--amber);
+  box-shadow:none;
+  color:var(--amber);
+}
+.fuel-pct-inp-wrap{
+  border-radius:4px;
+  border:1px solid var(--border);
+  background:#fff;
+  opacity:1;
+}
+.fuel-track{border:1px solid var(--border);background:#eef2ef;}
+.fuel-track-fill-s,.fuel-track-fill-n{
+  background:var(--amber) !important;
+  border-radius:8px;
+}
+.fuel-thumb-vis{
+  border:2px solid var(--amber);
+  box-shadow:none;
+}
+.fuel-slider-hint{color:var(--muted);font-size:.68rem;}
+.fuel-preset-btn{
+  background:#fff;
+  color:var(--text2);
+  border:1px solid var(--border);
+}
+.fuel-preset-btn:hover,.fuel-preset-btn.active{
+  background:var(--amber-pale);
+  border-color:var(--amber);
+  color:var(--amber);
+}
+
+/* Preview / hints */
+.rp-box,.hint-box,.price-preview,.km-ref-box{
+  background:#fff !important;
+  border:1px solid var(--border2) !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+}
+.rp-line{height:1px;background:var(--border);}
+.rp-info,.rp-city{color:var(--text2);}
+.hint-box{color:var(--muted);font-size:.74rem;}
+.hint-toll{color:var(--text2);}
+.price-preview{padding:.9rem;}
+.pp-label{color:var(--muted);letter-spacing:1.4px;}
+.pp-item-val,.pp-item-val.pp-total,.pp-item-val.pp-pp{color:var(--amber);}
+
+/* Table / dashboard */
+.sec-hdr{margin-bottom:.75rem;}
+.sec-ttl{font-size:.95rem;color:var(--text);font-weight:800;}
+.sec-cnt{
+  background:var(--amber-pale);
+  border:1px solid var(--border);
+  color:var(--amber);
+  border-radius:4px;
+}
+.fbar input,.fbar select{height:34px;}
+.twrap{
+  border:1px solid var(--border2);
+  border-radius:8px;
+  box-shadow:none;
+  background:#fff;
+}
+.tbl th{
+  background:#f8faf9;
+  color:var(--muted);
+  border-bottom:1px solid var(--border2);
+  font-size:.68rem;
+  padding:.6rem .75rem;
+}
+.tbl td{
+  padding:.62rem .75rem;
+  border-bottom:1px solid #edf2ef;
+  font-size:.86rem;
+}
+.tbl tbody tr:hover td{background:#f8faf9;}
+.total-c,.total-pp{color:var(--amber);font-weight:800;}
+.trow-total td{
+  background:#f8faf9 !important;
+  border-top:1px solid var(--border) !important;
+}
+.vtag{
+  border-radius:4px;
+  padding:3px 7px;
+  letter-spacing:.2px;
+}
+.v-lowbed,.v-selfloader{
+  background:var(--amber-pale);
+  color:var(--amber);
+  border:1px solid var(--border);
+}
+.aBtn{
+  width:30px;height:30px;
+  border:1px solid var(--border2);
+  background:#fff !important;
+  color:var(--text2) !important;
+}
+.aBtn:hover{background:var(--amber-pale) !important;color:var(--amber) !important;border-color:var(--amber);}
+.ab-d:hover{background:#fef2f2 !important;color:var(--danger) !important;border-color:#f3b4ae;}
+.empty .ei{filter:grayscale(1);}
+
+/* Dropdowns/modals */
+.export-menu,.modal,.map-modal,#acList{
+  border:1px solid var(--border2) !important;
+  border-radius:8px !important;
+  box-shadow:0 12px 28px rgba(20,37,27,.12) !important;
+}
+.export-item{color:var(--text2);border-bottom:1px solid var(--border2);}
+.export-item:hover,.ac-item:hover,.ac-item.hi{background:var(--amber-pale);color:var(--amber);}
+.modal-bg,.map-modal-bg{background:rgba(20,37,27,.38);backdrop-filter:blur(3px);}
+.modal{border-radius:10px;}
+.m-head,.map-modal-head{
+  background:#fff !important;
+  border-bottom:1px solid var(--border2);
+}
+.m-title,.map-modal-title{color:var(--text);font-size:1.08rem;}
+.m-body{padding:1.25rem;}
+.m-foot,.map-modal-foot{background:#f8faf9;border-top:1px solid var(--border2);}
+.m-route{
+  background:#fff;
+  border:1px solid var(--border2);
+  border-radius:8px;
+}
+.mr-line{height:1px;background:var(--border);}
+.mr-city{font-size:1.15rem;color:var(--text);}
+.dtbl th{
+  background:#f8faf9;
+  color:var(--muted);
+  border-bottom:1px solid var(--border2);
+}
+.dtbl td{border-bottom:1px solid #edf2ef;}
+.dtbl .dtot td,.dtbl .dtot-pp td{
+  background:#f8faf9 !important;
+  color:var(--amber) !important;
+  border-top:1px solid var(--border) !important;
+}
+.dbadge{
+  border-radius:4px;
+  padding:3px 7px;
+  background:var(--amber-pale) !important;
+  color:var(--amber) !important;
+  border:1px solid var(--border);
+}
+.m-close{
+  border-radius:6px;
+  background:#fff;
+  border:1px solid var(--border);
+  color:var(--muted);
+}
+.m-close:hover{background:#fef2f2;color:var(--danger);border-color:#f3b4ae;}
+
+/* Map */
+.map-search-bar,.map-info-bar,.map-tip{background:#f8faf9;border-color:var(--border2);}
+#leafletMap{filter:saturate(.82) contrast(.98);}
+.map-spm-match{
+  background:var(--amber-pale);
+  color:var(--amber);
+  border:1px solid var(--border);
+  border-radius:4px;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:#cbd6d0;border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:#9fb0a6;}
+
+/* More enterprise density on small labels */
+.ac-item,.export-item,.dtbl td,.tbl td{line-height:1.35;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+
+
+/* =========================================================
+   FONT SIZE PATCH - Clara
+   Purpose: keep the existing corporate design, only make text
+   slightly bigger and more readable.
+   ========================================================= */
+html{font-size:15px !important;}
+body{font-size:15px !important;}
+.logo-t1{font-size:1.04rem !important;}
+.logo-t2{font-size:.64rem !important;}
+.hdate{font-size:.78rem !important;}
+.sb-title{font-size:.78rem !important;}
+.sb-sub{font-size:.78rem !important;}
+.fsec-lbl{font-size:.72rem !important;}
+.flabel{font-size:.86rem !important;}
+input,select,textarea{font-size:.93rem !important;}
+.btn{font-size:.88rem !important;}
+.btn-submit{font-size:1rem !important;}
+.btn-reset{font-size:.9rem !important;}
+.vopt label{font-size:.9rem !important;}
+.vopt label .vprice{font-size:.72rem !important;}
+.lb-sub-lbl{font-size:.7rem !important;}
+.lb-sopt label{font-size:.78rem !important;}
+.fuel-card .fname{font-size:.86rem !important;}
+.fuel-card .fprice{font-size:.72rem !important;}
+.fuel-pct-inp{font-size:1rem !important;}
+.fuel-slider-hint{font-size:.74rem !important;}
+.fuel-preset-btn{font-size:.74rem !important;}
+.rp-city{font-size:.94rem !important;}
+.rp-info{font-size:.8rem !important;}
+.hint-box{font-size:.82rem !important;}
+.pp-label{font-size:.74rem !important;}
+.pp-item-lbl{font-size:.72rem !important;}
+.pp-item-val{font-size:1rem !important;}
+.sec-ttl{font-size:1.06rem !important;}
+.sec-cnt{font-size:.78rem !important;}
+.fbar input,.fbar select{font-size:.9rem !important;}
+.tbl th{font-size:.75rem !important;}
+.tbl td{font-size:.93rem !important;}
+.total-c,.total-pp{font-size:1.04rem !important;}
+.vtag{font-size:.7rem !important;}
+.aBtn{font-size:.95rem !important;}
+.empty p{font-size:.94rem !important;}
+.empty small{font-size:.8rem !important;}
+.export-item{font-size:.9rem !important;}
+.ac-item{font-size:.94rem !important;}
+.ac-isl,.atag{font-size:.68rem !important;}
+.map-pin-info{font-size:.88rem !important;}
+.map-pin-coords{font-size:.8rem !important;}
+.map-spm-match{font-size:.78rem !important;}
+.map-tip{font-size:.78rem !important;}
+.m-title,.map-modal-title{font-size:1.18rem !important;}
+.mr-city{font-size:1.24rem !important;}
+.dtbl th{font-size:.82rem !important;}
+.dtbl td{font-size:.98rem !important;}
+.dbadge{font-size:.78rem !important;}
+
+
+
+/* Delivery Type & Safety Factor */
+.safety-factor-box{display:flex;align-items:flex-start;gap:.55rem;margin-top:.65rem;padding:.62rem .75rem;border:1px solid var(--border2);border-radius:8px;background:#fff;cursor:pointer;transition:all .15s ease;}
+.safety-factor-box:hover{background:var(--amber-pale);border-color:var(--border);}
+.safety-factor-box input{width:16px;height:16px;margin-top:2px;accent-color:var(--amber);flex-shrink:0;}
+.sf-ui{display:flex;flex-direction:column;gap:2px;line-height:1.3;}
+.sf-title{font-size:.88rem;font-weight:800;color:var(--text);}
+.sf-desc{font-size:.76rem;color:var(--muted);}
+.delivery-badge,.safety-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--amber-pale);border:1px solid var(--border);color:var(--amber);border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:800;}
+.safety-badge{background:#FFF9EA;color:var(--warning);border-color:#E8D9B2;}
+.db-safety{background:#FFF9EA !important;color:var(--warning) !important;border-color:#E8D9B2 !important;}
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">⚓</div>
+    <div class="logo-texts">
+      <div class="logo-t1">Cipta Krida Bahari</div>
+      <div class="logo-t2">Sistem Uang Jalan v9</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="hdate" id="hdate"></div>
+    <div class="export-dd" id="exportDD">
+      <button class="btn btn-amber" onclick="toggleExportDD(event)">📤 Export ▾</button>
+      <div class="export-menu" id="exportMenu">
+        <div class="export-item" onclick="closeExportDD();exportPDF()"><span class="ei-icon">📄</span> Export PDF</div>
+        <div class="export-item" onclick="closeExportDD();exportExcel()"><span class="ei-icon">📊</span> Export Excel</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="sb-title" id="formMode">+ Tambah Project Baru</div>
+    <div class="sb-sub">Isi form di bawah lalu simpan ke dashboard</div>
+  </div>
+  <div class="sb-body">
+
+    <!-- Identitas -->
+    <div class="fsec">
+      <div class="fsec-lbl">🏢 Identitas</div>
+      <div class="fg">
+        <label class="flabel">Tipe Delivery</label>
+        <select id="f_deliveryType" onchange="updatePreview()">
+          <option value="">— Tidak Pilih Tipe Delivery —</option>
+          <option value="Reguler Antar Cabang">Reguler Antar Cabang</option>
+          <option value="Reguler Intercity">Reguler Intercity</option>
+          <option value="Adhoc">Adhoc</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="flabel">Nama Perusahaan</label>
+        <input type="text" id="f_customer" placeholder="Nama perusahaan / customer">
+      </div>
+    </div>
+
+    <!-- Rute -->
+    <div class="fsec">
+      <div class="fsec-lbl">🗺 Rute Perjalanan</div>
+      <div class="fg">
+        <label class="flabel">Cabang Asal (CKB)</label>
+        <select id="f_origin" onchange="onRouteChange()">
+          <option value="">— Pilih Cabang CKB —</option>
+          <option value="CKB Cakung">CKB Cakung (Jakarta)</option>
+        </select>
+      </div>
+      <div class="fg ac-box">
+        <label class="flabel">Kota / Area Tujuan <span class="atag" id="destTag" style="display:none;"></span></label>
+        <div style="display:flex;gap:.4rem;align-items:stretch;">
+          <input type="text" id="f_dest" placeholder="Ketik nama kota / area tujuan..." autocomplete="off"
+            oninput="acShow()" onfocus="acShow()" onblur="setTimeout(acHide,200)" onkeydown="acKey(event)"
+            style="flex:1;">
+          <button onclick="openMapPicker()" title="Pilih lokasi spesifik di peta"
+            style="padding:0 .75rem;background:var(--teal-pale);border:1.5px solid rgba(22,163,74,.3);
+            border-radius:var(--radius-sm);cursor:pointer;font-size:1rem;color:var(--teal);
+            transition:all .18s;flex-shrink:0;white-space:nowrap;"
+            onmouseover="this.style.background='var(--teal)';this.style.color='#fff'"
+            onmouseout="this.style.background='var(--teal-pale)';this.style.color='var(--teal)'">
+            📍 Peta
+          </button>
+        </div>
+        <div id="specificLocInfo" style="display:none;margin-top:.4rem;font-size:.74rem;
+          background:var(--teal-pale);border:1.5px solid rgba(22,163,74,.2);border-radius:var(--radius-sm);
+          padding:.4rem .7rem;color:var(--teal);font-weight:500;"></div>
+      </div>
+      <div id="rp"></div>
+    </div>
+
+    <!-- Kendaraan -->
+    <div class="fsec">
+      <div class="fsec-lbl">🚛 Jenis Kendaraan</div>
+      <div class="vgrid">
+        <div class="vopt">
+          <input type="radio" name="fv" id="vLB" value="lowbed" checked onchange="onVehicleChange()">
+          <label for="vLB"><span class="vi">🚛</span>Low Bed<span class="vprice" id="vpLB">—</span></label>
+        </div>
+        <div class="vopt">
+          <input type="radio" name="fv" id="vSL" value="selfloader" onchange="onVehicleChange()">
+          <label for="vSL"><span class="vi">🚚</span>Self Loader<span class="vprice" id="vpSL">—</span></label>
+        </div>
+      </div>
+
+      <!-- Sub-tipe Low Bed: Scania / Iveco / Hino -->
+      <div id="lbSubWrap">
+        <div class="lb-sub-lbl">🔧 Brand Low Bed</div>
+        <div class="lb-subopts" style="flex-wrap:wrap;gap:.35rem;">
+          <div class="lb-sopt">
+            <input type="radio" name="fvLBsub" id="vLBHino" value="hino" checked onchange="onLBBrandChange()">
+            <label for="vLBHino"><span class="lbi">🟠</span> Hino</label>
+          </div>
+          <div class="lb-sopt">
+            <input type="radio" name="fvLBsub" id="vLBIveco" value="iveco" onchange="onLBBrandChange()">
+            <label for="vLBIveco"><span class="lbi">🔵</span> Iveco</label>
+          </div>
+          <div class="lb-sopt">
+            <input type="radio" name="fvLBsub" id="vLBScania" value="scania" onchange="onLBBrandChange()">
+            <label for="vLBScania"><span class="lbi">🔴</span> Scania</label>
+          </div>
+        </div>
+        <!-- Unit Kendaraan Low Bed -->
+        <div id="lbUnitWrap" style="margin-top:.55rem;animation:fadeSlideIn .2s ease;">
+          <div class="lb-sub-lbl">🚛 Unit Kendaraan</div>
+          <select id="fvLBUnit" onchange="updatePreview()"
+            style="font-size:.82rem;padding:.45rem .75rem;border-color:#bfdbfe;background:#eff6ff;color:#1d4ed8;font-weight:600;">
+            <option value="">— Pilih Unit —</option>
+          </select>
+        </div>
+      </div>
+      <!-- Sub-tipe Self Loader -->
+      <div id="slSubWrap" style="display:none;margin-top:.65rem;animation:fadeSlideIn .2s ease;">
+        <div class="lb-sub-lbl">🚚 Unit Self Loader</div>
+        <select id="fvSLUnit" onchange="onVehicleChange()"
+          style="font-size:.82rem;padding:.45rem .75rem;border-color:#e9d5ff;background:#f5f3ff;color:#7c3aed;font-weight:600;">
+          <option value="">— Pilih Unit —</option>
+          <option value="hino-500-9170">Hino 500 FM280JW 6x4 · B 9170 SIU</option>
+          <option value="hino-500-9171">Hino 500 FM280JW 6x4 · B 9171 SIU</option>
+          <option value="hino-500-9172">Hino 500 FM280JW 6x4 · B 9172 SIU</option>
+          <option value="hino-500-9173">Hino 500 FM280JW 6x4 · B 9173 SIU</option>
+        </select>
+      </div>
+      <div id="pricePreview" style="margin-top:.7rem;"></div>
+    </div>
+
+    <!-- Bahan Bakar -->
+    <div class="fsec">
+      <div class="fsec-lbl">⛽ Jenis Bahan Bakar</div>
+      <div class="fuel-mix-wrap">
+        <!-- Dua kartu dengan input persen -->
+        <div class="fuel-cards">
+          <div class="fuel-card subsidi active-s" id="fuelCardS">
+            <span class="fi">🟢</span>
+            <span class="fname">Solar Subsidi</span>
+            <span class="fprice" id="lblSubsidiPrice">Rp 6.800/L</span>
+            <div class="fuel-pct-inp-wrap">
+              <input type="number" class="fuel-pct-inp" id="inpPctS" min="0" max="100" value="100"
+                oninput="onPctInputS()" onblur="clampPctInputs()">
+              <span class="fuel-pct-sym">%</span>
+            </div>
+          </div>
+          <div class="fuel-card nonsubsidi" id="fuelCardN">
+            <span class="fi">🟡</span>
+            <span class="fname">Non-Subsidi</span>
+            <span class="fprice" id="lblNonsubsidiPrice">Rp 13.950/L</span>
+            <div class="fuel-pct-inp-wrap">
+              <input type="number" class="fuel-pct-inp" id="inpPctN" min="0" max="100" value="0"
+                oninput="onPctInputN()" onblur="clampPctInputs()">
+              <span class="fuel-pct-sym">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slider -->
+        <div class="fuel-slider-section">
+          <div class="fuel-slider-hint">
+            <span class="drag-icon">↔</span>
+            <span>Geser slider atau ketik % di atas untuk mengatur campuran BBM</span>
+          </div>
+          <div class="fuel-track-outer">
+            <div class="fuel-track" id="fuelTrack"></div>
+            <div class="fuel-track-fill-s" id="fuelFillS"></div>
+            <div class="fuel-track-fill-n" id="fuelFillN"></div>
+            <input type="range" class="fuel-range" id="fuelSlider" min="0" max="100" value="100"
+              oninput="onFuelSliderChange()">
+            <div class="fuel-thumb-vis" id="fuelThumbVis"></div>
+          </div>
+        </div>
+
+        <!-- Preset cepat -->
+        <div class="fuel-presets">
+          <button class="fuel-preset-btn active" id="preset100" onclick="setFuelPreset(100)">100% Sub</button>
+          <button class="fuel-preset-btn" id="preset75"  onclick="setFuelPreset(75)">75% Sub</button>
+          <button class="fuel-preset-btn" id="preset50"  onclick="setFuelPreset(50)">50/50</button>
+          <button class="fuel-preset-btn" id="preset25"  onclick="setFuelPreset(25)">25% Sub</button>
+          <button class="fuel-preset-btn" id="preset0"   onclick="setFuelPreset(0)">100% Non</button>
+        </div>
+      </div>
+      <div id="fuelHint" class="hint-box" style="font-size:.74rem;padding:.45rem .75rem;margin-top:.55rem;"></div>
+      <label class="safety-factor-box" for="f_safetyFactor">
+        <input type="checkbox" id="f_safetyFactor" onchange="updatePreview()">
+        <span class="sf-ui">
+          <span class="sf-title">Add Safety Factor</span>
+          <span class="sf-desc">Add 10% extra KM for fuel calculation</span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Biaya Tambahan -->
+    <div class="fsec">
+      <div class="fsec-lbl">➕ Biaya Tambahan Lainnya</div>
+      <div id="xList"></div>
+      <button class="ibtn ibtn-add" style="width:100%;border-radius:var(--radius-sm);height:34px;font-size:.85rem;margin-top:.3rem;" onclick="addExtra()">+ Tambah Biaya</button>
+    </div>
+
+    <!-- Kurangi Biaya -->
+    <div class="fsec">
+      <div class="fsec-lbl">➖ Kurangi Biaya</div>
+      <div id="dList"></div>
+      <button class="ibtn ibtn-add" style="width:100%;border-radius:var(--radius-sm);height:34px;font-size:.85rem;margin-top:.3rem;background:rgba(220,38,38,.08);color:var(--danger);border-color:rgba(220,38,38,.18);" onclick="addDiscount()">− Tambah Pengurangan</button>
+    </div>
+
+    <!-- Catatan -->
+    <div class="fsec">
+      <div class="fsec-lbl">📝 Catatan</div>
+      <textarea id="f_notes" rows="3" placeholder="Catatan tambahan jika ada..." style="resize:vertical;min-height:68px;"></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="submitProject()">⚡ SIMPAN KE DASHBOARD</button>
+    <button class="btn-reset" onclick="resetForm()">↺ Reset Form</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="dash">
+    <div class="sec-hdr">
+      <div class="sec-ttl">📋 Monitoring Uang Jalan <span class="sec-cnt" id="pCount">0 project</span></div>
+      <div class="fbar">
+        <input type="text" id="srchQ" placeholder="🔍 Cari nama / kota..." oninput="renderTable()">
+        <select id="fVehicle" onchange="renderTable()">
+          <option value="">Semua Kendaraan</option>
+          <option value="lowbed">Low Bed</option>
+          <option value="selfloader">Self Loader</option>
+        </select>
+      </div>
+    </div>
+    <div class="twrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>#</th><th>Perusahaan</th><th>Rute</th>
+          <th class="r">KM</th><th class="r">Hari</th>
+          <th>Kendaraan</th>
+          <th class="r">Uang Jalan (PP)</th>
+          <th class="r">Fixed Cost</th>
+          <th>Aksi</th>
+        </tr></thead>
+        <tbody id="tBody"></tbody>
+      </table>
+      <div class="empty" id="emptyEl">
+        <div class="ei">📋</div>
+        <p>Belum ada project.</p>
+        <small>Isi form di kiri lalu klik Simpan ke Dashboard.</small>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-title" id="mTitle">Detail</div>
+      <button class="m-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body" id="mBody"></div>
+    <div class="m-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Tutup</button>
+      <div class="export-dd" id="exportDDModal">
+        <button class="btn btn-amber" onclick="toggleExportDDModal(event)">📤 Export ▾</button>
+        <div class="export-menu" style="bottom:calc(100% + 6px);top:auto;">
+          <div class="export-item" onclick="closeExportDDModal();exportExcelSingle()"><span class="ei-icon">📊</span> Export Excel</div>
+          <div class="export-item" onclick="closeExportDDModal();printModal()"><span class="ei-icon">📄</span> Cetak PDF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="acList"></div>
+
+<!-- MAP PICKER MODAL -->
+<div class="map-modal-bg" id="mapModal">
+  <div class="map-modal">
+    <div class="map-modal-head">
+      <div class="map-modal-title">📍 Pilih Lokasi Tujuan Spesifik</div>
+      <button class="m-close" onclick="closeMapModal()">✕</button>
+    </div>
+    <div class="map-search-bar">
+      <input type="text" id="mapSearchInput" placeholder="Cari alamat atau nama tempat... (contoh: Kawasan Industri MM2100 Bekasi)"
+        onkeydown="if(event.key==='Enter') searchMapLocation()">
+      <button class="map-search-btn" onclick="searchMapLocation()">🔍 Cari</button>
+    </div>
+    <div class="map-tip">💡 Klik di peta untuk menempatkan pin, atau gunakan pencarian di atas</div>
+    <div id="mapContainer">
+      <div id="leafletMap"></div>
+    </div>
+    <div class="map-info-bar" id="mapInfoBar" style="display:none;">
+      <div class="map-pin-info">
+        <div class="map-pin-addr" id="mapPinAddr">—</div>
+        <div class="map-pin-coords" id="mapPinCoords"></div>
+      </div>
+      <div class="map-spm-match" id="mapSpmMatch"></div>
+    </div>
+    <div class="map-modal-foot">
+      <button class="btn btn-ghost" onclick="closeMapModal()">Batal</button>
+      <button class="btn btn-amber" id="mapConfirmBtn" onclick="confirmMapLocation()" disabled
+        style="opacity:.5;cursor:not-allowed;">✓ Pakai Lokasi Ini</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// KOORDINAT KOTA — untuk OSRM API (gratis, tanpa API key)
+// Digunakan HANYA sebagai referensi jarak, bukan untuk mengubah harga
+// Rute menggunakan profile "driving" — OSRM otomatis hindari jalan tidak sesuai
+// ═══════════════════════════════════════
+const CITY_COORDS = {
+  "CKB Cakung":                  [-6.1756, 106.9537],
+  "TG PRIOK, MARUNDA CENTRE AREA":[-6.1053, 106.8787],
+  "BSD":                         [-6.3012, 106.6527],
+  "KUNINGAN, JAKSEL":            [-6.2300, 106.8310],
+  "BEKASI":                      [-6.2383, 106.9756],
+  "BOGOR":                       [-6.5971, 106.8060],
+  "SUKABUMI":                    [-6.9147, 106.9303],
+  "CIBINONG":                    [-6.4820, 106.8623],
+  "CIBITUNG":                    [-6.2581, 107.1319],
+  "CIKARANG":                    [-6.2497, 107.1475],
+  "KERAWANG":                    [-6.3150, 107.2985],
+  "BANDUNG":                     [-6.9175, 107.6191],
+  "TASIKMALAYA":                 [-7.3274, 108.2207],
+  "CILACAP":                     [-7.7256, 109.0152],
+  "CIREBON":                     [-6.7055, 108.5571],
+  "TEGAL":                       [-6.8694, 109.1402],
+  "CILEGON":                     [-6.0025, 106.0548],
+  "SERANG":                      [-6.1202, 106.1503],
+  "BALARAJA":                    [-6.1955, 106.4957],
+  "SEMARANG":                    [-6.9932, 110.4203],
+  "PURWOKERTO":                  [-7.4197, 109.2341],
+  "SOLO":                        [-7.5755, 110.8243],
+  "JOGJA":                       [-7.7956, 110.3695],
+  "KEDIRI":                      [-7.8481, 112.0182],
+  "TUBAN":                       [-6.8955, 112.0509],
+  "GRESIK":                      [-7.1574, 112.6551],
+  "LAMONGAN":                    [-7.1174, 112.4162],
+  "SURABAYA":                    [-7.2575, 112.7521],
+  "MALANG":                      [-7.9839, 112.6214],
+  "BANYUWANGI":                  [-8.2325, 114.3690],
+  "BALI":                        [-8.6705, 115.2126],  // Denpasar
+  "MATARAM":                     [-8.5852, 116.1172],
+  "BATU HIJAU":                  [-8.9652, 116.8735],
+  "GARUT":                       [-7.2267, 107.9006],
+  "SUMBAWA":                     [-8.4892, 117.4162],
+  "TPA IJOBAIT LOMBOK":          [-8.5812, 116.1102],
+  "BOJONEGORO":                  [-7.1545, 111.8815],
+  "SENTOLO, GARUT":              [-7.2267, 107.9006],
+  "CIANJUR":                     [-6.8218, 107.1423],
+  "BANJARNEGARA, WADUK MRICAN":  [-7.3885, 109.6950],
+  "PATIMBAN, SUBANG":            [-6.3027, 107.7503],
+  "PROBOLINGGO":                 [-7.7453, 113.2151],
+  "PANGGUNG REJO, BLITAR":       [-8.0953, 112.1608],
+};
+
+// ═══════════════════════════════════════
+// OSRM — Routing sesuai jenis kendaraan berat (truck)
+// Profile: "driving" (OSRM gratis, tidak perlu API key)
+// Catatan: OSRM belum punya profile "truck" di server publik,
+// tapi "driving" sudah cukup representatif untuk rute jalan raya.
+// Jarak SPM tetap sebagai acuan resmi untuk harga.
+// ═══════════════════════════════════════
+const OSRM_BASE = "https://router.project-osrm.org/route/v1/driving/";
+let osrmCache = {};
+
+async function getOSRMDistance(originKey, destKey){
+  const cacheKey = originKey+"|"+destKey;
+  if(osrmCache[cacheKey] !== undefined) return osrmCache[cacheKey];
+
+  const o = CITY_COORDS[originKey], d = CITY_COORDS[destKey];
+  if(!o || !d){ osrmCache[cacheKey]=null; return null; }
+
+  // Koordinat dalam format lng,lat (OSRM convention)
+  const url = `${OSRM_BASE}${o[1]},${o[0]};${d[1]},${d[0]}?overview=false`;
+  try{
+    const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    if(!r.ok){ osrmCache[cacheKey]=null; return null; }
+    const data = await r.json();
+    if(data.code==="Ok" && data.routes && data.routes[0]){
+      const km = Math.round(data.routes[0].distance / 1000);
+      osrmCache[cacheKey] = km;
+      return km;
+    }
+    osrmCache[cacheKey]=null; return null;
+  } catch(e){
+    osrmCache[cacheKey]=null; return null;
+  }
+}
+
+// ═══════════════════════════════════════
+// ROUTE DATABASE — dari Excel SPM
+// Format: "origin|dest": [km_1trip, hari_lowbed, hari_selfloader, uang_jalan_lowbed, uang_jalan_selfloader, keterangan_tol, keterangan_penyebrangan]
+// ═══════════════════════════════════════
+
+// SPM Pricing table (key = "ORIGIN_CLEAN|DEST")
+// Semua origin dari CKB Cakung
+const SPM_ROUTES = [
+  {no:1,  origin:"CKB Cakung", dest:"TG PRIOK, MARUNDA CENTRE AREA", km:18,    kmpp:36,    hLB:1,  hSL:1,  ujLB:450000,   ujSL:400000,   fcLB:1214941.72, fcSL:878830.87,
+    tol:"Tol Dalam Kota Jakarta (segmen Cakung–Priok)", crossing:"",
+    tollDetail:"Tol Dalam Kota Jakarta"},
+  {no:2,  origin:"CKB Cakung", dest:"BSD",                           km:61.5,  kmpp:123,   hLB:1,  hSL:1,  ujLB:910000,   ujSL:780000,   fcLB:1214941.72, fcSL:878830.87,
+    tol:"Tol Jakarta-Tangerang, Tol TB Simatupang, Tol JORR", crossing:""},
+  {no:3,  origin:"CKB Cakung", dest:"KUNINGAN, JAKSEL",              km:40,    kmpp:80,    hLB:1,  hSL:1,  ujLB:770000,   ujSL:610000,   fcLB:1214941.72, fcSL:878830.87,
+    tol:"Tol Dalam Kota Jakarta (segmen Cawang–Gatot Subroto)", crossing:""},
+  {no:4,  origin:"CKB Cakung", dest:"BEKASI",                        km:34,    kmpp:68,    hLB:1,  hSL:1,  ujLB:790000,   ujSL:650000,   fcLB:1214941.72, fcSL:878830.87,
+    tol:"Tol Jakarta-Cikampek (segmen Cakung–Bekasi Barat)", crossing:""},
+  {no:5,  origin:"CKB Cakung", dest:"BOGOR",                         km:66.6,  kmpp:133.2, hLB:1,  hSL:1,  ujLB:1540000,  ujSL:1230000,  fcLB:1214941.72, fcSL:878830.87,
+    tol:"Tol JORR, Tol Jagorawi (Jakarta–Bogor)", crossing:""},
+  {no:6,  origin:"CKB Cakung", dest:"SUKABUMI",                      km:123,   kmpp:246,   hLB:1,  hSL:1,  ujLB:1790000,  ujSL:1500000,  fcLB:1214941.72, fcSL:878830.87,
+    tol:"Tol JORR, Tol Jagorawi, Tol Bocimi (Bogor–Sukabumi)", crossing:""},
+  {no:7,  origin:"CKB Cakung", dest:"CIBINONG",                      km:63,    kmpp:126,   hLB:1,  hSL:1,  ujLB:1420000,  ujSL:1210000,  fcLB:988967,     fcSL:982145,
+    tol:"Tol JORR, Tol Jagorawi (segmen Cibinong)", crossing:""},
+  {no:8,  origin:"CKB Cakung", dest:"CIBITUNG",                      km:39.1,  kmpp:78.2,  hLB:1,  hSL:1,  ujLB:1270000,  ujSL:1110000,  fcLB:988967,     fcSL:982145,
+    tol:"Tol Jakarta-Cikampek (segmen Cibitung)", crossing:""},
+  {no:9,  origin:"CKB Cakung", dest:"CIKARANG",                      km:46.9,  kmpp:93.8,  hLB:1,  hSL:1,  ujLB:1320000,  ujSL:1140000,  fcLB:988967,     fcSL:982145,
+    tol:"Tol Jakarta-Cikampek (segmen Cikarang)", crossing:""},
+  {no:10, origin:"CKB Cakung", dest:"KERAWANG",                      km:75,    kmpp:150,   hLB:1,  hSL:1,  ujLB:1490000,  ujSL:1260000,  fcLB:988967,     fcSL:982145,
+    tol:"Tol Jakarta-Cikampek (Cikampek–Karawang Timur)", crossing:""},
+  {no:11, origin:"CKB Cakung", dest:"BANDUNG",                       km:146,   kmpp:292,   hLB:2,  hSL:2,  ujLB:2890000,  ujSL:2490000,  fcLB:1977934,    fcSL:1964290,
+    tol:"Tol Jakarta-Cikampek, Tol Cipularang, Tol Padaleunyi", crossing:""},
+  {no:12, origin:"CKB Cakung", dest:"TASIKMALAYA",                   km:286,   kmpp:572,   hLB:4,  hSL:3,  ujLB:4200000,  ujSL:3390000,  fcLB:3955868,    fcSL:2946435,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali (exit Kertajati/Majalengka), lanjut arteri menuju Tasikmalaya", crossing:""},
+  {no:13, origin:"CKB Cakung", dest:"CILACAP",                       km:374,   kmpp:748,   hLB:4,  hSL:3,  ujLB:4740000,  ujSL:3750000,  fcLB:3955868,    fcSL:2946435,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang (sebagian, keluar menuju Cilacap)", crossing:""},
+  {no:14, origin:"CKB Cakung", dest:"CIREBON",                       km:214,   kmpp:428,   hLB:2,  hSL:2,  ujLB:3680000,  ujSL:3240000,  fcLB:1977934,    fcSL:1964290,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci (keluar Kanci/Cirebon)", crossing:""},
+  {no:15, origin:"CKB Cakung", dest:"TEGAL",                         km:290,   kmpp:580,   hLB:3,  hSL:2,  ujLB:4380000,  ujSL:3550000,  fcLB:2966901,    fcSL:1964290,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang", crossing:""},
+  {no:16, origin:"CKB Cakung", dest:"CILEGON",                       km:129,   kmpp:258,   hLB:1,  hSL:1,  ujLB:1780000,  ujSL:1510000,  fcLB:988967,     fcSL:982145,
+    tol:"Tol Jakarta-Tangerang, Tol Tangerang-Merak (segmen Cilegon)", crossing:""},
+  {no:17, origin:"CKB Cakung", dest:"SERANG",                        km:108,   kmpp:216,   hLB:1,  hSL:1,  ujLB:1650000,  ujSL:1430000,  fcLB:988967,     fcSL:982145,
+    tol:"Tol Jakarta-Tangerang, Tol Tangerang-Merak (segmen Serang)", crossing:""},
+  {no:18, origin:"CKB Cakung", dest:"BALARAJA",                      km:81,    kmpp:162,   hLB:1,  hSL:1,  ujLB:1480000,  ujSL:1320000,  fcLB:988967,     fcSL:982145,
+    tol:"Tol Jakarta-Tangerang, Tol Tangerang-Merak (segmen Balaraja)", crossing:""},
+  {no:19, origin:"CKB Cakung", dest:"SEMARANG",                      km:429,   kmpp:858,   hLB:3,  hSL:3,  ujLB:6090000,  ujSL:5210000,  fcLB:2966901,    fcSL:2946435,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang", crossing:""},
+  {no:20, origin:"CKB Cakung", dest:"PURWOKERTO",                    km:351,   kmpp:702,   hLB:4,  hSL:4,  ujLB:5830000,  ujSL:5110000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang (keluar Pemalang menuju Purwokerto)", crossing:""},
+  {no:21, origin:"CKB Cakung", dest:"SOLO",                          km:533,   kmpp:1066,  hLB:4,  hSL:4,  ujLB:7110000,  ujSL:6020000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo", crossing:""},
+  {no:22, origin:"CKB Cakung", dest:"JOGJA",                         km:559,   kmpp:1118,  hLB:4,  hSL:4,  ujLB:7270000,  ujSL:6120000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Yogyakarta", crossing:""},
+  {no:23, origin:"CKB Cakung", dest:"KEDIRI",                        km:707,   kmpp:1414,  hLB:4,  hSL:4,  ujLB:10090000, ujSL:7640000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono", crossing:""},
+  {no:24, origin:"CKB Cakung", dest:"TUBAN",                         km:653,   kmpp:1306,  hLB:4,  hSL:4,  ujLB:9760000,  ujSL:7420000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono (keluar menuju Tuban)", crossing:""},
+  {no:25, origin:"CKB Cakung", dest:"GRESIK",                        km:736,   kmpp:1472,  hLB:4,  hSL:4,  ujLB:10270000, ujSL:7760000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya, Tol Surabaya-Gresik", crossing:""},
+  {no:26, origin:"CKB Cakung", dest:"LAMONGAN",                      km:790,   kmpp:1580,  hLB:4,  hSL:4,  ujLB:10600000, ujSL:7980000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya (keluar menuju Lamongan)", crossing:""},
+  {no:27, origin:"CKB Cakung", dest:"SURABAYA",                      km:810,   kmpp:1620,  hLB:4,  hSL:4,  ujLB:10730000, ujSL:8110000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya", crossing:""},
+  {no:28, origin:"CKB Cakung", dest:"MALANG",                        km:842,   kmpp:1684,  hLB:5,  hSL:5,  ujLB:10840000, ujSL:9110000,  fcLB:4944835,    fcSL:4910725,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya, Tol Pandaan-Malang", crossing:""},
+  {no:29, origin:"CKB Cakung", dest:"BANYUWANGI",                    km:1053,  kmpp:2106,  hLB:5,  hSL:5,  ujLB:12140000, ujSL:9970000,  fcLB:4944835,    fcSL:4910725,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya", crossing:""},
+  {no:30, origin:"CKB Cakung", dest:"BALI",                          km:1200,  kmpp:2400,  hLB:10, hSL:10, ujLB:19170000, ujSL:16200000, fcLB:9889670,    fcSL:9821450,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya",
+    crossing:"⛴ Penyeberangan Ketapang (Banyuwangi) – Gilimanuk (Bali)"},
+  {no:31, origin:"CKB Cakung", dest:"MATARAM",                       km:1299,  kmpp:2598,  hLB:11, hSL:11, ujLB:46510000, ujSL:36230000, fcLB:10878637,   fcSL:10803595,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya",
+    crossing:"⛴ Ketapang–Gilimanuk (Bali) + Padangbai–Lembar (NTB)"},
+  {no:32, origin:"CKB Cakung", dest:"BATU HIJAU",                    km:1372.5,kmpp:2745,  hLB:11, hSL:11, ujLB:48960000, ujSL:38100000, fcLB:10878637,   fcSL:10803595,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya",
+    crossing:"⛴ Ketapang–Gilimanuk (Bali) + Padangbai–Lembar (NTB) + Kayangan–Pototano (Sumbawa)"},
+  {no:33, origin:"CKB Cakung", dest:"GARUT",                         km:280,   kmpp:560,   hLB:2,  hSL:2,  ujLB:6340000,  ujSL:2560000,  fcLB:1977934,    fcSL:1964290,
+    tol:"Tol Jakarta-Cikampek, Tol Cipularang, Tol Padaleunyi, Tol Soroja (segmen Bandung–Garut)", crossing:""},
+  {no:34, origin:"CKB Cakung", dest:"SUMBAWA",                       km:1498,  kmpp:2996,  hLB:11, hSL:11, ujLB:56910000, ujSL:37610000, fcLB:10878637,   fcSL:10803595,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya",
+    crossing:"⛴ Ketapang–Gilimanuk (Bali) + Padangbai–Lembar (NTB) + Kayangan–Pototano (Sumbawa)"},
+  {no:35, origin:"CKB Cakung", dest:"TPA IJOBAIT LOMBOK",            km:990,   kmpp:1980,  hLB:11, hSL:11, ujLB:44600000, ujSL:34180000, fcLB:10878637,   fcSL:10803595,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya",
+    crossing:"⛴ Ketapang–Gilimanuk (Bali) + Padangbai–Lembar (NTB)"},
+  {no:36, origin:"CKB Cakung", dest:"BOJONEGORO",                    km:680,   kmpp:1360,  hLB:4,  hSL:4,  ujLB:10110000, ujSL:7880000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi (keluar menuju Bojonegoro)", crossing:""},
+  {no:37, origin:"CKB Cakung", dest:"SENTOLO, GARUT",                km:330,   kmpp:660,   hLB:3,  hSL:3,  ujLB:4720000,  ujSL:4340000,  fcLB:2966901,    fcSL:2946435,
+    tol:"Tol Jakarta-Cikampek, Tol Cipularang, Tol Padaleunyi, Tol Soroja (sebagian)", crossing:""},
+  {no:38, origin:"CKB Cakung", dest:"CIANJUR",                       km:130,   kmpp:260,   hLB:2,  hSL:2,  ujLB:2760000,  ujSL:2750000,  fcLB:1977934,    fcSL:1964290,
+    tol:"Tol Jakarta-Cikampek, Tol Cipularang (sebagian), kemudian via Puncak atau Tol Bocimi", crossing:""},
+  {no:39, origin:"CKB Cakung", dest:"BANJARNEGARA, WADUK MRICAN",    km:410,   kmpp:820,   hLB:3,  hSL:3,  ujLB:3710000,  ujSL:4480000,  fcLB:2966901,    fcSL:2946435,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang (keluar menuju Banjarnegara)", crossing:""},
+  {no:40, origin:"CKB Cakung", dest:"PATIMBAN, SUBANG",              km:145,   kmpp:290,   hLB:2,  hSL:2,  ujLB:1950000,  ujSL:1800000,  fcLB:1977934,    fcSL:1964290,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali (keluar Subang–Patimban)", crossing:""},
+  {no:41, origin:"CKB Cakung", dest:"PROBOLINGGO",                   km:920,   kmpp:1840,  hLB:4,  hSL:4,  ujLB:7880000,  ujSL:9050000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono, Tol Kertosono-Mojokerto, Tol Mojokerto-Surabaya, Tol Gempol-Pasuruan (menuju Probolinggo)", crossing:""},
+  {no:42, origin:"CKB Cakung", dest:"PANGGUNG REJO, BLITAR",         km:785,   kmpp:1570,  hLB:4,  hSL:4,  ujLB:8830000,  ujSL:7090000,  fcLB:3955868,    fcSL:3928580,
+    tol:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang, Tol Semarang-Solo, Tol Solo-Ngawi, Tol Ngawi-Kertosono (keluar menuju Blitar)", crossing:""},
+];
+
+// Build lookup
+const SPM_MAP = {};
+SPM_ROUTES.forEach(r=>{ SPM_MAP[(r.origin+"|"+r.dest).toUpperCase()] = r; });
+
+// ── SYNC dari Kelola Jalur ──
+// Membaca ckb_route_sync (disimpan oleh ckb-kelola-jalur.html)
+// dan meng-override / menambah data SPM_MAP
+function applyRouteSync(){
+  try {
+    const raw = localStorage.getItem("ckb_route_sync");
+    if(!raw) return;
+    const syncMap = JSON.parse(raw);
+    Object.entries(syncMap).forEach(([key, r]) => {
+      // Override atau tambah ke SPM_MAP
+      const existing = SPM_MAP[key];
+      if(existing){
+        existing.km = r.km; existing.kmpp = r.kmpp;
+        existing.hLB = r.hLB; existing.hSL = r.hSL;
+        existing.ujLB = r.ujLB; existing.ujSL = r.ujSL;
+        existing.tol = r.tol; existing.crossing = r.crossing;
+      } else {
+        // Rute baru dari kelola jalur
+        SPM_ROUTES.push({
+          no: SPM_ROUTES.length+1,
+          origin: r.origin, dest: r.dest,
+          km: r.km, kmpp: r.kmpp,
+          hLB: r.hLB, hSL: r.hSL,
+          ujLB: r.ujLB, ujSL: r.ujSL,
+          fcLB: 0, fcSL: 0,
+          tol: r.tol, crossing: r.crossing
+        });
+        SPM_MAP[key] = SPM_ROUTES[SPM_ROUTES.length-1];
+      }
+      // Juga update BREAKDOWN jika ada tolSegs/crossSegs
+      if(r.tolSegs || r.crossSegs){
+        BREAKDOWN[r.dest] = BREAKDOWN[r.dest] || {tolSegs:{},crossSegs:{},crewLB:r.hLB*225000,crewSL:r.hSL*225000,solarLB:0,solarSL:0,sisaLB:0,sisaSL:0};
+        if(r.tolSegs) BREAKDOWN[r.dest].tolSegs = r.tolSegs;
+        if(r.crossSegs) BREAKDOWN[r.dest].crossSegs = r.crossSegs;
+      }
+    });
+  } catch(e){ console.warn("Route sync error:", e); }
+}
+// Panggil setelah BREAKDOWN didefinisikan (lihat bawah)
+
+
+// ═══════════════════════════════════════
+// BREAKDOWN PER RUTE (untuk detail komponen biaya)
+// Semua nilai PP (pulang pergi). sisa = operasional/overhead/dll agar total = ujLB/ujSL
+// Driver Rp150.000/hari, Helper Rp75.000/hari | Solar LB 3km/L, SL 3.5km/L @Rp6.800
+// Tol = tarif gol.V (lowbed/selfloader, lebih mahal dari gol.I)
+// ═══════════════════════════════════════
+const BREAKDOWN = {
+  "TG PRIOK, MARUNDA CENTRE AREA":{tolSegs:{"Tol Dalam Kota Jakarta":{lb:22000,sl:16500}},tolPP:33000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:81600,solarSL:69943,sisaLB:99400,sisaSL:72057},
+  "BSD":{tolSegs:{"Tol Jakarta-Tangerang":{lb:11500,sl:8500},"Tol TB Simatupang":{lb:16000,sl:12000},"Tol JORR":{lb:31500,sl:23500}},tolPP:88000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:278800,solarSL:238971,sisaLB:288200,sisaSL:228029},
+  "KUNINGAN, JAKSEL":{tolSegs:{"Tol Dalam Kota Jakarta":{lb:22000,sl:16500}},tolPP:33000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:181333,solarSL:155429,sisaLB:319667,sisaSL:196571},
+  "BEKASI":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500}},tolPP:108000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:154133,solarSL:132114,sisaLB:302867,sisaSL:211886},
+  "BOGOR":{tolSegs:{"Tol JORR":{lb:31500,sl:23500},"Tol Jagorawi":{lb:29500,sl:22000}},tolPP:91000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:301920,solarSL:258789,sisaLB:891080,sisaSL:655211},
+  "SUKABUMI":{tolSegs:{"Tol JORR":{lb:31500,sl:23500},"Tol Bocimi":{lb:42000,sl:31500}},tolPP:110000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:557600,solarSL:477943,sisaLB:860400,sisaSL:687057},
+  "CIBINONG":{tolSegs:{"Tol JORR":{lb:31500,sl:23500}},tolPP:47000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:285600,solarSL:244800,sisaLB:846400,sisaSL:693200},
+  "CIBITUNG":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500}},tolPP:108000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:177253,solarSL:151931,sisaLB:759747,sisaSL:652069},
+  "CIKARANG":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500}},tolPP:108000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:212613,solarSL:182240,sisaLB:774387,sisaSL:651760},
+  "KERAWANG":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500}},tolPP:108000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:340000,solarSL:291429,sisaLB:817000,sisaSL:662571},
+  "BANDUNG":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipularang":{lb:104000,sl:78000},"Tol Padaleunyi":{lb:22500,sl:17000}},tolPP:298000,crossSegs:{},crewLB:450000,crewSL:450000,solarLB:661867,solarSL:567314,sisaLB:1417133,sisaSL:1201686},
+  "TASIKMALAYA":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali (sebagian, exit Kertajati)":{lb:181500,sl:144500}},tolPP:471000,crossSegs:{},crewLB:900000,crewSL:675000,solarLB:1296533,solarSL:1111314,sisaLB:1532467,sisaSL:1233686},
+  "CILACAP":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500}},tolPP:770000,crossSegs:{},crewLB:900000,crewSL:675000,solarLB:1695467,solarSL:1453257,sisaLB:1043533,sisaSL:796743},
+  "CIREBON":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500}},tolPP:500000,crossSegs:{},crewLB:450000,crewSL:450000,solarLB:970133,solarSL:831543,sisaLB:1605867,sisaSL:1442457},
+  "TEGAL":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500}},tolPP:806000,crossSegs:{},crewLB:675000,crewSL:450000,solarLB:1314667,solarSL:1126857,sisaLB:1289333,sisaSL:1148143},
+  "CILEGON":{tolSegs:{"Tol Jakarta-Tangerang":{lb:11500,sl:8500},"Tol Tangerang-Merak":{lb:116500,sl:87500}},tolPP:192000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:584800,solarSL:501257,sisaLB:714200,sisaSL:591743},
+  "SERANG":{tolSegs:{"Tol Jakarta-Tangerang":{lb:11500,sl:8500},"Tol Tangerang-Merak":{lb:116500,sl:87500}},tolPP:192000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:489600,solarSL:419657,sisaLB:679400,sisaSL:593343},
+  "BALARAJA":{tolSegs:{"Tol Jakarta-Tangerang":{lb:11500,sl:8500}},tolPP:17000,crossSegs:{},crewLB:225000,crewSL:225000,solarLB:367200,solarSL:314743,sisaLB:864800,sisaSL:763257},
+  "SEMARANG":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500}},tolPP:1199000,crossSegs:{},crewLB:675000,crewSL:675000,solarLB:1944800,solarSL:1666971,sisaLB:1733200,sisaSL:1566029},
+  "PURWOKERTO":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500}},tolPP:770000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:1591200,solarSL:1363886,sisaLB:2237800,sisaSL:2021114},
+  "SOLO":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500}},tolPP:1361000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:2416267,solarSL:2071086,sisaLB:1775733,sisaSL:1535914},
+  "JOGJA":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Yogyakarta":{lb:85500,sl:64000}},tolPP:1489000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:2534133,solarSL:2172114,sisaLB:1646867,sisaSL:1406886},
+  "KEDIRI":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000}},tolPP:2049000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:3205067,solarSL:2747200,sisaLB:3074933,sisaSL:1810800},
+  "TUBAN":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000}},tolPP:2049000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:2960267,solarSL:2537371,sisaLB:2989733,sisaSL:1800629},
+  "GRESIK":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500},"Tol Surabaya-Gresik":{lb:14000,sl:10500}},tolPP:2366000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:3336533,solarSL:2859886,sisaLB:2660467,sisaSL:1501114},
+  "LAMONGAN":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:3581333,solarSL:3069714,sisaLB:2773667,sisaSL:1532286},
+  "SURABAYA":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:3672000,solarSL:3147429,sisaLB:2813000,sisaSL:1584571},
+  "MALANG":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500},"Tol Pandaan-Malang":{lb:71500,sl:53500}},tolPP:2452000,crossSegs:{},crewLB:1125000,crewSL:1125000,solarLB:3817067,solarSL:3271771,sisaLB:2409933,sisaSL:2128229},
+  "BANYUWANGI":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{},crewLB:1125000,crewSL:1125000,solarLB:4773600,solarSL:4091657,sisaLB:2896400,sisaSL:2275343},
+  "BALI":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{"Ketapang–Gilimanuk":{"lb":1243000,"sl":897600}},crewLB:2250000,crewSL:2250000,solarLB:5440000,solarSL:4662857,sisaLB:5649000,sisaSL:5013943},
+  "MATARAM":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{"Ketapang–Gilimanuk":{"lb":1243000,"sl":897600},"Padangbai–Lembar":{"lb":8808400,"sl":6074300}},crewLB:2475000,crewSL:2475000,solarLB:5888800,solarSL:5047543,sisaLB:14698400,sisaSL:12285657},
+  "BATU HIJAU":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{"Ketapang–Gilimanuk":{"lb":1243000,"sl":897600},"Padangbai–Lembar":{"lb":8808400,"sl":6074300},"Kayangan–Pototano":{"lb":2265000,"sl":2153000}},crewLB:2475000,crewSL:2475000,solarLB:6222000,solarSL:5333143,sisaLB:12285200,sisaSL:9564057},
+  "GARUT":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipularang":{lb:104000,sl:78000},"Tol Padaleunyi":{lb:22500,sl:17000},"Tol Soroja":{lb:30000,sl:22500}},tolPP:343000,crossSegs:{},crewLB:450000,crewSL:450000,solarLB:1269333,solarSL:1088000,sisaLB:4199667,sisaSL:706000},
+  "SUMBAWA":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{"Ketapang–Gilimanuk":{"lb":1243000,"sl":897600},"Padangbai–Lembar":{"lb":8808400,"sl":6074300},"Kayangan–Pototano":{"lb":2265000,"sl":2153000}},crewLB:2475000,crewSL:2475000,solarLB:6790933,solarSL:5820800,sisaLB:19666267,sisaSL:8586400},
+  "TPA IJOBAIT LOMBOK":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500}},tolPP:2345000,crossSegs:{"Ketapang–Gilimanuk":{"lb":1243000,"sl":897600},"Padangbai–Lembar":{"lb":8808400,"sl":6074300}},crewLB:2475000,crewSL:2475000,solarLB:4488000,solarSL:3846857,sisaLB:14189200,sisaSL:11436343},
+  "BOJONEGORO":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500}},tolPP:1755000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:3082667,solarSL:2642286,sisaLB:3609333,sisaSL:2449714},
+  "SENTOLO, GARUT":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipularang":{lb:104000,sl:78000},"Tol Padaleunyi":{lb:22500,sl:17000},"Tol Soroja":{lb:30000,sl:22500}},tolPP:343000,crossSegs:{},crewLB:675000,crewSL:675000,solarLB:1496000,solarSL:1282286,sisaLB:2128000,sisaSL:2066714},
+  "CIANJUR":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipularang":{lb:104000,sl:78000},"Tol Bocimi":{lb:42000,sl:31500}},tolPP:327000,crossSegs:{},crewLB:450000,crewSL:450000,solarLB:589333,solarSL:505143,sisaLB:1320667,sisaSL:1494857},
+  "BANJARNEGARA, WADUK MRICAN":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500}},tolPP:770000,crossSegs:{},crewLB:675000,crewSL:675000,solarLB:1858667,solarSL:1593143,sisaLB:75333,sisaSL:1386857},
+  "PATIMBAN, SUBANG":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500}},tolPP:500000,crossSegs:{},crewLB:450000,crewSL:450000,solarLB:657333,solarSL:563429,sisaLB:188667,sisaSL:270571},
+  "PROBOLINGGO":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000},"Tol Kertosono-Mojokerto":{lb:110000,sl:82500},"Tol Mojokerto-Surabaya":{lb:107500,sl:65500},"Tol Gempol-Pasuruan":{lb:93000,sl:70000}},tolPP:2485000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:4170667,solarSL:3574857,sisaLB:-721667,sisaSL:1957143},
+  "PANGGUNG REJO, BLITAR":{tolSegs:{"Tol Jakarta-Cikampek":{lb:54000,sl:40500},"Tol Cipali":{lb:273000,sl:217500},"Tol Palimanan-Kanci":{lb:32000,sl:19500},"Tol Kanci-Pejagan":{lb:59500,sl:44500},"Tol Pejagan-Pemalang":{lb:132000,sl:90500},"Tol Pemalang-Batang":{lb:95000,sl:71000},"Tol Batang-Semarang":{lb:223000,sl:167500},"Tol Semarang-Solo":{lb:140500,sl:105500},"Tol Solo-Ngawi":{lb:250000,sl:187500},"Tol Ngawi-Kertosono":{lb:196000,sl:147000}},tolPP:2049000,crossSegs:{},crewLB:900000,crewSL:900000,solarLB:3558667,solarSL:3050286,sisaLB:1461333,sisaSL:957714},
+};
+
+// ── Terapkan sinkronisasi dari Kelola Jalur ──
+applyRouteSync();
+
+// Dengarkan update real-time dari tab lain
+window.addEventListener("storage", e => {
+  if(e.key === "ckb_route_sync"){
+    applyRouteSync();
+    onRouteChange();
+  }
+  if(e.key === "ckb_tol_master" || e.key === "ckb_cross_master"){
+    applyTarifSync();
+    onRouteChange();
+  }
+  if(e.key === "ckb_bbm_prices"){
+    applyBBMSync();
+    onRouteChange();
+  }
+  if(e.key === "ckb_fixed_costs"){
+    applyFixedCostSync();
+    onRouteChange();
+  }
+  if(e.key === "ckb_crew_rates"){
+    applyCrewRateSync();
+    onRouteChange();
+  }
+});
+
+// helper: build detail rows from BREAKDOWN for given dest + vehicle + fuel type
+// helper: gabungkan Biaya Tambahan / Kurangi Biaya ke dalam baris "Operasional Lainnya"
+// alih-alih ditampilkan sebagai baris terpisah. Hasilnya: amt ops = total tambahan - pengurangan.
+function mergeOpsWithExtras(bdRows, extrasArr, discArr){
+  if(!bdRows) return null;
+  const ex = extrasArr || [], dc = discArr || [];
+  const sumX = ex.reduce((s,e)=>s+e.amount,0);
+  const sumD = dc.reduce((s,e)=>s+e.amount,0);
+  const netOps = sumX - sumD;
+  return bdRows.map(row=>{
+    if(row.cat !== "ops") return row;
+    let noteParts = [];
+    ex.forEach(e=>noteParts.push(`➕ ${e.desc}: Rp${e.amount.toLocaleString("id-ID")}`));
+    dc.forEach(e=>noteParts.push(`➖ ${e.desc}: Rp${e.amount.toLocaleString("id-ID")}`));
+    return Object.assign({}, row, {amt: netOps, note: noteParts.join(" · ")});
+  });
+}
+
+function getBDRows(dest, vehicle, fuelType, osrmKm, mixPct, addSafetyFactor=false){
+  const bd = BREAKDOWN[dest];
+  if(!bd) return null;
+  const isLB = vehicle === "lowbed";
+  const fuel = fuelType || "subsidi";
+  const rows = [];
+
+  // Hitung harga blended berdasarkan mixPct (0–100 = % subsidi)
+  // mixPct digunakan bila fuel === "mixed", fallback ke nilai penuh subsidi/nonsubsidi
+  const pctS = (mixPct !== undefined && mixPct !== null) ? mixPct / 100
+    : (fuel === "subsidi" ? 1 : 0);
+  const pctN = 1 - pctS;
+  const hargaPerL = Math.round(SOLAR_PRICES.subsidi * pctS + SOLAR_PRICES.nonsubsidi * pctN);
+
+  // Solar — tampilkan sesuai jenis bahan bakar, tapi total tetap
+  const r2 = SPM_ROUTES.find(x => x.dest.toUpperCase() === dest.toUpperCase() || dest.toUpperCase().includes(x.dest.toUpperCase()));
+  const kmppBase = r2 ? r2.kmpp : 0;
+  const safetyPct = addSafetyFactor ? 0.10 : 0;
+  const safetyKm = addSafetyFactor ? Math.round(kmppBase * safetyPct) : 0;
+  const kmpp = kmppBase + safetyKm;
+  const kmL = isLB
+    ? (KMperL[document.querySelector("input[name=fvLBsub]:checked")?.value || "hino"] || KMperL.lowbed)
+    : (KMperL[document.getElementById("fvSLUnit")?.value] || KMperL.selfloader);
+  const solarBaseAmt = isLB ? bd.solarLB : bd.solarSL; // nilai asli dari data SPM (dihitung @Rp6.800)
+  const solarCalcAmt = kmpp > 0 ? Math.round((kmpp / kmL) * hargaPerL) : solarBaseAmt; // kalkulasi sistem
+  // Subsidi murni → pakai nilai SPM; selainnya → kalkulasi ulang dengan harga blended
+  const solarAmt = (pctS === 1 && !addSafetyFactor) ? solarBaseAmt
+    : (kmpp > 0 ? solarCalcAmt : solarBaseAmt);
+  const hargaFmt = "Rp\u00a0" + hargaPerL.toLocaleString("id-ID");
+  const kmlDisplay = kmL.toFixed(1).replace(".",",");
+  const pctLabel = pctS === 1 ? "Subsidi" : pctN === 1 ? "Non-Subsidi"
+    : `${Math.round(pctS*100)}% Sub+${Math.round(pctN*100)}% Non`;
+  const solarLabel = `${kmlDisplay} km/L × ${hargaFmt} (${pctLabel})`;
+
+  // Selalu tampilkan baris solar utama (nilai yang dipakai)
+  rows.push({cat:"solar", label:"⛽ Bahan Bakar Solar (PP)",
+    note: solarLabel,
+    amt: solarAmt,
+    solarBaseAmt: solarBaseAmt,
+    solarCalcAmt: solarCalcAmt,
+    kmSpm: r2 ? r2.km : 0,
+    kmOsrm: osrmKm !== undefined ? osrmKm : null,
+    kmpp: kmpp,
+    kmppBase: kmppBase,
+    safetyKm: safetyKm,
+    safetyPct: safetyPct,
+    kmL: kmL,
+    hargaPerL: hargaPerL,
+    fuel: fuel
+  });
+
+  if(addSafetyFactor){
+    rows.push({cat:"safety", label:"🛡 Safety Factor BBM", note:`10% × ${kmppBase.toLocaleString("id-ID")} km = +${safetyKm.toLocaleString("id-ID")} km. Effective KM: ${kmpp.toLocaleString("id-ID")} km`, amt:0});
+  }
+
+  // Driver + Helper (termasuk makan & inap)
+  rows.push({cat:"crew", label:"👤 Driver + Helper (PP)",
+    note:`(Rp${CREW_RATE.driver.toLocaleString("id-ID")} + Rp${CREW_RATE.helper.toLocaleString("id-ID")}) × hari`,
+    amt: isLB ? bd.crewLB : bd.crewSL});
+
+  // Tol per ruas (× 2 arah)
+  Object.entries(bd.tolSegs).forEach(([nama, tarif])=>{
+    const tarif1way = (typeof tarif === "object") ? (isLB ? tarif.lb : tarif.sl) : tarif;
+    const golLabel = (typeof tarif === "object") ? (isLB ? "Gol.V" : "Gol.III") : "Gol.V";
+    rows.push({cat:"tol", label:"🛣 "+nama,
+      note: golLabel + " × 2 arah",
+      amt: tarif1way * 2});
+  });
+
+  // Penyeberangan (× 2 arah PP)
+  Object.entries(bd.crossSegs).forEach(([nama, tarif])=>{
+    const amt1way = isLB ? tarif.lb : tarif.sl;
+    rows.push({cat:"cross", label:"⛴ Penyeberangan "+nama,
+      note: (isLB ? "Tarif Lowbed" : "Tarif Selfloader") + " Rp"+amt1way.toLocaleString("id-ID")+" × 2 arah",
+      amt: amt1way * 2});
+  });
+
+  // Operasional Lainnya — TIDAK lagi dihitung otomatis dari sisa data SPM.
+  // Semua komponen (Tol, BBM, Crew) sudah dihitung penuh oleh sistem di atas,
+  // jadi nilai ini selalu 0 kecuali admin menambahkan manual lewat
+  // "Biaya Tambahan Lainnya" / "Kurangi Biaya" pada form.
+  rows.push({cat:"ops", label:"🏠 Operasional Lainnya",
+    note: "Dihitung sistem dari Tol + BBM + Crew di atas",
+    amt: 0});
+
+  return rows;
+}
+
+function lookupRoute(origin, dest){
+  if(!origin||!dest) return null;
+  const q = dest.trim().toUpperCase();
+  // Exact match first
+  const key = (origin+"|"+q);
+  if(SPM_MAP[key]) return SPM_MAP[key];
+  // Partial match — dest contains query or query contains dest
+  const matches = SPM_ROUTES.filter(r=>
+    r.origin===origin && (
+      r.dest.toUpperCase().includes(q) ||
+      q.includes(r.dest.toUpperCase())
+    )
+  );
+  return matches.length===1 ? matches[0] : null;
+}
+
+// All destination names for autocomplete
+function getDestMatches(origin, q){
+  const routes = origin ? SPM_ROUTES.filter(r=>r.origin===origin) : SPM_ROUTES;
+  if(!q) return routes.slice(0,14);
+  const ql = q.toLowerCase();
+  return routes.filter(r=>r.dest.toLowerCase().includes(ql)).slice(0,14);
+}
+
+const VLB = {lowbed:"Low Bed", selfloader:"Self Loader"};
+
+function getVehicleUnitLabel(p, short){
+  if(p.vehicle==="lowbed"&&p.lbSubType){
+    const model = p.lbUnit ? (UNIT_MODEL[p.lbUnit] || "") : "";
+    if(model) return model;
+    return p.lbSubType==="iveco"?"Iveco":p.lbSubType==="scania"?"Scania":"Hino";
+  }
+  if(p.vehicle==="selfloader"&&p.slUnit){
+    return UNIT_MODEL[p.slUnit] || "Hino 500 FM280JW 6x4";
+  }
+  return "-";
+}
+
+function getVehiclePlate(p){
+  const key = p.vehicle==="lowbed" ? p.lbUnit : p.slUnit;
+  return key ? (UNIT_PLATE[key] || "") : "";
+}
+// Harga solar per liter — dibaca dari localStorage (ckb_bbm_prices), fallback ke default
+const SOLAR_PRICES_DEFAULT = {subsidi: 6800, nonsubsidi: 13950};
+let SOLAR_PRICES = {...SOLAR_PRICES_DEFAULT};
+// Rasio km/L per kendaraan — juga dibaca dari localStorage
+// kmlLB & kmlSL = rata-rata fallback; per-unit dipakai saat unit dipilih
+const KMperL_DEFAULT = {
+  lowbed: 3, selfloader: 3.5,
+  hino: 3, iveco: 3, scania: 3,
+  "hino-500-9170": 3.5, "hino-500-9171": 3.5, "hino-500-9172": 3.5, "hino-500-9173": 3.5
+};
+let KMperL = {...KMperL_DEFAULT};
+
+(function loadBBMFromStorage(){
+  try {
+    const saved = localStorage.getItem("ckb_bbm_prices");
+    if(saved){
+      const p = JSON.parse(saved);
+      SOLAR_PRICES = {...SOLAR_PRICES_DEFAULT, ...{subsidi: p.subsidi||SOLAR_PRICES_DEFAULT.subsidi, nonsubsidi: p.nonsubsidi||SOLAR_PRICES_DEFAULT.nonsubsidi}};
+      KMperL = {
+        lowbed:  p.kmlLB  || KMperL_DEFAULT.lowbed,
+        selfloader: p.kmlSL || KMperL_DEFAULT.selfloader,
+        hino:    p.kmlHinoLB   || KMperL_DEFAULT.hino,
+        iveco:   p.kmlIvecoLB  || KMperL_DEFAULT.iveco,
+        scania:  p.kmlScaniaLB || KMperL_DEFAULT.scania,
+        "hino-500-9170": p.kmlSL9170 || KMperL_DEFAULT["hino-500-9170"],
+        "hino-500-9171": p.kmlSL9171 || KMperL_DEFAULT["hino-500-9171"],
+        "hino-500-9172": p.kmlSL9172 || KMperL_DEFAULT["hino-500-9172"],
+        "hino-500-9173": p.kmlSL9173 || KMperL_DEFAULT["hino-500-9173"],
+      };
+    }
+  } catch(e){}
+})();
+
+function applyBBMSync(){
+  try {
+    const saved = localStorage.getItem("ckb_bbm_prices");
+    if(saved){
+      const p = JSON.parse(saved);
+      SOLAR_PRICES = {...SOLAR_PRICES_DEFAULT, ...{subsidi: p.subsidi||SOLAR_PRICES_DEFAULT.subsidi, nonsubsidi: p.nonsubsidi||SOLAR_PRICES_DEFAULT.nonsubsidi}};
+      KMperL = {
+        lowbed:  p.kmlLB  || KMperL_DEFAULT.lowbed,
+        selfloader: p.kmlSL || KMperL_DEFAULT.selfloader,
+        hino:    p.kmlHinoLB   || KMperL_DEFAULT.hino,
+        iveco:   p.kmlIvecoLB  || KMperL_DEFAULT.iveco,
+        scania:  p.kmlScaniaLB || KMperL_DEFAULT.scania,
+        "hino-500-9170": p.kmlSL9170 || KMperL_DEFAULT["hino-500-9170"],
+        "hino-500-9171": p.kmlSL9171 || KMperL_DEFAULT["hino-500-9171"],
+        "hino-500-9172": p.kmlSL9172 || KMperL_DEFAULT["hino-500-9172"],
+        "hino-500-9173": p.kmlSL9173 || KMperL_DEFAULT["hino-500-9173"],
+      };
+    }
+  } catch(e){}
+  updateBBMLabels();
+}
+
+function updateBBMLabels(){
+  const fmtPrice = (n) => "Rp " + n.toLocaleString("id-ID") + "/L";
+  const ls = document.getElementById("lblSubsidiPrice");
+  const ln = document.getElementById("lblNonsubsidiPrice");
+  if(ls) ls.textContent = fmtPrice(SOLAR_PRICES.subsidi);
+  if(ln) ln.textContent = fmtPrice(SOLAR_PRICES.nonsubsidi);
+}
+
+// ── Sync tarif tol & penyeberangan dari Master Tarif ──
+function applyTarifSync(){
+  try {
+    const savedTol = localStorage.getItem("ckb_tol_master");
+    const savedCross = localStorage.getItem("ckb_cross_master");
+    if(!savedTol && !savedCross) return;
+
+    const TOL_SYNC = savedTol ? JSON.parse(savedTol) : null;
+    const CROSS_SYNC = savedCross ? JSON.parse(savedCross) : null;
+
+    // Update BREAKDOWN tolSegs & crossSegs berdasarkan nama ruas
+    Object.keys(BREAKDOWN).forEach(dest => {
+      const bd = BREAKDOWN[dest];
+
+      if(TOL_SYNC && bd.tolSegs){
+        Object.keys(bd.tolSegs).forEach(tolName => {
+          const master = TOL_SYNC.find(t => t.name === tolName);
+          if(master){
+            bd.tolSegs[tolName] = {lb: master.lb, sl: master.sl};
+          }
+        });
+      }
+
+      if(CROSS_SYNC && bd.crossSegs){
+        Object.keys(bd.crossSegs).forEach(crossName => {
+          const master = CROSS_SYNC.find(c => c.name === crossName);
+          if(master){
+            bd.crossSegs[crossName] = {lb: master.lb, sl: master.sl};
+          }
+        });
+      }
+    });
+  } catch(e){ console.warn("Tarif sync error:", e); }
+}
+
+// Terapkan sync tarif saat startup
+applyTarifSync();
+
+// ── Sync Fixed Cost dari Master Tarif ──
+// Reads ckb_fixed_costs → updates fcLB/fcSL per route in SPM_ROUTES (fcLB = avg_LB * hLB, fcSL = fcSL * hSL)
+const FC_PER_DAY_DEFAULT = { fcLB: 988967, fcSL: 982145 };
+let FC_PER_DAY = { ...FC_PER_DAY_DEFAULT };
+
+(function loadFixedCostFromStorage(){
+  try {
+    const saved = localStorage.getItem("ckb_fixed_costs");
+    if (saved) {
+      const p = JSON.parse(saved);
+      FC_PER_DAY = {
+        fcLB: p.fcLB || FC_PER_DAY_DEFAULT.fcLB,
+        fcSL: p.fcSL || FC_PER_DAY_DEFAULT.fcSL,
+      };
+    }
+  } catch(e) {}
+})();
+
+function applyFixedCostSync(){
+  try {
+    const saved = localStorage.getItem("ckb_fixed_costs");
+    if (saved) {
+      const p = JSON.parse(saved);
+      FC_PER_DAY = {
+        fcLB: p.fcLB || FC_PER_DAY_DEFAULT.fcLB,
+        fcSL: p.fcSL || FC_PER_DAY_DEFAULT.fcSL,
+      };
+    }
+    // Fixed Cost = harga/hari (Master Tarif) × Leadtime PP.
+    // r.hLB/r.hSL adalah leadtime SATU ARAH (sama seperti "146 km" yang ditampilkan
+    // di preview rute — itu jarak satu arah, bukan kmpp). Semua komponen biaya lain
+    // sudah dihitung PP (pulang-pergi), jadi Fixed Cost juga harus dikali 2.
+    SPM_ROUTES.forEach(r => {
+      r.fcLB = Math.round(FC_PER_DAY.fcLB * r.hLB * 2);
+      r.fcSL = Math.round(FC_PER_DAY.fcSL * r.hSL * 2);
+    });
+  } catch(e) { console.warn("Fixed cost sync error:", e); }
+}
+
+// Apply on startup
+applyFixedCostSync();
+
+// ── Sync Tarif Driver & Helper dari Master Tarif ──
+// Reads ckb_crew_rates → recalculates crewLB/crewSL in BREAKDOWN (total/hari × hLB/hSL per rute)
+const CREW_RATE_DEFAULT = { driver: 150000, helper: 75000 };
+let CREW_RATE = { ...CREW_RATE_DEFAULT };
+
+function applyCrewRateSync(){
+  try {
+    const saved = localStorage.getItem("ckb_crew_rates");
+    if (saved) {
+      const p = JSON.parse(saved);
+      CREW_RATE = {
+        driver: p.driver || CREW_RATE_DEFAULT.driver,
+        helper: p.helper || CREW_RATE_DEFAULT.helper,
+      };
+    }
+    const totalPerDay = CREW_RATE.driver + CREW_RATE.helper;
+    // Recalculate crewLB/crewSL in BREAKDOWN based on each dest's leadtime (hLB/hSL) from SPM_ROUTES
+    Object.keys(BREAKDOWN).forEach(dest => {
+      const bd = BREAKDOWN[dest];
+      const r = SPM_ROUTES.find(x => x.dest.toUpperCase() === dest.toUpperCase());
+      if (r) {
+        bd.crewLB = Math.round(totalPerDay * r.hLB);
+        bd.crewSL = Math.round(totalPerDay * r.hSL);
+      }
+    });
+  } catch(e) { console.warn("Crew rate sync error:", e); }
+}
+
+// Apply on startup (after BREAKDOWN & SPM_ROUTES are defined)
+applyCrewRateSync();
+
+// Update label BBM di UI setelah DOM siap
+document.addEventListener("DOMContentLoaded", () => {
+  updateBBMLabels();                                    
+  updateFuelSliderUI();
+  updateFuelHint();
+  updateLBUnitDropdown(true); // init unit dropdown untuk Low Bed
+});
+if(document.readyState !== "loading") setTimeout(() => { updateBBMLabels(); updateFuelSliderUI(); updateFuelHint(); }, 0);
+
+const SOLAR_LABELS = {subsidi: "Subsidi", nonsubsidi: "Non-Subsidi"};
+// km/L konsumsi per kendaraan — dikelola dinamis via BBM_PRICES (lihat atas)
+const fmt = n => "Rp\u00a0" + Math.round(n).toLocaleString("id-ID");
+const el = id => document.getElementById(id);
+const gv = (id, fb=0) => { const v=parseFloat(el(id)?.value); return isNaN(v)?fb:v; };
+const gs = id => (el(id)?.value||"").trim();
+
+// AUTOCOMPLETE 
+let acHiIdx = -1;
+function acShow(){
+  const inp = el("f_dest"), list = el("acList");
+  const q = inp.value.trim();
+  const origin = gs("f_origin");
+  const matches = getDestMatches(origin, q);
+  if(!matches.length){ list.style.display="none"; return; }
+  acHiIdx = -1;
+  list.innerHTML = matches.map(r=>{
+    const ql = q.toLowerCase();
+    const name = r.dest;
+    const hi = ql ? name.replace(new RegExp("("+ql.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi"), '<span class="ac-match">$1</span>') : name;
+    return `<div class="ac-item" data-val="${r.dest}" onmousedown="acPick('${r.dest.replace(/'/g,"\\'")}')">${hi}<span class="ac-isl">${(()=>{const ck=osrmCache["CKB Cakung|"+r.dest];return ck!=null?ck+" km":r.km+" km";})()}</span></div>`;
+  }).join("");
+  const rect = inp.getBoundingClientRect();
+  list.style.left = rect.left+"px"; list.style.top = (rect.bottom+3)+"px";
+  list.style.width = rect.width+"px"; list.style.display = "block";
+}
+function acHide(){ el("acList").style.display="none"; acHiIdx=-1; }
+function acKey(e){
+  const list=el("acList"), items=[...list.querySelectorAll(".ac-item")];
+  if(list.style.display==="none"||!items.length) return;
+  if(e.key==="ArrowDown"){e.preventDefault();acHiIdx=Math.min(acHiIdx+1,items.length-1);acHilite(items);}
+  else if(e.key==="ArrowUp"){e.preventDefault();acHiIdx=Math.max(acHiIdx-1,0);acHilite(items);}
+  else if(e.key==="Enter"&&acHiIdx>=0){e.preventDefault();acPick(items[acHiIdx].dataset.val);}
+  else if(e.key==="Escape"){acHide();}
+}
+function acHilite(items){ items.forEach((it,i)=>it.classList.toggle("hi",i===acHiIdx)); }
+function acPick(val){ el("f_dest").value=val; acHide(); onRouteChange(); }
+// Hanya tutup dropdown jika scroll terjadi di luar acList (bukan scroll di dalam list itu sendiri)
+window.addEventListener("scroll", e=>{
+  const list = el("acList");
+  if(list && !list.contains(e.target)) acHide();
+}, true);
+window.addEventListener("resize", acHide);
+
+function onRouteChange(){ updatePreview(); }
+// Data unit per brand Low Bed
+const LB_UNITS = {
+  hino:   [{v:"hino-fm350-9068",    l:"Hino FM350 TH · B 9068 SEI",           model:"Hino FM350 TH",          plate:"B 9068 SEI"}],
+  iveco:  [
+    {v:"iveco-hd9-9300",     l:"Iveco HD9 66.54T · B 9300 SEI",               model:"Iveco HD9 66.54T",        plate:"B 9300 SEI"},
+    {v:"iveco-hd9-9809",     l:"Iveco HD9 66.56T · B 9809 SEI",               model:"Iveco HD9 66.56T",        plate:"B 9809 SEI"},
+    {v:"iveco-tway-9786",    l:"Iveco T-WAY AT720T48TH 6x4 · B 9786 SEI",    model:"Iveco T-WAY AT720T48TH",  plate:"B 9786 SEI"},
+  ],
+  scania: [{v:"scania-rm580-9995", l:"Scania RM580LA 6x4 · B 9995 SYN",       model:"Scania RM580LA 6x4",      plate:"B 9995 SYN"}],
+};
+
+const SL_UNITS = [
+  {v:"hino-500-9170", model:"Hino 500 FM280JW 6x4", plate:"B 9170 SIU"},
+  {v:"hino-500-9171", model:"Hino 500 FM280JW 6x4", plate:"B 9171 SIU"},
+  {v:"hino-500-9172", model:"Hino 500 FM280JW 6x4", plate:"B 9172 SIU"},
+  {v:"hino-500-9173", model:"Hino 500 FM280JW 6x4", plate:"B 9173 SIU"},
+];
+
+// Flat lookups: unit value -> model name / plate
+const UNIT_MODEL = {};
+const UNIT_PLATE = {};
+Object.values(LB_UNITS).flat().forEach(u => { UNIT_MODEL[u.v] = u.model; UNIT_PLATE[u.v] = u.plate; });
+SL_UNITS.forEach(u => { UNIT_MODEL[u.v] = u.model; UNIT_PLATE[u.v] = u.plate; });
+
+let _currentLBBrand = "hino";
+
+function updateLBUnitDropdown(forceRebuild){
+  const brand = document.querySelector("input[name=fvLBsub]:checked")?.value || "hino";
+  const sel = document.getElementById("fvLBUnit");
+  if(!sel) return;
+  // Hanya rebuild jika brand berubah atau dipaksa
+  if(!forceRebuild && brand === _currentLBBrand && sel.options.length > 1) return;
+  _currentLBBrand = brand;
+  const units = LB_UNITS[brand] || [];
+  sel.innerHTML = '<option value="">\u2014 Pilih Unit \u2014</option>' +
+    units.map(u => '<option value="'+u.v+'">'+u.l+'</option>').join("");
+  if(units.length === 1) sel.value = units[0].v;
+}
+
+function onLBBrandChange(){
+  _currentLBBrand = ""; // force rebuild ketika brand berganti
+  updateLBUnitDropdown(true);
+  updatePreview();
+}
+
+function onVehicleChange(){
+  const v = document.querySelector("input[name=fv]:checked")?.value;
+  const lbSub = document.getElementById("lbSubWrap");
+  const slSub = document.getElementById("slSubWrap");
+  if(lbSub) lbSub.style.display = (v === "lowbed") ? "" : "none";
+  if(slSub) slSub.style.display = (v === "selfloader") ? "" : "none";
+  if(v === "lowbed") updateLBUnitDropdown(false);
+  updatePreview();
+}
+function onFuelChange(){ updateFuelHint(); updatePreview(); }
+
+// ── Dual-Fuel Slider ──
+// fuelMixPct = 0..100 (persen solar subsidi), sisanya nonsubsidi
+let fuelMixPct = 100; // default 100% subsidi
+
+function onFuelSliderChange(){
+  fuelMixPct = parseInt(el("fuelSlider").value);
+  syncFuelInputs();
+  updateFuelSliderUI();
+  onFuelChange();
+}
+
+function onPctInputS(){
+  let v = parseInt(el("inpPctS").value)||0;
+  v = Math.max(0, Math.min(100, v));
+  fuelMixPct = v;
+  el("inpPctN").value = 100 - v;
+  el("fuelSlider").value = v;
+  updateFuelSliderUI();
+  onFuelChange();
+}
+
+function onPctInputN(){
+  let v = parseInt(el("inpPctN").value)||0;
+  v = Math.max(0, Math.min(100, v));
+  fuelMixPct = 100 - v;
+  el("inpPctS").value = 100 - v;
+  el("fuelSlider").value = 100 - v;
+  updateFuelSliderUI();
+  onFuelChange();
+}
+
+function clampPctInputs(){
+  const s = Math.max(0, Math.min(100, parseInt(el("inpPctS").value)||0));
+  fuelMixPct = s;
+  el("inpPctS").value = s;
+  el("inpPctN").value = 100 - s;
+  el("fuelSlider").value = s;
+  updateFuelSliderUI();
+  onFuelChange();
+}
+
+function syncFuelInputs(){
+  el("inpPctS").value = fuelMixPct;
+  el("inpPctN").value = 100 - fuelMixPct;
+}
+
+function setFuelPreset(pct){
+  fuelMixPct = pct;
+  el("fuelSlider").value = pct;
+  syncFuelInputs();
+  updateFuelSliderUI();
+  onFuelChange();
+}
+
+function updateFuelSliderUI(){
+  const s = fuelMixPct, n = 100 - s;
+
+  // Track fills
+  if(el("fuelFillS")) el("fuelFillS").style.width = s + "%";
+  if(el("fuelFillN")) el("fuelFillN").style.width = n + "%";
+
+  // Thumb position
+  if(el("fuelThumbVis")) el("fuelThumbVis").style.left = s + "%";
+
+  // Sync inputs
+  if(el("inpPctS")) el("inpPctS").value = s;
+  if(el("inpPctN")) el("inpPctN").value = n;
+
+  // Kartu highlight
+  const cS = el("fuelCardS"), cN = el("fuelCardN");
+  if(cS){
+    cS.classList.toggle("active-s", s > 0);
+    cS.style.opacity = s === 0 ? ".5" : "1";
+  }
+  if(cN){
+    cN.classList.toggle("active-n", n > 0);
+    cN.style.opacity = n === 0 ? ".5" : "1";
+  }
+
+  // Preset buttons
+  [100,75,50,25,0].forEach(p => {
+    const btn = el("preset"+p);
+    if(btn) btn.classList.toggle("active", s === p);
+  });
+}
+
+function getFuelMix(){
+  const pctS = fuelMixPct / 100;
+  const pctN = 1 - pctS;
+  const blended = SOLAR_PRICES.subsidi * pctS + SOLAR_PRICES.nonsubsidi * pctN;
+  return {pctS, pctN, blended};
+}
+
+// Backward compat
+function getSelectedFuel(){
+  if(fuelMixPct === 100) return "subsidi";
+  if(fuelMixPct === 0) return "nonsubsidi";
+  return "mixed";
+}
+
+function updateFuelHint(){
+  const mix = getFuelMix();
+  const hintEl = el("fuelHint");
+  if(!hintEl) return;
+  const s = Math.round(mix.pctS * 100), n = 100 - s;
+  if(s === 100){
+    hintEl.className = "hint-box";
+    hintEl.style.cssText = "font-size:.74rem;padding:.45rem .75rem;margin-top:.55rem;";
+    hintEl.innerHTML = "🟢 <strong>100% Solar Biosolar B35 (Subsidi)</strong> — Rp " + SOLAR_PRICES.subsidi.toLocaleString("id-ID") + "/L";
+  } else if(n === 100){
+    hintEl.className = "hint-box hint-toll";
+    hintEl.style.cssText = "font-size:.74rem;padding:.45rem .75rem;margin-top:.55rem;";
+    hintEl.innerHTML = "🟡 <strong>100% Pertamina Dex (Non-Subsidi)</strong> — Rp " + SOLAR_PRICES.nonsubsidi.toLocaleString("id-ID") + "/L";
+  } else {
+    hintEl.className = "hint-box";
+    hintEl.style.cssText = "font-size:.74rem;padding:.45rem .75rem;margin-top:.55rem;background:linear-gradient(135deg,#dcfce7,#fef9c3);border-color:#86efac;";
+    hintEl.innerHTML = `⚗️ Campuran: <strong>${s}% Subsidi</strong> + <strong>${n}% Non-Subsidi</strong> — Harga rata-rata <strong>Rp ${Math.round(mix.blended).toLocaleString("id-ID")}/L</strong>`;
+  }
+}
+
+function renderPreviewUI(r, osrmKm, vehicle, fuel, xtra, disc, addSafetyFactor=false){
+  const kmDisplay = r.km; // Selalu tampilkan jarak dari data SPM
+  // Hitung ulang Uang Jalan Dasar secara dinamis dari breakdown sistem
+  // (Tol + BBM + Crew, mengikuti campuran BBM yang sedang dipilih),
+  // bukan dari nilai fixed data SPM lagi.
+  const bdLB = getBDRows(r.dest, "lowbed", fuel, osrmKm, fuelMixPct, addSafetyFactor);
+  const bdSL = getBDRows(r.dest, "selfloader", fuel, osrmKm, fuelMixPct, addSafetyFactor);
+  const ujLBeff = bdLB ? bdLB.reduce((s,row)=>s+row.amt,0) : r.ujLB;
+  const ujSLeff = bdSL ? bdSL.reduce((s,row)=>s+row.amt,0) : r.ujSL;
+  const baseThis = vehicle==="lowbed" ? ujLBeff : ujSLeff;
+  const fcThis   = vehicle==="lowbed" ? r.fcLB : r.fcSL;
+  const spmThis  = vehicle==="lowbed" ? r.ujLB : r.ujSL; // nilai asli data SPM, untuk referensi saja
+  const days = vehicle==="lowbed" ? r.hLB : r.hSL;
+  const total = baseThis + xtra - disc;
+  const safetyKmPreview = addSafetyFactor ? Math.round((r.kmpp || r.km * 2 || 0) * 0.10) : 0;
+  const effectiveKmPreview = addSafetyFactor ? ((r.kmpp || r.km * 2 || 0) + safetyKmPreview) : (r.kmpp || r.km * 2 || 0);
+  const mix = getFuelMix();
+  const pctS = Math.round(mix.pctS * 100), pctN = 100 - pctS;
+  let fuelBadge;
+  if(pctS === 100){
+    fuelBadge = `<span style="background:#dcfce7;color:#15803d;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:.4rem;">⛽ Solar Subsidi</span>`;
+  } else if(pctN === 100){
+    fuelBadge = `<span style="background:#fef9c3;color:#854d0e;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:.4rem;">⛽ Non-Subsidi</span>`;
+  } else {
+    fuelBadge = `<span style="background:linear-gradient(to right,#dcfce7,#fef9c3);color:#374151;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:.4rem;border:1px solid #d1d5db;">⚗️ ${pctS}% Sub + ${pctN}% Non</span>`;
+  }
+
+  el("vpLB").textContent = fmt(ujLBeff)+" (PP)";
+  el("vpSL").textContent = fmt(ujSLeff)+" (PP)";
+
+  el("rp").innerHTML=`<div class="rp-box">
+    <span class="rp-city">${r.origin}</span>
+    <div class="rp-line"></div>
+    <div style="text-align:center;">
+      <div class="rp-info">${kmDisplay.toLocaleString("id-ID")} km · ${days} hari</div>
+      ${r.crossing ? `<div style="font-size:.65rem;color:var(--coral);margin-top:2px;font-weight:600;">${r.crossing}</div>` : ""}
+    </div>
+    <div class="rp-line" style="transform:scaleX(-1);"></div>
+    <span class="rp-city">${r.dest}</span>
+  </div>
+  ${r.tol?`<div class="hint-box hint-toll" style="margin-bottom:.35rem;">🛣 ${r.tol}</div>`:""}
+  ${r.crossing?`<div class="hint-box" style="margin-bottom:.35rem;">${r.crossing}</div>`:""}`;
+
+  // Baris "Uang Jalan Dasar (PP)" hanya ditampilkan kalau ada biaya tambahan/pengurangan
+  // (kalau tidak ada, nilainya sama persis dengan TOTAL — jadi tidak perlu ditampilkan dobel)
+  const showDasarRow = (xtra > 0 || disc > 0);
+
+  el("pricePreview").innerHTML=`<div class="price-preview">
+    <div class="pp-label">Estimasi Uang Jalan (${VLB[vehicle]}) — sudah Pulang Pergi ${fuelBadge}</div>
+    <div class="pp-rows">
+      ${showDasarRow?`<div class="pp-item">
+        <div class="pp-item-lbl">Uang Jalan Dasar (PP)</div>
+        <div class="pp-item-val">${fmt(baseThis)}</div>
+      </div>`:""}
+      ${xtra>0?`<div class="pp-item">
+        <div class="pp-item-lbl">➕ Biaya Tambahan</div>
+        <div class="pp-item-val" style="color:#7c3aed;">${fmt(xtra)}</div>
+      </div>`:""}
+      ${disc>0?`<div class="pp-item">
+        <div class="pp-item-lbl">➖ Kurangi Biaya</div>
+        <div class="pp-item-val" style="color:var(--danger);">− ${fmt(disc)}</div>
+      </div>`:""}
+      ${addSafetyFactor?`<div class="pp-item" style="grid-column:1/-1;background:#fff9ea;border-color:#e8d9b2;">
+        <div class="pp-item-lbl">🛡 Safety Factor BBM</div>
+        <div class="pp-item-val" style="color:var(--warning);font-size:.9rem;">+10% KM = +${safetyKmPreview.toLocaleString("id-ID")} km · Effective ${effectiveKmPreview.toLocaleString("id-ID")} km</div>
+      </div>`:""}
+      <div class="pp-item" style="grid-column:1/-1;border-color:rgba(22,163,74,.25);">
+        <div class="pp-item-lbl">↔ TOTAL UANG JALAN (PP)</div>
+        <div class="pp-item-val pp-pp">${fmt(total)}</div>
+      </div>
+      <div class="pp-item" style="grid-column:1/-1;background:var(--bg);border-color:var(--border2);">
+        <div class="pp-item-lbl" style="color:var(--muted);">📊 Fixed Cost (untuk costing)</div>
+        <div class="pp-item-val" style="color:var(--muted);font-size:.85rem;">${fmt(fcThis)}</div>
+      </div>
+      <div class="pp-item" style="grid-column:1/-1;background:var(--bg);border-color:var(--border2);">
+        <div class="pp-item-lbl" style="color:var(--muted);">📋 Data SPM (PP)</div>
+        <div class="pp-item-val" style="color:var(--muted);font-size:.85rem;">${fmt(spmThis)}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// State untuk preview aktif
+let osrmReqId = 0;
+let previewState = {r:null, vehicle:null, fuel:null, xtra:0, disc:0};
+
+function updatePreview(){
+  const origin = gs("f_origin");
+  const dest = gs("f_dest");
+  const vehicle = document.querySelector("input[name=fv]:checked")?.value || "lowbed";
+  const fuel = getSelectedFuel();
+  const addSafetyFactor = !!document.getElementById("f_safetyFactor")?.checked;
+  const previewEl = el("pricePreview");
+  const rpEl = el("rp");
+  const destTag = el("destTag");
+
+  updateFuelHint();
+
+  if(!origin || !dest){
+    previewEl.innerHTML=""; rpEl.innerHTML="";
+    el("vpLB").textContent="—"; el("vpSL").textContent="—";
+    destTag.style.display="none";
+    return;
+  }
+
+  const r = lookupRoute(origin, dest);
+
+  if(!r){
+    destTag.textContent="Tidak ada di SPM"; destTag.className="atag notfound"; destTag.style.display="";
+    previewEl.innerHTML=`<div style="background:#fef3c7;border:1.5px solid #fde68a;border-radius:8px;padding:.55rem .85rem;font-size:.8rem;color:#92400e;">⚠️ Rute <strong>${dest}</strong> tidak ditemukan di database SPM. Coba ketik ulang atau pilih dari saran di atas.</div>`;
+    rpEl.innerHTML=""; el("vpLB").textContent="—"; el("vpSL").textContent="—";
+    return;
+  }
+
+  destTag.textContent="✓ Ada di SPM"; destTag.className="atag found"; destTag.style.display="";
+
+  const xtra = extras.reduce((s,id)=>s+gv("xa"+id,0), 0);
+  const disc = discounts.reduce((s,id)=>s+gv("da"+id,0), 0);
+
+  // Simpan state untuk callback OSRM
+  previewState = {r, vehicle, fuel, xtra, disc, origin, dest, addSafetyFactor};
+
+  // Render dulu pakai SPM km (langsung tampil, tidak tunggu)
+  const cachedKm = osrmCache[origin+"|"+dest] !== undefined ? osrmCache[origin+"|"+dest] : null;
+  renderPreviewUI(r, cachedKm, vehicle, fuel, xtra, disc, addSafetyFactor);
+
+  // Jika belum di-cache, fetch OSRM async lalu update km
+  if(osrmCache[origin+"|"+dest] === undefined){
+    osrmReqId++;
+    const myReqId = osrmReqId;
+    getOSRMDistance(origin, dest).then(km => {
+      // Pastikan state preview masih sama (user belum pindah rute)
+      if(myReqId !== osrmReqId) return;
+      if(previewState.dest !== dest || previewState.origin !== origin) return;
+      renderPreviewUI(
+        previewState.r, km,
+        previewState.vehicle, previewState.fuel,
+        previewState.xtra, previewState.disc, previewState.addSafetyFactor
+      );
+    });
+  }
+}
+
+// EXTRA COSTS
+let extras = [];
+function addExtra(){
+  const id = Date.now(); extras.push(id);
+  const row = document.createElement("div"); row.className="xrow"; row.id="xr"+id;
+  row.innerHTML=`<input type="text" class="xd" placeholder="Keterangan" id="xd${id}"><input type="number" placeholder="Rp" id="xa${id}" min="0" oninput="updatePreview()"><button class="ibtn ibtn-del" onclick="delExtra(${id})">✕</button>`;
+  el("xList").appendChild(row);
+}
+function delExtra(id){ el("xr"+id)?.remove(); extras=extras.filter(x=>x!==id); updatePreview(); }
+
+// DISCOUNTS
+let discounts = [];
+function addDiscount(){
+  const id = Date.now(); discounts.push(id);
+  const row = document.createElement("div"); row.className="xrow"; row.id="dr"+id;
+  row.innerHTML=`<input type="text" class="xd" placeholder="Keterangan pengurangan" id="dd${id}"><input type="number" placeholder="Rp" id="da${id}" min="0" oninput="updatePreview()" style="border-color:rgba(220,38,38,.3);"><button class="ibtn ibtn-del" onclick="delDiscount(${id})">✕</button>`;
+  el("dList").appendChild(row);
+}
+function delDiscount(id){ el("dr"+id)?.remove(); discounts=discounts.filter(x=>x!==id); updatePreview(); }
+
+// PROJECTS
+let projects = [], editId = null;
+
+function calcP(p){
+  const r = lookupRoute(p.origin, p.dest);
+  if(!r) return {base:0, xtra:0, disc:0, total:0, fc:0, km:p.km||0, days:p.days||0};
+  // Harga dihitung sistem (Tol + BBM + Crew) sesuai campuran BBM yang disimpan;
+  // fallback ke nilai fixed SPM hanya jika rute tidak punya data breakdown.
+  const savedPct = p.fuelMixPct !== undefined ? p.fuelMixPct : ((p.fuel||"subsidi")==="subsidi" ? 100 : 0);
+  const bd = getBDRows(p.dest, p.vehicle, p.fuel||"subsidi", p.kmSource==="osrm" ? p.km : null, savedPct, !!p.addSafetyFactor);
+  const base = bd ? bd.reduce((s,row)=>s+row.amt,0) : (p.vehicle==="lowbed" ? r.ujLB : r.ujSL);
+  const fc   = p.vehicle==="lowbed" ? r.fcLB : r.fcSL;
+  const xtra = (p.extras||[]).reduce((s,e)=>s+e.amount,0);
+  const disc = (p.discounts||[]).reduce((s,e)=>s+e.amount,0);
+  const total = base + xtra - disc;
+  const days = p.vehicle==="lowbed" ? r.hLB : r.hSL;
+  const km = r.km; // selalu gunakan jarak dari data SPM untuk tampilan
+  const kmOsrm = p.kmSource === "osrm" ? p.km : null; // simpan km OSRM untuk referensi jika perlu
+  return {base, xtra, disc, total, fc, km, kmOsrm, days, kmSource: p.kmSource||"spm"};
+}
+
+function submitProject(){
+  const origin = gs("f_origin");
+  const dest = gs("f_dest");
+  if(!origin){ alert("Pilih Cabang Asal."); return; }
+  if(!dest){ alert("Pilih Kota Tujuan."); return; }
+  const r = lookupRoute(origin, dest);
+  if(!r){ alert("Rute tidak ditemukan di database SPM."); return; }
+  const deliveryType = gs("f_deliveryType") || "";
+  const addSafetyFactor = !!document.getElementById("f_safetyFactor")?.checked;
+  const xData = extras.map(id=>({desc:gs("xd"+id)||"Biaya Tambahan",amount:gv("xa"+id,0)})).filter(e=>e.amount>0);
+  const dData = discounts.map(id=>({desc:gs("dd"+id)||"Pengurangan",amount:gv("da"+id,0)})).filter(e=>e.amount>0);
+  const vehicle = document.querySelector("input[name=fv]:checked").value;
+  const lbSubType = vehicle === "lowbed"
+    ? (document.querySelector("input[name=fvLBsub]:checked")?.value || "hino")
+    : null;
+  const lbUnit = vehicle === "lowbed"
+    ? (document.getElementById("fvLBUnit")?.value || "")
+    : null;
+  const slUnit = vehicle === "selfloader"
+    ? (document.getElementById("fvSLUnit")?.value || "")
+    : null;
+  const fuel = getSelectedFuel();
+  const savedFuelMixPct = fuelMixPct;
+  // Gunakan km OSRM jika sudah ada di cache, fallback ke SPM
+  const cachedKm = osrmCache[origin+"|"+dest];
+  const kmFinal = (cachedKm !== undefined && cachedKm !== null) ? cachedKm : r.km;
+
+  const doSave = (km) => {
+    const data = {
+      id: editId||Date.now(),
+      customer: gs("f_customer")||"-",
+      origin, dest,
+      km: km,
+      kmpp: km * 2,
+      kmSource: (cachedKm !== undefined && cachedKm !== null) ? "osrm" : "spm",
+      days: vehicle==="lowbed"?r.hLB:r.hSL,
+      vehicle, lbSubType, lbUnit, slUnit, fuel, fuelMixPct: savedFuelMixPct, deliveryType, addSafetyFactor, extras: xData, discounts: dData, notes: gs("f_notes"),
+      createdAt: editId?(projects.find(p=>p.id===editId)?.createdAt||Date.now()):Date.now(),
+    };
+    if(editId){ projects=projects.map(p=>p.id===editId?data:p); editId=null; }
+    else{ projects.unshift(data); }
+    save(); renderTable(); resetForm();
+  };
+
+  // Jika OSRM sudah di-cache, langsung simpan
+  if(osrmCache[origin+"|"+dest] !== undefined){
+    doSave(kmFinal);
+  } else {
+    // Coba fetch OSRM dulu, simpan dengan hasil apapun (timeout = pakai SPM)
+    const btn = document.querySelector(".btn-submit");
+    if(btn){ btn.disabled=true; btn.textContent="⏳ Mengambil jarak OSRM..."; }
+    getOSRMDistance(origin, dest).then(km => {
+      const finalKm = km !== null ? km : r.km;
+      doSave(finalKm);
+    }).finally(()=>{
+      if(btn){ btn.disabled=false; btn.textContent="⚡ SIMPAN KE DASHBOARD"; }
+    });
+  }
+}
+
+function renderTable(){
+  const q = gs("srchQ").toLowerCase(), fv = gs("fVehicle");
+  const filtered = projects.filter(p=>{
+    const mq = !q || [p.customer,p.origin,p.dest].some(x=>(x||"").toLowerCase().includes(q));
+    return mq && (!fv || p.vehicle===fv);
+  });
+  el("pCount").textContent = filtered.length+" project";
+  const body = el("tBody");
+  el("emptyEl").style.display = filtered.length?"none":"block";
+  if(!filtered.length){ body.innerHTML=""; return; }
+  body.innerHTML = filtered.map((p,i)=>{
+    const c = calcP(p);
+    return `<tr class="au" style="animation-delay:${i*.03}s">
+      <td style="color:var(--muted);font-family:'Instrument Mono',monospace;font-size:.82rem;">${String(i+1).padStart(2,"0")}</td>
+      <td><div style="font-weight:700;font-size:.95rem;">${p.customer}</div>
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-top:4px;">
+          ${p.deliveryType?`<span class="delivery-badge">${p.deliveryType}</span>`:""}
+          ${p.addSafetyFactor?`<span class="safety-badge">Safety Factor</span>`:""}
+        </div>
+      </td>
+      <td><div style="display:flex;align-items:center;gap:.3rem;font-size:.88rem;font-weight:500;">
+        <span>${p.origin}</span><span style="color:var(--amber);font-weight:700;">→</span><span>${p.dest}</span>
+      </div></td>
+      <td class="r" style="font-family:'Instrument Mono',monospace;">${c.km.toLocaleString("id-ID")}</td>
+      <td class="r" style="font-family:'Instrument Mono',monospace;">${c.days}</td>
+      <td><div style="display:flex;flex-direction:column;gap:3px;">
+        <div><span class="vtag v-${p.vehicle}">${VLB[p.vehicle]}</span></div>
+        ${(()=>{ const m=getVehicleUnitLabel(p,true); return m!=="-"?`<div style="font-size:.75rem;color:var(--text2);font-weight:600;">${m}</div>`:""; })()}
+      </div></td>
+      <td class="r total-c">${fmt(c.total)}</td>
+      <td class="r" style="font-family:'Instrument Mono',monospace;font-size:.82rem;color:var(--muted);">${fmt(c.fc)}</td>
+      <td><div class="act-cell">
+        <button class="aBtn ab-v" onclick="viewDetail(${p.id})" title="Detail">👁</button>
+        <button class="aBtn ab-e" onclick="editProject(${p.id})" title="Edit">✏️</button>
+        <button class="aBtn ab-d" onclick="delProject(${p.id})" title="Hapus">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join("") + `
+  <tr class="trow-total">
+    <td colspan="4" style="font-size:.88rem;letter-spacing:.5px;color:var(--amber);padding:.75rem 1.1rem;font-weight:800;">TOTAL — ${filtered.length} PROJECT</td>
+    <td class="r" style="font-family:'Instrument Mono',monospace;color:var(--muted);">${filtered.reduce((s,p)=>s+calcP(p).days,0)}</td>
+    <td></td>
+    <td class="r total-c" style="font-size:1.05rem;">${fmt(filtered.reduce((s,p)=>s+calcP(p).total,0))}</td>
+    <td></td>
+    <td></td>
+  </tr>`;
+}
+
+// MODAL
+let modalPid = null;
+function viewDetail(id){
+  const p = projects.find(x=>x.id===id); if(!p) return;
+  const c = calcP(p);
+  const r = lookupRoute(p.origin, p.dest);
+  const savedPct = p.fuelMixPct !== undefined ? p.fuelMixPct : ((p.fuel||"subsidi")==="subsidi" ? 100 : 0);
+  const savedPctN = 100 - savedPct;
+  let fuelLabel, fuelStyle;
+  if(savedPct === 100){
+    fuelLabel = "⛽ Solar Subsidi";
+    fuelStyle = "background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:8px;font-size:.72rem;font-weight:700;";
+  } else if(savedPctN === 100){
+    fuelLabel = "⛽ Non-Subsidi";
+    fuelStyle = "background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:8px;font-size:.72rem;font-weight:700;";
+  } else {
+    fuelLabel = `⚗️ ${savedPct}% Subsidi + ${savedPctN}% Non-Subsidi`;
+    fuelStyle = "background:linear-gradient(to right,#dcfce7,#fef9c3);color:#374151;padding:2px 8px;border-radius:8px;font-size:.72rem;font-weight:700;border:1px solid #d1d5db;";
+  }
+  const bd = getBDRows(p.dest, p.vehicle, p.fuel||"subsidi", p.kmSource==="osrm" ? p.km : null, savedPct, !!p.addSafetyFactor);
+  const bdMerged = mergeOpsWithExtras(bd, p.extras, p.discounts);
+
+  // Build cost rows
+  const BADGE_CAT = {solar:"solar",crew:"crew",tol:"tol",cross:"cross",ops:"ops",extra:"extra",disc:"disc"};
+  let allRows = [];
+  if(bdMerged){
+    bdMerged.forEach(row=>allRows.push({
+      cat:row.cat, label:row.label, note:row.note, amt:Math.abs(row.amt), sign: row.amt<0?-1:1,
+      // Teruskan data solar comparison jika ada
+      solarBaseAmt: row.solarBaseAmt,
+      solarCalcAmt: row.solarCalcAmt,
+      kmpp: row.kmpp, kmSpm: row.kmSpm, kmOsrm: row.kmOsrm, kmL: row.kmL,
+      hargaPerL: row.hargaPerL, fuel: row.fuel,
+      kmppBase: row.kmppBase, safetyKm: row.safetyKm, safetyPct: row.safetyPct
+    }));
+  } else {
+    // Tidak ada data breakdown sistem — tampilkan Dasar + Biaya Tambahan/Pengurangan sebagai baris terpisah
+    allRows.push({cat:"base", label:"💰 Uang Jalan Dasar (PP)", note:"Harga SPM "+VLB[p.vehicle], amt:c.base, sign:1});
+    (p.extras||[]).forEach(e=>allRows.push({cat:"extra", label:"➕ "+e.desc, note:"Biaya tambahan", amt:e.amount, sign:1}));
+    (p.discounts||[]).forEach(e=>allRows.push({cat:"disc", label:"➖ "+e.desc, note:"Pengurangan", amt:e.amount, sign:-1}));
+  }
+
+  const grandTotal = allRows.reduce((s,row)=>s+(row.amt*row.sign),0);
+
+  el("mTitle").textContent = `Detail — ${p.customer}`;
+  el("mBody").innerHTML = `
+    <div class="m-route">
+      <div><div style="font-size:.72rem;color:var(--muted);letter-spacing:1px;margin-bottom:2px;">ASAL</div><div class="mr-city">${p.origin}</div></div>
+      <div class="mr-line"></div>
+      <div style="text-align:center;">
+        <div style="font-size:.88rem;color:var(--amber);font-weight:700;">📍 ${c.km.toLocaleString("id-ID")} km · ${c.days} hari</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:3px;">🚛 ${VLB[p.vehicle]}${(()=>{
+          const unitKey = p.vehicle==="lowbed" ? p.lbUnit : p.slUnit;
+          if(p.vehicle==="lowbed"&&p.lbSubType) {
+            const brand = p.lbSubType==="iveco"?"Iveco":p.lbSubType==="scania"?"Scania":"Hino";
+            const plate = getVehiclePlate(p);
+            if(plate) return ` (${brand} · ${plate})`;
+            return ` (${brand})`;
+          }
+          const plate = getVehiclePlate(p);
+          if(plate) return ` · ${plate}`;
+          return '';
+        })()}</div>
+      </div>
+      <div class="mr-line" style="transform:scaleX(-1);"></div>
+      <div style="text-align:right;"><div style="font-size:.72rem;color:var(--muted);letter-spacing:1px;margin-bottom:2px;">TUJUAN</div><div class="mr-city">${p.dest}</div></div>
+    </div>
+    <div style="margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;">
+      <span style="color:var(--muted);font-size:.9rem;">Customer: <strong style="color:var(--text);font-size:1rem;">${p.customer}</strong></span>
+      ${p.deliveryType?`<span class="delivery-badge">${p.deliveryType}</span>`:""}
+      ${p.addSafetyFactor?`<span class="safety-badge">🛡 Safety Factor BBM Active</span>`:""}
+    </div>
+    <table class="dtbl">
+      <thead><tr><th>#</th><th>Komponen Biaya</th><th>Keterangan</th><th style="text-align:right;">Jumlah (PP)</th></tr></thead>
+      <tbody>
+        ${allRows.map((row,i)=>{
+          // Baris solar — tampilkan kalkulasi sistem DAN nilai dari data SPM
+          if(row.cat === "solar" && row.solarBaseAmt !== undefined){
+            const isDiff = Math.abs(row.solarCalcAmt - row.solarBaseAmt) > 1;
+            const calcLabel = `${row.kmpp.toLocaleString("id-ID")} km ÷ ${row.kmL.toFixed(1).replace(".",",")} km/L × Rp ${row.hargaPerL.toLocaleString("id-ID")}/L`;
+            return `<tr>
+              <td style="color:var(--muted);font-size:.75rem;font-family:'Instrument Mono',monospace;">${String(i+1).padStart(2,"0")}</td>
+              <td><span class="dbadge db-solar">${row.label}</span></td>
+              <td style="font-size:.79rem;color:var(--muted);">
+                <div>${row.note}</div>
+              </td>
+              <td style="text-align:right;font-family:'Instrument Mono',monospace;font-weight:700;">${fmt(row.amt)}</td>
+            </tr>`;
+          }
+          // Baris biasa
+          return `<tr>
+            <td style="color:var(--muted);font-size:.75rem;font-family:'Instrument Mono',monospace;">${String(i+1).padStart(2,"0")}</td>
+            <td><span class="dbadge db-${row.cat}">${row.label}</span></td>
+            <td style="font-size:.8rem;color:var(--muted);">${row.note}</td>
+            <td style="text-align:right;font-family:'Instrument Mono',monospace;font-weight:700;${row.sign<0?"color:var(--danger);":""}">${row.sign<0?"− ":""}${fmt(row.amt)}</td>
+          </tr>`;
+        }).join("")}
+        <tr class="dtot"><td colspan="3" style="font-weight:800;letter-spacing:.5px;">TOTAL UANG JALAN (PULANG PERGI)</td><td style="text-align:right;">${fmt(grandTotal)}</td></tr>
+        <tr style="background:var(--bg);"><td colspan="3" style="font-size:.8rem;color:var(--muted);padding:.5rem 1rem;">📊 Fixed Cost (untuk costing)</td><td style="text-align:right;font-family:'Instrument Mono',monospace;font-size:.8rem;color:var(--muted);padding:.5rem 1rem;">${fmt(c.fc)}</td></tr>
+        <tr style="background:var(--amber-pale);"><td colspan="3" style="font-size:.82rem;font-weight:800;color:var(--amber);padding:.5rem 1rem;">💰 TOTAL COST (Uang Jalan PP + Fixed Cost)</td><td style="text-align:right;font-family:'Instrument Mono',monospace;font-size:.85rem;font-weight:800;color:var(--amber);padding:.5rem 1rem;">${fmt(grandTotal + c.fc)}</td></tr>
+      </tbody>
+    </table>
+    ${p.notes?`<div style="margin-top:1rem;font-size:.88rem;color:var(--muted);background:var(--bg);padding:.65rem .95rem;border-radius:var(--radius-sm);border:1.5px solid var(--border2);">📝 ${p.notes}</div>`:""}
+  `;
+  el("modal").classList.add("open"); modalPid = id;
+}
+function closeModal(){ el("modal").classList.remove("open"); }
+el("modal").addEventListener("click",e=>{ if(e.target===el("modal")) closeModal(); });
+function printModal(){ if(modalPid) printProject(modalPid); }
+
+// EDIT / DELETE
+function editProject(id){
+  const p = projects.find(x=>x.id===id); if(!p) return;
+  editId = id;
+  el("f_customer").value = p.customer;
+  if(el("f_deliveryType")) el("f_deliveryType").value = p.deliveryType || "";
+  if(el("f_safetyFactor")) el("f_safetyFactor").checked = !!p.addSafetyFactor;
+  el("f_origin").value = p.origin;
+  el("f_dest").value = p.dest;
+  document.querySelector(`input[name=fv][value="${p.vehicle}"]`).checked = true;
+  // Restore sub-tipe Low Bed (Hino/Iveco/Scania)
+  if(p.vehicle === "lowbed"){
+    const subVal = p.lbSubType || "hino";
+    const subRadio = document.querySelector(`input[name=fvLBsub][value="${subVal}"]`);
+    if(subRadio) subRadio.checked = true;
+    const sub = document.getElementById("lbSubWrap");
+    if(sub) sub.style.display = "";
+    const slSub = document.getElementById("slSubWrap");
+    if(slSub) slSub.style.display = "none";
+    updateLBUnitDropdown();
+    setTimeout(() => {
+      const unitSel = document.getElementById("fvLBUnit");
+      if(unitSel && p.lbUnit) unitSel.value = p.lbUnit;
+    }, 0);
+  } else {
+    const sub = document.getElementById("lbSubWrap");
+    if(sub) sub.style.display = "none";
+    const slSub = document.getElementById("slSubWrap");
+    if(slSub) slSub.style.display = "";
+    setTimeout(() => {
+      const slUnitSel = document.getElementById("fvSLUnit");
+      if(slUnitSel && p.slUnit) slUnitSel.value = p.slUnit;
+    }, 0);
+  }
+  // Restore fuel mix slider
+  fuelMixPct = (p.fuelMixPct !== undefined) ? p.fuelMixPct : ((p.fuel||"subsidi")==="subsidi" ? 100 : 0);
+  el("fuelSlider").value = fuelMixPct;
+  updateFuelSliderUI();
+  el("f_notes").value = p.notes||"";
+  el("xList").innerHTML=""; extras=[];
+  (p.extras||[]).forEach(e=>{ addExtra(); const lid=extras[extras.length-1]; el("xd"+lid).value=e.desc; el("xa"+lid).value=e.amount; });
+  el("dList").innerHTML=""; discounts=[];
+  (p.discounts||[]).forEach(e=>{ addDiscount(); const lid=discounts[discounts.length-1]; el("dd"+lid).value=e.desc; el("da"+lid).value=e.amount; });
+  el("formMode").textContent = "✎ Edit Project";
+  updatePreview();
+  document.querySelector(".sb-body").scrollTop = 0;
+}
+function delProject(id){
+  if(!confirm("Hapus project ini?")) return;
+  projects = projects.filter(p=>p.id!==id); save(); renderTable();
+}
+
+// PRINT
+function printProject(id){
+  const p = projects.find(x=>x.id===id); if(!p) return;
+  const c = calcP(p);
+  const r = lookupRoute(p.origin, p.dest);
+  const printMixPct = p.fuelMixPct !== undefined ? p.fuelMixPct : ((p.fuel||"subsidi")==="subsidi" ? 100 : 0);
+  const printMixN = 100 - printMixPct;
+  const fuelLabel = printMixPct === 100
+    ? `Solar Subsidi (Rp ${SOLAR_PRICES.subsidi.toLocaleString("id-ID")}/L)`
+    : printMixN === 100
+      ? `Solar Non-Subsidi (Rp ${SOLAR_PRICES.nonsubsidi.toLocaleString("id-ID")}/L)`
+      : `Campuran ${printMixPct}% Subsidi + ${printMixN}% Non-Subsidi`;
+  const bd = getBDRows(p.dest, p.vehicle, p.fuel||"subsidi", p.kmSource==="osrm" ? p.km : null, printMixPct, !!p.addSafetyFactor);
+  const bdMerged = mergeOpsWithExtras(bd, p.extras, p.discounts);
+  let printRows = [];
+  if(bdMerged){
+    bdMerged.forEach(row=>printRows.push({
+      cat:row.cat, label:row.label, note:row.note, amt:Math.abs(row.amt), sign: row.amt<0?-1:1,
+      solarBaseAmt: row.solarBaseAmt,
+      solarCalcAmt: row.solarCalcAmt,
+      kmpp: row.kmpp, kmSpm: row.kmSpm, kmOsrm: row.kmOsrm, kmL: row.kmL,
+      hargaPerL: row.hargaPerL, fuel: row.fuel,
+      kmppBase: row.kmppBase, safetyKm: row.safetyKm, safetyPct: row.safetyPct
+    }));
+  } else {
+    printRows.push({label:"Uang Jalan Dasar (PP)", note:"Harga SPM "+VLB[p.vehicle], amt:c.base, sign:1});
+    (p.extras||[]).forEach(e=>printRows.push({label:"➕ "+e.desc, note:"Biaya tambahan", amt:e.amount, sign:1}));
+    (p.discounts||[]).forEach(e=>printRows.push({label:"➖ "+e.desc, note:"Pengurangan", amt:e.amount, sign:-1}));
+  }
+  const grandTotal = printRows.reduce((s,r)=>s+(r.amt*r.sign),0);
+  const w = window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><title>Uang Jalan - ${p.customer}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;padding:2.5rem;color:#0d1f15;font-size:13px;}
+.hdr{border-bottom:3px solid #0a7c3e;padding-bottom:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-end;}
+.co{font-size:1.3rem;font-weight:800;color:#0d1f15;}.co small{display:block;font-size:.7rem;color:#5a7a65;font-weight:400;margin-top:2px;}
+.meta{font-size:.72rem;color:#5a7a65;text-align:right;}
+.rbox{background:#f0faf4;border:2px solid #c6ecd8;border-radius:10px;padding:.9rem 1.2rem;margin-bottom:.8rem;display:flex;align-items:center;gap:1rem;}
+.rc{font-size:1.1rem;font-weight:800;color:#0d1f15;}
+.infobox{background:#f0f9f7;border:1px solid #b2ddd6;border-radius:8px;padding:.5rem .9rem;margin-bottom:1rem;font-size:.77rem;color:#0a6e5b;line-height:1.6;}
+table{width:100%;border-collapse:collapse;}
+th{background:#0d1f15;color:#fff;padding:7px 10px;text-align:left;font-size:.72rem;}th:last-child{text-align:right;}
+td{padding:6px 10px;border-bottom:1px solid #e2f2e9;font-size:.82rem;color:#0d1f15;}td:last-child{text-align:right;font-weight:600;}
+.tot td{background:#f0faf4;font-weight:800;border-top:2px solid #0a7c3e;}.tot td:last-child{color:#0a7c3e;font-size:.95rem;}
+.tot2 td{background:#dcfce7;font-weight:800;border-top:2px solid #16a34a;}.tot2 td:last-child{color:#16a34a;font-size:1rem;}
+.footer{margin-top:2rem;font-size:.68rem;color:#c0b4a4;border-top:1px solid #e2f2e9;padding-top:.75rem;display:flex;justify-content:space-between;}
+.notes{margin-top:1rem;background:#f7fdf9;padding:.5rem .75rem;border-radius:6px;font-size:.75rem;color:#5a7a65;border:1px solid #e2f2e9;}
+</style></head><body>
+<div class="hdr">
+  <div class="co">PT CIPTA KRIDA BAHARI<small>Dokumen Uang Jalan / Travel Allowance</small></div>
+  <div class="meta">Customer: <strong>${p.customer}</strong>${p.deliveryType?`<br>Delivery: <strong>${p.deliveryType}</strong>`:""}${p.addSafetyFactor?"<br>Safety Factor: <strong>Active (+10% KM)</strong>":""}<br>Tanggal: ${new Date(p.createdAt).toLocaleDateString("id-ID")}</div>
+</div>
+<div class="rbox">
+  <div><div style="font-size:.62rem;color:#5a7a65;">ASAL</div><div class="rc">${p.origin}</div></div>
+  <div style="flex:1;text-align:center;color:#0a7c3e;font-size:1.2rem;">→</div>
+  <div style="text-align:center;"><div style="font-size:.78rem;color:#0a7c3e;font-weight:800;">${c.km.toLocaleString("id-ID")} km · ${c.days} hari</div>
+  <div style="font-size:.68rem;color:#5a7a65;">${VLB[p.vehicle]}${getVehicleUnitLabel(p,true)!=="-"?" · "+getVehicleUnitLabel(p,true):""} · ⛽ ${fuelLabel}</div></div>
+  <div style="flex:1;text-align:center;color:#0a7c3e;font-size:1.2rem;">→</div>
+  <div style="text-align:right;"><div style="font-size:.62rem;color:#5a7a65;">TUJUAN</div><div class="rc">${p.dest}</div></div>
+</div>
+${r&&r.tol?`<div class="infobox">🛣 <strong>Rute Tol:</strong> ${r.tol}</div>`:""}
+${r&&r.crossing?`<div class="infobox">${r.crossing}</div>`:""}
+<table><thead><tr><th>#</th><th>Komponen Biaya</th><th>Keterangan</th><th>Jumlah (PP)</th></tr></thead><tbody>
+${printRows.map((row,i)=>{
+  if(row.cat === "solar" && row.solarBaseAmt !== undefined){
+    const isDiff = Math.abs(row.solarCalcAmt - row.solarBaseAmt) > 1;
+    const calcStr = `${row.kmpp.toLocaleString("id-ID")} km ÷ ${row.kmL.toFixed(1).replace(".",",")} km/L × Rp ${row.hargaPerL.toLocaleString("id-ID")}/L`;
+    return `<tr>
+      <td style="color:#5a7a65;font-size:.78rem;">${String(i+1).padStart(2,"0")}</td>
+      <td>${row.label}</td>
+      <td style="color:#5a7a65;">
+        <div>${row.note}</div>
+      </td>
+      <td style="text-align:right;font-weight:700;">${fmt(row.amt)}</td>
+    </tr>`;
+  }
+  return `<tr><td style="color:#5a7a65;font-size:.78rem;">${String(i+1).padStart(2,"0")}</td><td>${row.label}</td><td style="color:#5a7a65;">${row.note}</td><td style="text-align:right;font-weight:700;${row.sign<0?"color:#dc2626;":""}">${row.sign<0?"− ":""}${fmt(row.amt)}</td></tr>`;
+}).join("")}
+<tr class="tot"><td colspan="3">TOTAL UANG JALAN (PULANG PERGI)</td><td>${fmt(grandTotal)}</td></tr>
+<tr style="background:#f7fdf9;"><td colspan="3" style="color:#5a7a65;font-size:.75rem;">📊 Fixed Cost (untuk costing)</td><td style="text-align:right;color:#5a7a65;font-size:.75rem;">${fmt(c.fc)}</td></tr>
+<tr style="background:#dcfce7;"><td colspan="3" style="color:#0a7c3e;font-size:.8rem;font-weight:800;">💰 TOTAL COST (Uang Jalan PP + Fixed Cost)</td><td style="text-align:right;color:#0a7c3e;font-size:.85rem;font-weight:800;">${fmt(grandTotal + c.fc)}</td></tr>
+</tbody></table>
+${p.notes?`<div class="notes">📝 Catatan: ${p.notes}</div>`:""}
+<div class="footer"><span>Dicetak: ${new Date().toLocaleString("id-ID")}</span><span>PT Cipta Krida Bahari — Dokumen Resmi</span></div>
+</body></html>`);
+  w.document.close(); w.print();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT DROPDOWN — toggle
+// ═══════════════════════════════════════════════════════════════
+function toggleExportDD(e){
+  e.stopPropagation();
+  el("exportDD").classList.toggle("open");
+}
+function closeExportDD(){
+  el("exportDD").classList.remove("open");
+}
+function toggleExportDDModal(e){
+  e.stopPropagation();
+  el("exportDDModal").classList.toggle("open");
+}
+function closeExportDDModal(){
+  el("exportDDModal").classList.remove("open");
+}
+document.addEventListener("click", e => {
+  const dd = el("exportDD");
+  if(dd && !dd.contains(e.target)) closeExportDD();
+  const ddm = el("exportDDModal");
+  if(ddm && !ddm.contains(e.target)) closeExportDDModal();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT EXCEL — semua project dengan styling ExcelJS
+// ═══════════════════════════════════════════════════════════════
+function exportExcel(){
+  if(!projects.length){ alert("Tidak ada data project."); return; }
+  _loadExcelJS(()=> _doExcel(projects));
+}
+
+function exportExcelSingle(){
+  if(!modalPid) return;
+  const p = projects.find(x=>x.id===modalPid);
+  if(!p) return;
+  _loadExcelJS(()=> _doExcel([p], true));
+}
+
+function _loadExcelJS(cb){
+  if(typeof ExcelJS !== "undefined"){ cb(); return; }
+  const s = document.createElement("script");
+  s.src = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js";
+  s.onload = cb;
+  s.onerror = ()=> alert("Gagal memuat library Excel. Periksa koneksi internet.");
+  document.head.appendChild(s);
+}
+
+async function _doExcel(targetProjects, singleMode = false){
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "CKB Sistem Uang Jalan";
+  wb.created = new Date();
+
+  const now = new Date().toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
+  const fmtRp = n => typeof n==="number" ? n : 0;
+
+  // ── PALETTE ─────────────────────────────────────────────────
+  const C = {
+    darkGreen:  "FF0D1F15",
+    green:      "FF0A7C3E",
+    green2:     "FF12A854",
+    lightGreen: "FFF0FAF4",
+    mintBorder: "FFC6ECD8",
+    teal:       "FF16A34A",
+    tealPale:   "FFDCFCE7",
+    amber:      "FF0A7C3E",
+    muted:      "FF5A7A65",
+    danger:     "FFDC2626",
+    white:      "FFFFFFFF",
+    offWhite:   "FFF7FDF9",
+    yellow:     "FFFFF9C3",
+    yellowBdr:  "FFFDE68A",
+    rowAlt:     "FFF4FAF6",
+    blue:       "FF1D4ED8",
+    bluePale:   "FFDBEAFE",
+    purple:     "FF7C3AED",
+    purplePale: "FFF3E8FF",
+  };
+
+  const fHeader = (color=C.white, sz=9, bold=true) => ({name:"Arial",size:sz,bold,color:{argb:color}});
+  const fillSolid = argb => ({type:"pattern",pattern:"solid",fgColor:{argb}});
+  const borderThin = argb => ({style:"thin",color:{argb}});
+  const allBorder = (argb="FFD1E8DA") => ({
+    top:borderThin(argb), left:borderThin(argb),
+    bottom:borderThin(argb), right:borderThin(argb)
+  });
+  const alignMid = (h="left") => ({vertical:"middle",horizontal:h});
+
+  // Category badge colors for cost rows
+  const catColor = {
+    solar:  {bg:C.yellow,   font:"FF854D0E"},
+    crew:   {bg:C.bluePale, font:C.blue},
+    tol:    {bg:"FFF3F4F6", font:"FF374151"},
+    cross:  {bg:"FFECFDF5", font:"FF065F46"},
+    ops:    {bg:"FFF5F3FF", font:"FF5B21B6"},
+    extra:  {bg:C.purplePale, font:C.purple},
+    disc:   {bg:"FFFEE2E2", font:C.danger},
+    base:   {bg:C.lightGreen, font:C.green},
+  };
+
+  // ── HELPER: style an entire row ──────────────────────────────
+  function styleRow(row, {fill, font, border, align, bold, numFmt} = {}){
+    row.eachCell({includeEmpty:true}, cell => {
+      if(fill) cell.fill = fill;
+      if(font) cell.font = {...cell.font, ...font};
+      if(bold !== undefined) cell.font = {...(cell.font||{}), bold};
+      if(border) cell.border = border;
+      if(align) cell.alignment = align;
+      if(numFmt) cell.numFmt = numFmt;
+    });
+  }
+
+  // ── SHEET: REKAP (hanya untuk export SEMUA project dari Dashboard) ──
+  if(!singleMode){
+  const wsR = wb.addWorksheet("Rekap", {views:[{state:"frozen",ySplit:4}]});
+  const RCOLS = 16;
+
+  wsR.columns = [
+    {key:"no",    width:5},
+    {key:"cust",  width:26},
+    {key:"asal",  width:18},
+    {key:"tujuan",width:22},
+    {key:"veh",   width:13},
+    {key:"lbsub", width:11},
+    {key:"fuel",  width:30},
+    {key:"km1",   width:13},
+    {key:"kmpp",  width:10},
+    {key:"hari",  width:7},
+    {key:"dasar", width:18},
+    {key:"tmb",   width:16},
+    {key:"kur",   width:16},
+    {key:"total", width:18},
+    {key:"fc",    width:16},
+    {key:"notes", width:32},
+  ];
+
+  // Row 1 — Company header
+  wsR.mergeCells(1,1,1,RCOLS);
+  const r1 = wsR.getRow(1);
+  r1.height = 30;
+  const c1 = wsR.getCell(1,1);
+  c1.value = "⚓  PT CIPTA KRIDA BAHARI — Rekap Uang Jalan";
+  c1.font = {name:"Arial",size:13,bold:true,color:{argb:C.white}};
+  c1.fill = fillSolid(C.darkGreen);
+  c1.alignment = alignMid("left");
+  c1.border = allBorder(C.green);
+
+  // Row 2 — Subtitle
+  wsR.mergeCells(2,1,2,RCOLS);
+  const r2 = wsR.getRow(2);
+  r2.height = 18;
+  const c2 = wsR.getCell(2,1);
+  c2.value = `Dicetak: ${now}    ·    Total: ${targetProjects.length} project`;
+  c2.font = {name:"Arial",size:9,color:{argb:C.muted}};
+  c2.fill = fillSolid(C.lightGreen);
+  c2.alignment = alignMid("left");
+  c2.border = allBorder(C.mintBorder);
+
+  // Row 3 — spacer
+  wsR.getRow(3).height = 6;
+
+  // Row 4 — Column headers
+  const rHdr = wsR.getRow(4);
+  rHdr.height = 22;
+  const hdrLabels = ["No","Customer","Asal","Tujuan","Kendaraan","Sub-Tipe","Bahan Bakar",
+    "KM (1 arah)","KM PP","Hari","Biaya Dasar (Rp)","Tambahan (Rp)","Pengurangan (Rp)",
+    "Total UJ PP (Rp)","Fixed Cost (Rp)","Catatan"];
+  hdrLabels.forEach((lbl,i)=>{
+    const cell = wsR.getCell(4, i+1);
+    cell.value = lbl;
+    cell.font = fHeader(C.white, 8, true);
+    cell.fill = fillSolid(C.darkGreen);
+    cell.alignment = alignMid(i>=7&&i<=14?"right":"left");
+    cell.border = allBorder(C.green);
+  });
+
+  // Data rows
+  const numericCols = [8,9,10,11,12,13,14,15]; // 1-indexed
+  targetProjects.forEach((p, i)=>{
+    const c = calcP(p);
+    const mixPct = p.fuelMixPct !== undefined ? p.fuelMixPct : ((p.fuel||"subsidi")==="subsidi" ? 100 : 0);
+    const mixN = 100 - mixPct;
+    const fuelStr = mixPct===100 ? "Solar Subsidi" : mixN===100 ? "Non-Subsidi" : `${mixPct}% Subsidi + ${mixN}% Non-Subsidi`;
+    const lbSub = getVehicleUnitLabel(p, true);
+    const isAlt = i % 2 === 1;
+    const rowBg = isAlt ? C.rowAlt : C.white;
+
+    const row = wsR.addRow([
+      i+1, p.customer, p.origin, p.dest, VLB[p.vehicle], lbSub, fuelStr,
+      fmtRp(c.km), fmtRp(c.km*2), fmtRp(c.days),
+      fmtRp(c.base), fmtRp(c.xtra), fmtRp(c.disc), fmtRp(c.total), fmtRp(c.fc),
+      p.notes||""
+    ]);
+    row.height = 18;
+    row.eachCell({includeEmpty:true}, (cell, colNum) => {
+      cell.fill = fillSolid(rowBg);
+      cell.font = {name:"Arial", size:9, color:{argb:C.darkGreen}};
+      cell.border = allBorder("FFE2F2E9");
+      if(numericCols.includes(colNum)){
+        cell.alignment = alignMid("right");
+        if(colNum >= 11) cell.numFmt = '#,##0';
+      } else {
+        cell.alignment = alignMid("left");
+      }
+      // Highlight total column
+      if(colNum === 14){
+        cell.font = {name:"Arial",size:9,bold:true,color:{argb:C.green}};
+        cell.fill = fillSolid(C.lightGreen);
+      }
+      // Red for pengurangan
+      if(colNum === 13 && fmtRp(c.disc) > 0){
+        cell.font = {name:"Arial",size:9,color:{argb:C.danger}};
+      }
+    });
+  });
+
+  // Total row
+  const totRow = wsR.addRow([
+    "TOTAL", "", "", "", "", "", "", "",
+    targetProjects.reduce((s,p)=>s+calcP(p).km*2, 0),
+    targetProjects.reduce((s,p)=>s+calcP(p).days, 0),
+    targetProjects.reduce((s,p)=>s+calcP(p).base, 0),
+    targetProjects.reduce((s,p)=>s+(calcP(p).xtra), 0),
+    targetProjects.reduce((s,p)=>s+(calcP(p).disc), 0),
+    targetProjects.reduce((s,p)=>s+calcP(p).total, 0),
+    targetProjects.reduce((s,p)=>s+calcP(p).fc, 0),
+    ""
+  ]);
+  totRow.height = 22;
+  totRow.eachCell({includeEmpty:true}, (cell, colNum) => {
+    cell.fill = fillSolid(C.darkGreen);
+    cell.font = {name:"Arial",size:9,bold:true,color:{argb:C.white}};
+    cell.border = allBorder(C.green);
+    if(numericCols.includes(colNum)) cell.alignment = alignMid("right");
+    if(colNum === 14){
+      cell.font = {name:"Arial",size:10,bold:true,color:{argb:"FF4ADE80"}};
+    }
+    if([9,10,11,12,13,14,15].includes(colNum)) cell.numFmt = '#,##0';
+  });
+  } // end if(!singleMode) — Rekap sheet
+
+  // ── SHEET PER PROJECT (hanya untuk export Detail 1 project) ──
+  if(singleMode){
+  targetProjects.forEach((p, idx)=>{
+    const {rows, grandTotal, c, r, fuelLabel, mixPct, mixPctN} = buildDetailRows(p);
+    const sheetName = singleMode
+      ? (p.customer||"Project").replace(/[\/\\?*\[\]:]/g,"").slice(0,25)
+      : `${String(idx+1).padStart(2,"0")}_${(p.customer||"Project").replace(/[\/\\?*\[\]:]/g,"").slice(0,18)}`;
+
+    const lbSubLabel = getVehicleUnitLabel(p, false) !== "-" ? ` (${getVehicleUnitLabel(p, false)})` : "";
+    const ws = wb.addWorksheet(sheetName);
+
+    ws.columns = [
+      {key:"no",    width:6},
+      {key:"comp",  width:32},
+      {key:"note",  width:38},
+      {key:"kmspm", width:14},
+      {key:"kmosrm",width:14},
+      {key:"amt",   width:20},
+    ];
+
+    let rowIdx = 1;
+
+    // ─ Company banner ─
+    ws.mergeCells(rowIdx,1,rowIdx,6);
+    const bannerCell = ws.getCell(rowIdx,1);
+    bannerCell.value = "⚓  PT CIPTA KRIDA BAHARI";
+    bannerCell.font = {name:"Arial",size:14,bold:true,color:{argb:C.white}};
+    bannerCell.fill = fillSolid(C.darkGreen);
+    bannerCell.alignment = alignMid("left");
+    bannerCell.border = allBorder(C.green);
+    ws.getRow(rowIdx).height = 30;
+    rowIdx++;
+
+    ws.mergeCells(rowIdx,1,rowIdx,6);
+    const subCell = ws.getCell(rowIdx,1);
+    subCell.value = `Dokumen Uang Jalan / Travel Allowance    ·    No. ${idx+1}/${targetProjects.length}    ·    ${now}`;
+    subCell.font = {name:"Arial",size:9,color:{argb:C.muted}};
+    subCell.fill = fillSolid(C.lightGreen);
+    subCell.alignment = alignMid("left");
+    subCell.border = allBorder(C.mintBorder);
+    ws.getRow(rowIdx).height = 16;
+    rowIdx++;
+
+    // ─ Spacer ─
+    ws.getRow(rowIdx).height = 8; rowIdx++;
+
+    // ─ Info section ─
+    const infoRows = [
+      ["Customer",      p.customer,                     C.lightGreen, C.darkGreen, true],
+      ["Asal",          p.origin,                       C.offWhite,   C.darkGreen, false],
+      ["Tujuan",        p.dest,                         C.offWhite,   C.darkGreen, false],
+      ["Kendaraan",     VLB[p.vehicle]+lbSubLabel,      C.offWhite,   C.darkGreen, false],
+      ["Bahan Bakar",   fuelLabel,                      C.yellow,     "FF854D0E",  false],
+      ["Jarak (1 arah)",`${c.km.toLocaleString("id-ID")} km`,         C.offWhite, C.green, false],
+      ["Jarak PP",      `${(c.km*2).toLocaleString("id-ID")} km`,     C.offWhite, C.green, false],
+      ["Hari",          `${c.days} hari`,               C.offWhite,   C.green,     false],
+      ["Tanggal Dibuat",new Date(p.createdAt).toLocaleDateString("id-ID"), C.offWhite, C.muted, false],
+    ];
+    if(r&&r.tol)      infoRows.push(["Rute Tol", r.tol, "FFECFDF5", "FF065F46", false]);
+    if(r&&r.crossing) infoRows.push(["Penyeberangan", r.crossing, "FFECFDF5", "FF065F46", false]);
+
+    infoRows.forEach(([label, val, bg, textColor, bold])=>{
+      ws.mergeCells(rowIdx,2,rowIdx,6);
+      const labelCell = ws.getCell(rowIdx,1);
+      const valCell   = ws.getCell(rowIdx,2);
+      labelCell.value = label;
+      labelCell.font  = {name:"Arial",size:8,bold:true,color:{argb:C.muted}};
+      labelCell.fill  = fillSolid(C.lightGreen);
+      labelCell.alignment = alignMid("left");
+      labelCell.border = allBorder(C.mintBorder);
+      valCell.value   = val;
+      valCell.font    = {name:"Arial",size:9,bold,color:{argb:textColor}};
+      valCell.fill    = fillSolid(bg);
+      valCell.alignment = alignMid("left");
+      valCell.border  = allBorder(C.mintBorder);
+      ws.getRow(rowIdx).height = 17;
+      rowIdx++;
+    });
+
+    // ─ Spacer ─
+    ws.getRow(rowIdx).height = 10; rowIdx++;
+
+    // ─ Table header ─
+    const tHdrLabels = ["No","Komponen Biaya","Keterangan","KM Searah","KM PP","Jumlah PP (Rp)"];
+    ws.getRow(rowIdx).height = 20;
+    tHdrLabels.forEach((lbl,ci)=>{
+      const cell = ws.getCell(rowIdx,ci+1);
+      cell.value = lbl;
+      cell.font  = fHeader(C.white, 8, true);
+      cell.fill  = fillSolid(C.darkGreen);
+      cell.alignment = alignMid(ci===5?"right":"left");
+      cell.border = allBorder(C.green);
+    });
+    rowIdx++;
+
+    // ─ Cost rows ─
+    rows.forEach((row, i)=>{
+      const cc = catColor[row.cat] || {bg:C.offWhite, font:C.darkGreen};
+      let kmSearah="", kmPP="";
+      if(row.cat==="solar" && row.solarBaseAmt !== undefined){
+        kmSearah = row.kmSpm != null ? row.kmSpm : "";
+        kmPP     = row.kmpp  != null ? row.kmpp  : "";
+      }
+      const amt = row.sign < 0 ? -row.amt : row.amt;
+      const cleanLabel = row.label.replace(/[💰⛽🛣🚢✈🏙🔧➕➖]/gu,"").trim();
+
+      const dataRow = ws.getRow(rowIdx);
+      dataRow.height = 17;
+
+      const cellNo = ws.getCell(rowIdx,1);
+      cellNo.value = i+1;
+      cellNo.font = {name:"Arial",size:8,color:{argb:C.muted}};
+      cellNo.fill = fillSolid(cc.bg);
+      cellNo.alignment = alignMid("center");
+      cellNo.border = allBorder("FFE2F2E9");
+
+      const cellLabel = ws.getCell(rowIdx,2);
+      cellLabel.value = cleanLabel;
+      cellLabel.font = {name:"Arial",size:9,bold:true,color:{argb:cc.font}};
+      cellLabel.fill = fillSolid(cc.bg);
+      cellLabel.alignment = alignMid("left");
+      cellLabel.border = allBorder("FFE2F2E9");
+
+      const cellNote = ws.getCell(rowIdx,3);
+      cellNote.value = row.note||"";
+      cellNote.font = {name:"Arial",size:8,color:{argb:C.muted}};
+      cellNote.fill = fillSolid(i%2===0?C.white:C.rowAlt);
+      cellNote.alignment = alignMid("left");
+      cellNote.border = allBorder("FFE2F2E9");
+
+      const cellSpm = ws.getCell(rowIdx,4);
+      cellSpm.value = kmSearah;
+      cellSpm.font = {name:"Arial",size:8,color:{argb:C.muted}};
+      cellSpm.fill = fillSolid(i%2===0?C.white:C.rowAlt);
+      cellSpm.alignment = alignMid("right");
+      cellSpm.border = allBorder("FFE2F2E9");
+
+      const cellOsrm = ws.getCell(rowIdx,5);
+      cellOsrm.value = kmPP;
+      cellOsrm.font = {name:"Arial",size:8,color:{argb:C.muted}};
+      cellOsrm.fill = fillSolid(i%2===0?C.white:C.rowAlt);
+      cellOsrm.alignment = alignMid("right");
+      cellOsrm.border = allBorder("FFE2F2E9");
+
+      const cellAmt = ws.getCell(rowIdx,6);
+      cellAmt.value = amt;
+      cellAmt.numFmt = '#,##0';
+      cellAmt.font = {name:"Arial",size:9,bold:true,
+        color:{argb: row.sign<0 ? C.danger : C.darkGreen}};
+      cellAmt.fill = fillSolid(row.sign<0 ? "FFFEE2E2" : (i%2===0?C.white:C.rowAlt));
+      cellAmt.alignment = alignMid("right");
+      cellAmt.border = allBorder("FFE2F2E9");
+
+      rowIdx++;
+    });
+
+    // ─ Total row ─
+    ws.mergeCells(rowIdx,1,rowIdx,5);
+    ws.getRow(rowIdx).height = 22;
+    const totLabel = ws.getCell(rowIdx,1);
+    totLabel.value = "TOTAL UANG JALAN (PULANG PERGI)";
+    totLabel.font = {name:"Arial",size:9,bold:true,color:{argb:C.white}};
+    totLabel.fill = fillSolid(C.darkGreen);
+    totLabel.alignment = alignMid("left");
+    totLabel.border = allBorder(C.green);
+    const totAmt = ws.getCell(rowIdx,6);
+    totAmt.value = grandTotal;
+    totAmt.numFmt = '#,##0';
+    totAmt.font = {name:"Arial",size:11,bold:true,color:{argb:"FF4ADE80"}};
+    totAmt.fill = fillSolid(C.darkGreen);
+    totAmt.alignment = alignMid("right");
+    totAmt.border = allBorder(C.green);
+    rowIdx++;
+
+    // ─ FC row ─
+    ws.mergeCells(rowIdx,1,rowIdx,5);
+    ws.getRow(rowIdx).height = 16;
+    const fcLabel = ws.getCell(rowIdx,1);
+    fcLabel.value = "Fixed Cost (untuk costing)";
+    fcLabel.font = {name:"Arial",size:8,color:{argb:C.muted}};
+    fcLabel.fill = fillSolid(C.offWhite);
+    fcLabel.alignment = alignMid("left");
+    fcLabel.border = allBorder(C.mintBorder);
+    const fcAmt = ws.getCell(rowIdx,6);
+    fcAmt.value = c.fc;
+    fcAmt.numFmt = '#,##0';
+    fcAmt.font = {name:"Arial",size:8,color:{argb:C.muted}};
+    fcAmt.fill = fillSolid(C.offWhite);
+    fcAmt.alignment = alignMid("right");
+    fcAmt.border = allBorder(C.mintBorder);
+    rowIdx++;
+
+    // ─ Total Cost row (Uang Jalan PP + Fixed Cost) ─
+    ws.mergeCells(rowIdx,1,rowIdx,5);
+    ws.getRow(rowIdx).height = 18;
+    const tcLabel = ws.getCell(rowIdx,1);
+    tcLabel.value = "💰 TOTAL COST (Uang Jalan PP + Fixed Cost)";
+    tcLabel.font = {name:"Arial",size:9,bold:true,color:{argb:C.green}};
+    tcLabel.fill = fillSolid(C.lightGreen);
+    tcLabel.alignment = alignMid("left");
+    tcLabel.border = allBorder(C.mintBorder);
+    const tcAmt = ws.getCell(rowIdx,6);
+    tcAmt.value = grandTotal + c.fc;
+    tcAmt.numFmt = '#,##0';
+    tcAmt.font = {name:"Arial",size:9,bold:true,color:{argb:C.green}};
+    tcAmt.fill = fillSolid(C.lightGreen);
+    tcAmt.alignment = alignMid("right");
+    tcAmt.border = allBorder(C.mintBorder);
+    rowIdx++;
+
+    // ─ Notes ─
+    if(p.notes){
+      ws.getRow(rowIdx).height = 8; rowIdx++;
+      ws.mergeCells(rowIdx,1,rowIdx,6);
+      ws.getRow(rowIdx).height = 18;
+      const notesCell = ws.getCell(rowIdx,1);
+      notesCell.value = `Catatan: ${p.notes}`;
+      notesCell.font = {name:"Arial",size:8,italic:true,color:{argb:"FF713F12"}};
+      notesCell.fill = fillSolid(C.yellow);
+      notesCell.alignment = {vertical:"middle",horizontal:"left",wrapText:true};
+      notesCell.border = allBorder(C.yellowBdr);
+      rowIdx++;
+    }
+  });
+  } // end if(singleMode) — per-project detail sheet
+
+  // ─── Download ────────────────────────────────────────────────
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = singleMode
+    ? `CKB_UJ_${(targetProjects[0].customer||"Project").replace(/\s+/g,"_")}_${new Date().toISOString().slice(0,10)}.xlsx`
+    : `CKB_UangJalan_${new Date().toISOString().slice(0,10)}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER — build detail rows for a project (used by PDF & Excel)
+// ═══════════════════════════════════════════════════════════════
+function buildDetailRows(p){
+  const c = calcP(p);
+  const r = lookupRoute(p.origin, p.dest);
+  const mixPct  = p.fuelMixPct !== undefined ? p.fuelMixPct : ((p.fuel||"subsidi")==="subsidi" ? 100 : 0);
+  const mixPctN = 100 - mixPct;
+  const fuelLabel = mixPct===100
+    ? `Solar Subsidi (Rp ${SOLAR_PRICES.subsidi.toLocaleString("id-ID")}/L)`
+    : mixPctN===100
+      ? `Solar Non-Subsidi (Rp ${SOLAR_PRICES.nonsubsidi.toLocaleString("id-ID")}/L)`
+      : `Campuran ${mixPct}% Subsidi + ${mixPctN}% Non-Subsidi`;
+  const bd = getBDRows(p.dest, p.vehicle, p.fuel||"subsidi", p.kmSource==="osrm" ? p.km : null, mixPct, !!p.addSafetyFactor);
+  const bdMerged = mergeOpsWithExtras(bd, p.extras, p.discounts);
+  let rows = [];
+  if(bdMerged){
+    bdMerged.forEach(row=>rows.push({
+      cat: row.cat, label: row.label, note: row.note, amt: Math.abs(row.amt), sign: row.amt<0?-1:1,
+      solarBaseAmt: row.solarBaseAmt, solarCalcAmt: row.solarCalcAmt,
+      kmpp: row.kmpp, kmSpm: row.kmSpm, kmOsrm: row.kmOsrm, kmL: row.kmL,
+      hargaPerL: row.hargaPerL,
+      kmppBase: row.kmppBase, safetyKm: row.safetyKm, safetyPct: row.safetyPct
+    }));
+  } else {
+    rows.push({cat:"base", label:"💰 Uang Jalan Dasar (PP)", note:"Harga SPM "+VLB[p.vehicle], amt:c.base, sign:1});
+    (p.extras||[]).forEach(e=>rows.push({cat:"extra", label:"➕ "+e.desc, note:"Biaya tambahan", amt:e.amount, sign:1}));
+    (p.discounts||[]).forEach(e=>rows.push({cat:"disc", label:"➖ "+e.desc, note:"Pengurangan", amt:e.amount, sign:-1}));
+  }
+  const grandTotal = rows.reduce((s,r)=>s+(r.amt*r.sign), 0);
+  return { rows, grandTotal, c, r, fuelLabel, mixPct, mixPctN };
+}
+
+function exportPDF(){
+  if(!projects.length){ alert("Tidak ada data project."); return; }
+  const now = new Date().toLocaleString("id-ID");
+  const dateStr = new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+
+  // Build HTML untuk semua project — setiap project di halaman terpisah
+  let allPages = projects.map((p, idx)=>{
+    const {rows, grandTotal, c, r, fuelLabel} = buildDetailRows(p);
+    const pageBreak = idx < projects.length-1 ? "page-break-after:always;" : "";
+    const tolInfo = r&&r.tol ? `<div class="infobox">🛣 <strong>Rute Tol:</strong> ${r.tol}</div>` : "";
+    const crossInfo = r&&r.crossing ? `<div class="infobox">${r.crossing}</div>` : "";
+    const rowsHtml = rows.map((row,i)=>{
+      if(row.cat==="solar" && row.solarBaseAmt !== undefined){
+        const calcStr = row.kmpp ? `${row.kmpp.toLocaleString("id-ID")} km ÷ ${row.kmL.toFixed(1).replace(".",",")} km/L × Rp ${row.hargaPerL.toLocaleString("id-ID")}/L` : "";
+        return `<tr>
+          <td class="td-no">${String(i+1).padStart(2,"0")}</td>
+          <td class="td-label">${row.label}</td>
+          <td class="td-note">
+            <div>${row.note}</div>
+            ${calcStr?`<div class="td-sub">${calcStr}</div>`:""}
+          </td>
+          <td class="td-amt">${fmt(row.amt)}</td>
+        </tr>`;
+      }
+      return `<tr>
+        <td class="td-no">${String(i+1).padStart(2,"0")}</td>
+        <td class="td-label">${row.label}</td>
+        <td class="td-note">${row.note||""}</td>
+        <td class="td-amt${row.sign<0?" td-neg":""}">${row.sign<0?"− ":""}${fmt(row.amt)}</td>
+      </tr>`;
+    }).join("");
+    const lbSub = getVehicleUnitLabel(p, false) !== "-" ? ` (${getVehicleUnitLabel(p, false)})` : "";
+    const pageClass = idx < projects.length-1 ? "page page-break" : "page";
+    return `
+    <div class="${pageClass}">
+
+      <!-- HEADER -->
+      <table class="hdr-table"><tr>
+        <td>
+          <span class="anchor-icon">⚓</span>
+          <span class="coname">
+            <span class="coname-main">PT CIPTA KRIDA BAHARI</span>
+            <span class="coname-sub">Dokumen Uang Jalan / Travel Allowance</span>
+          </span>
+        </td>
+        <td>
+          <div class="meta-no">No. ${String(idx+1).padStart(3,"0")} / ${projects.length}</div>
+          <div class="meta-date">${dateStr}</div>
+        </td>
+      </tr></table>
+
+      <!-- CUSTOMER -->
+      <table class="cust-table"><tr>
+        <td style="width:1%;"><span class="cust-lbl">CUSTOMER</span></td>
+        <td class="cust-name">${p.customer}</td>
+        <td class="cust-date">Dibuat: ${new Date(p.createdAt).toLocaleDateString("id-ID")}</td>
+      </tr></table>
+
+      <!-- RUTE -->
+      <table class="rbox-table"><tr>
+        <td>
+          <div class="rlbl">ASAL</div>
+          <div class="rcity">${p.origin}</div>
+        </td>
+        <td class="rarrow-cell">→</td>
+        <td class="rmid-cell">
+          <div class="rmid-km">📍 ${c.km.toLocaleString("id-ID")} km · ${c.days} hari</div>
+          <div class="rmid-veh">🚛 ${VLB[p.vehicle]}${lbSub}</div>
+          <div class="rmid-veh">⛽ ${fuelLabel}</div>
+        </td>
+        <td class="rarrow-cell">→</td>
+        <td class="rdest-cell">
+          <div class="rlbl">TUJUAN</div>
+          <div class="rcity">${p.dest}</div>
+        </td>
+      </tr></table>
+
+      ${tolInfo}${crossInfo}
+
+      <!-- TABEL BIAYA -->
+      <table class="biaya-table">
+        <thead><tr>
+          <th>#</th>
+          <th>Komponen Biaya</th>
+          <th>Keterangan</th>
+          <th>Jumlah (PP)</th>
+        </tr></thead>
+        <tbody>
+          ${rowsHtml}
+          <tr class="tot-row">
+            <td colspan="3">TOTAL UANG JALAN (PULANG PERGI)</td>
+            <td class="td-amt">${fmt(grandTotal)}</td>
+          </tr>
+          <tr class="fc-row">
+            <td colspan="3">📊 Fixed Cost (untuk costing)</td>
+            <td class="td-amt">${fmt(c.fc)}</td>
+          </tr>
+          <tr class="tot-row">
+            <td colspan="3">💰 TOTAL COST (Uang Jalan PP + Fixed Cost)</td>
+            <td class="td-amt">${fmt(grandTotal + c.fc)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      ${p.notes?`<div class="notes-box">📝 <strong>Catatan:</strong> ${p.notes}</div>`:""}
+
+      <!-- FOOTER -->
+      <table class="footer-table"><tr>
+        <td>Dicetak: ${now}</td>
+        <td>PT Cipta Krida Bahari — Dokumen Resmi</td>
+        <td>Hal. ${idx+1} / ${projects.length}</td>
+      </tr></table>
+
+    </div>`;
+  }).join("\n");
+
+  // Summary halaman terakhir
+  const grandAll = projects.reduce((s,p)=>s+calcP(p).total, 0);
+  const fcAll    = projects.reduce((s,p)=>s+calcP(p).fc, 0);
+  const summaryRows = projects.map((p,i)=>{
+    const c = calcP(p);
+    return `<tr>
+      <td class="td-no">${String(i+1).padStart(2,"0")}</td>
+      <td style="font-weight:600;">${p.customer}</td>
+      <td>${p.origin} → ${p.dest}</td>
+      <td>${VLB[p.vehicle]}</td>
+      <td>${c.km.toLocaleString("id-ID")}</td>
+      <td>${c.days}</td>
+      <td style="font-weight:700;">${fmt(c.total)}</td>
+      <td style="color:#5a7a65;">${fmt(c.fc)}</td>
+    </tr>`;
+  }).join("");
+
+  allPages += `
+  <div class="page">
+
+    <!-- HEADER REKAP -->
+    <table class="hdr-table"><tr>
+      <td>
+        <span class="anchor-icon">⚓</span>
+        <span class="coname">
+          <span class="coname-main">PT CIPTA KRIDA BAHARI</span>
+          <span class="coname-sub">Rekap Seluruh Uang Jalan</span>
+        </span>
+      </td>
+      <td>
+        <div class="meta-no">REKAP — ${projects.length} Project</div>
+        <div class="meta-date">${dateStr}</div>
+      </td>
+    </tr></table>
+
+    <!-- SUMMARY BAR -->
+    <table class="cust-table"><tr>
+      <td style="width:1%;"><span class="cust-lbl">TOTAL</span></td>
+      <td class="cust-name">${projects.length} Project Aktif</td>
+      <td class="cust-date">Grand Total: <strong>${fmt(grandAll)}</strong></td>
+    </tr></table>
+
+    <!-- TABEL REKAP -->
+    <table class="rekap-table">
+      <thead><tr>
+        <th>#</th><th>Customer</th><th>Asal → Tujuan</th><th>Kendaraan</th>
+        <th>KM</th><th>Hari</th><th>Total UJ</th><th>Fixed Cost</th>
+      </tr></thead>
+      <tbody>
+        ${summaryRows}
+        <tr class="rekap-tot">
+          <td colspan="4">GRAND TOTAL — ${projects.length} Project</td>
+          <td>${projects.reduce((s,p)=>s+calcP(p).km,0).toLocaleString("id-ID")}</td>
+          <td>${projects.reduce((s,p)=>s+calcP(p).days,0)}</td>
+          <td>${fmt(grandAll)}</td>
+          <td>${fmt(fcAll)}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- FOOTER REKAP -->
+    <table class="footer-table"><tr>
+      <td>Dicetak: ${now}</td>
+      <td>PT Cipta Krida Bahari — Dokumen Resmi</td>
+      <td>Halaman Rekap</td>
+    </tr></table>
+
+  </div>`;
+
+  const w = window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>Uang Jalan — PT Cipta Krida Bahari</title>
+<style>
+/* === RESET & BASE === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, Helvetica, sans-serif; background: #fff; color: #0d1f15; font-size: 13px; line-height: 1.5; }
+
+/* === PAGE WRAPPER === */
+.page { width: 100%; max-width: 21cm; margin: 0 auto; padding: 1.5cm 1.8cm 1.5cm; }
+
+/* === HEADER (table-based agar tidak bertumpuk) === */
+.hdr-table { width: 100%; border-collapse: collapse; border-bottom: 3px solid #0a7c3e; padding-bottom: 10px; margin-bottom: 14px; }
+.hdr-table td { vertical-align: middle; padding-bottom: 10px; }
+.hdr-table td:last-child { text-align: right; }
+.logo-wrap { display: inline-block; }
+.anchor-icon { display: inline-block; width: 36px; height: 36px; background: #0a7c3e; border-radius: 7px; text-align: center; line-height: 36px; font-size: 18px; vertical-align: middle; margin-right: 8px; }
+.coname { display: inline-block; vertical-align: middle; }
+.coname-main { font-size: 16px; font-weight: 800; color: #0d1f15; display: block; }
+.coname-sub { font-size: 9px; color: #5a7a65; display: block; margin-top: 1px; }
+.meta-no { font-size: 11px; font-weight: 700; color: #0d1f15; }
+.meta-date { font-size: 10px; color: #5a7a65; margin-top: 2px; }
+
+/* === CUSTOMER BAR (table-based) === */
+.cust-table { width: 100%; border-collapse: collapse; background: #f0faf4; border: 1.5px solid #c6ecd8; border-radius: 8px; margin-bottom: 12px; }
+.cust-table td { padding: 8px 12px; vertical-align: middle; }
+.cust-lbl { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #5a7a65; background: #fff; padding: 2px 8px; border-radius: 10px; border: 1px solid #d1e8da; white-space: nowrap; }
+.cust-name { font-size: 14px; font-weight: 800; color: #0d1f15; }
+.cust-date { font-size: 10px; color: #5a7a65; text-align: right; white-space: nowrap; }
+
+/* === RUTE BOX (table-based) === */
+.rbox-table { width: 100%; border-collapse: collapse; background: #f0faf4; border: 2px solid #c6ecd8; border-radius: 10px; margin-bottom: 12px; }
+.rbox-table td { padding: 10px 14px; vertical-align: middle; }
+.rlbl { font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: #5a7a65; margin-bottom: 2px; }
+.rcity { font-size: 14px; font-weight: 800; color: #0d1f15; }
+.rarrow-cell { text-align: center; color: #0a7c3e; font-size: 18px; font-weight: 900; width: 30px; }
+.rmid-cell { text-align: center; }
+.rmid-km { font-size: 12px; font-weight: 700; color: #0a7c3e; }
+.rmid-veh { font-size: 10px; color: #5a7a65; margin-top: 3px; }
+.rdest-cell { text-align: right; }
+
+/* === INFO BOX === */
+.infobox { background: #f0f9f7; border: 1px solid #b2ddd6; border-radius: 6px; padding: 6px 12px; margin-bottom: 8px; font-size: 10px; color: #0a6e5b; }
+
+/* === BIAYA TABLE === */
+.biaya-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.biaya-table thead tr th { background: #0d1f15; color: #fff; padding: 7px 10px; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+.biaya-table thead tr th:first-child { width: 32px; text-align: center; border-radius: 0; }
+.biaya-table thead tr th:last-child { text-align: right; width: 130px; }
+.biaya-table thead tr th:nth-child(2) { width: 160px; }
+.biaya-table tbody tr td { padding: 8px 10px; border-bottom: 1px solid #e2f2e9; vertical-align: top; }
+.biaya-table tbody tr:hover td { background: #fafffe; }
+.td-no { font-family: monospace; color: #5a7a65; font-size: 10px; text-align: center; }
+.td-label { font-size: 11px; font-weight: 600; color: #0d1f15; }
+.td-note { font-size: 10px; color: #5a7a65; }
+.td-sub { font-size: 9px; color: #5a7a65; margin-top: 3px; padding: 3px 6px; background: #f7fdf9; border-radius: 4px; border-left: 2px solid #c6ecd8; }
+.td-amt { text-align: right; font-family: monospace; font-size: 11px; font-weight: 700; color: #0d1f15; white-space: nowrap; }
+.td-neg { color: #dc2626; }
+
+/* === TOTAL ROW === */
+.tot-row td { background: #0d1f15; color: #fff; padding: 9px 10px; font-size: 11px; font-weight: 800; border-top: 2px solid #0a7c3e; letter-spacing: 0.3px; }
+.tot-row .td-amt { color: #4ade80; font-size: 13px; }
+.fc-row td { background: #f7fdf9; color: #5a7a65; padding: 6px 10px; font-size: 10px; border-bottom: 2px solid #c6ecd8; }
+.fc-row .td-amt { color: #5a7a65; font-size: 10px; }
+
+/* === CATATAN === */
+.notes-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 12px; font-size: 10px; color: #713f12; margin-bottom: 12px; line-height: 1.6; }
+
+/* === FOOTER === */
+.footer-table { width: 100%; border-collapse: collapse; border-top: 1px solid #e2f2e9; margin-top: 14px; padding-top: 6px; }
+.footer-table td { font-size: 9px; color: #a0b4a8; padding-top: 6px; }
+.footer-table td:nth-child(2) { text-align: center; }
+.footer-table td:last-child { text-align: right; }
+
+/* === PAGE BREAK === */
+.page-break { page-break-after: always; break-after: page; border-top: none; border-bottom: 4px solid #0a7c3e; margin-bottom: 0; padding-bottom: 1.5cm; }
+
+/* === REKAP PAGE === */
+.rekap-title { font-size: 13px; font-weight: 800; color: #0a7c3e; margin-bottom: 10px; padding: 8px 12px; background: #f0faf4; border-left: 4px solid #0a7c3e; }
+.rekap-table { width: 100%; border-collapse: collapse; }
+.rekap-table th { background: #0d1f15; color: #fff; padding: 7px 9px; font-size: 9px; text-align: left; text-transform: uppercase; letter-spacing: .5px; }
+.rekap-table th:nth-child(n+5) { text-align: right; }
+.rekap-table td { padding: 7px 9px; border-bottom: 1px solid #e2f2e9; font-size: 10px; vertical-align: middle; }
+.rekap-table td:nth-child(n+5) { text-align: right; font-family: monospace; }
+.rekap-tot td { background: #0d1f15; color: #fff; font-weight: 800; font-size: 10px; padding: 8px 9px; }
+.rekap-tot td:nth-child(n+5) { text-align: right; font-family: monospace; }
+.rekap-tot td:last-child { color: #4ade80; }
+
+/* === PRINT MEDIA === */
+@media print {
+  body { font-size: 12px; }
+  .page { padding: 0.8cm 1.2cm 0.8cm; max-width: 100%; }
+  .page-break { page-break-after: always; break-after: page; }
+  @page { size: A4; margin: 0.8cm; }
+  .biaya-table thead tr th, .tot-row td, .rekap-table th, .rekap-tot td {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}
+</style>
+</head><body>
+${allPages}
+<script>window.onload=()=>{ window.print(); }<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+// RESET
+function resetForm(){
+  editId = null;
+  el("formMode").textContent = "+ Tambah Project Baru";
+  el("f_customer").value = "";
+  if(el("f_deliveryType")) el("f_deliveryType").value = "";
+  if(el("f_safetyFactor")) el("f_safetyFactor").checked = false;
+  el("f_origin").value = "";
+  el("f_dest").value = "";
+  el("f_notes").value = "";
+  document.querySelector("input[name=fv][value=lowbed]").checked = true;
+  // Reset sub-tipe Low Bed ke Hino
+  const hinoRadio = document.querySelector("input[name=fvLBsub][value=hino]");
+  if(hinoRadio) hinoRadio.checked = true;
+  const sub = document.getElementById("lbSubWrap");
+  if(sub) sub.style.display = "";
+  // Reset fuel slider ke 100% subsidi
+  fuelMixPct = 100;
+  el("fuelSlider").value = 100;
+  updateFuelSliderUI();
+  updateFuelHint();
+  el("xList").innerHTML = ""; extras = [];
+  el("dList").innerHTML = ""; discounts = [];
+  el("rp").innerHTML = ""; el("pricePreview").innerHTML = "";
+  el("vpLB").textContent = "—"; el("vpSL").textContent = "—";
+  const dt = el("destTag"); if(dt){ dt.style.display="none"; }
+  // Reset lokasi spesifik
+  specificLoc = null;
+  const sli = el("specificLocInfo"); if(sli) sli.style.display="none";
+}
+
+// STORAGE
+function save(){ try{ localStorage.setItem("ckb_v6",JSON.stringify(projects)); }catch(e){} }
+function load(){ try{ const d=localStorage.getItem("ckb_v6"); if(d) projects=JSON.parse(d); }catch(e){} }
+
+// INIT
+el("hdate").textContent = new Date().toLocaleDateString("id-ID",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+load(); renderTable(); updateFuelHint();
+</script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ═══════════════════════════════════════
+// MAP PICKER — Pilih lokasi spesifik di peta
+// ═══════════════════════════════════════
+
+let leafletMap = null;
+let mapMarker = null;
+let mapPickedLat = null, mapPickedLng = null;
+let mapPickedAddr = "";
+let mapPickedSpmKey = "";   // kota SPM terdekat
+let specificLoc = null;     // {lat, lng, addr, spmKey, kmOsrm}
+
+// Koordinat CKB Cakung (titik asal)
+const CKB_LAT = -6.1756, CKB_LNG = 106.9537;
+
+// Cari kota SPM terdekat berdasarkan koordinat (haversine)
+function findNearestSpm(lat, lng){
+  let nearest = null, minDist = Infinity;
+  for(const [key, coords] of Object.entries(CITY_COORDS)){
+    if(key === "CKB Cakung") continue;
+    const d = haversine(lat, lng, coords[0], coords[1]);
+    if(d < minDist){ minDist = d; nearest = key; }
+  }
+  return {key: nearest, dist: Math.round(minDist)};
+}
+
+function haversine(lat1, lon1, lat2, lon2){
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Reverse geocode dengan Nominatim (gratis, tanpa API key)
+async function reverseGeocode(lat, lng){
+  try{
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=id`, {
+      headers: {"Accept-Language":"id"},
+      signal: AbortSignal.timeout(6000)
+    });
+    const d = await r.json();
+    // Buat label ringkas: nama + kota/kabupaten
+    const a = d.address || {};
+    const parts = [
+      a.amenity || a.building || a.industrial || a.road || a.suburb,
+      a.city || a.town || a.county || a.state_district
+    ].filter(Boolean);
+    return parts.join(", ") || d.display_name?.split(",").slice(0,2).join(",") || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  } catch(e){
+    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  }
+}
+
+// Search location dengan Nominatim
+async function searchMapLocation(){
+  const q = el("mapSearchInput").value.trim();
+  if(!q) return;
+  const btn = document.querySelector(".map-search-btn");
+  btn.textContent = "⏳"; btn.disabled = true;
+  try{
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=id`, {
+      signal: AbortSignal.timeout(8000)
+    });
+    const data = await r.json();
+    if(data && data[0]){
+      const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+      leafletMap.setView([lat, lng], 15);
+      placeMapPin(lat, lng);
+    } else {
+      alert("Lokasi tidak ditemukan. Coba kata kunci yang lebih spesifik.");
+    }
+  } catch(e){
+    alert("Gagal mencari lokasi. Periksa koneksi internet.");
+  } finally {
+    btn.textContent = "🔍 Cari"; btn.disabled = false;
+  }
+}
+
+async function placeMapPin(lat, lng){
+  // Tempatkan marker
+  if(mapMarker) leafletMap.removeLayer(mapMarker);
+  mapMarker = L.marker([lat, lng], {
+    icon: L.divIcon({
+      className: "",
+      html: `<div style="width:32px;height:32px;background:#0a7c3e;border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 12px rgba(10,124,62,.5);
+        margin-top:-28px;margin-left:-12px;"></div>`,
+      iconSize: [32,32], iconAnchor:[12,32]
+    })
+  }).addTo(leafletMap);
+
+  mapPickedLat = lat; mapPickedLng = lng;
+
+  // Update info bar
+  el("mapInfoBar").style.display = "flex";
+  el("mapPinAddr").textContent = "⏳ Mengambil alamat...";
+  el("mapPinCoords").textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+  el("mapConfirmBtn").disabled = true;
+  el("mapConfirmBtn").style.opacity = ".5";
+
+  // Nearest SPM
+  const nearest = findNearestSpm(lat, lng);
+  mapPickedSpmKey = nearest.key;
+  el("mapSpmMatch").textContent = `📋 SPM: ${nearest.key} (${nearest.dist} km lurus)`;
+
+  // Reverse geocode async
+  const addr = await reverseGeocode(lat, lng);
+  mapPickedAddr = addr;
+  el("mapPinAddr").textContent = "📍 " + addr;
+
+  // Enable confirm
+  el("mapConfirmBtn").disabled = false;
+  el("mapConfirmBtn").style.opacity = "1";
+  el("mapConfirmBtn").style.cursor = "pointer";
+}
+
+function openMapPicker(){
+  el("mapModal").classList.add("open");
+  // Init peta jika belum
+  if(!leafletMap){
+    setTimeout(()=>{
+      leafletMap = L.map("leafletMap", {zoomControl:true}).setView([-6.5, 108.5], 7);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
+        maxZoom: 19
+      }).addTo(leafletMap);
+      // Klik di peta → taruh pin
+      leafletMap.on("click", e => placeMapPin(e.latlng.lat, e.latlng.lng));
+      // Tandai CKB Cakung sebagai titik asal
+      L.marker([CKB_LAT, CKB_LNG], {
+        icon: L.divIcon({
+          className:"",
+          html:`<div style="background:#16a34a;color:#fff;font-size:.65rem;font-weight:800;
+            padding:3px 7px;border-radius:6px;white-space:nowrap;box-shadow:0 2px 8px rgba(22,163,74,.4);
+            border:1.5px solid #fff;">CKB Cakung</div>`,
+          iconSize:[80,24], iconAnchor:[40,24]
+        })
+      }).addTo(leafletMap);
+    }, 80);
+  } else {
+    setTimeout(()=> leafletMap.invalidateSize(), 80);
+  }
+}
+
+function closeMapModal(){
+  el("mapModal").classList.remove("open");
+}
+
+async function confirmMapLocation(){
+  if(mapPickedLat === null) return;
+  const btn = el("mapConfirmBtn");
+  btn.textContent = "⏳ Menghitung jarak..."; btn.disabled = true;
+
+  // Hitung jarak OSRM dari CKB Cakung ke titik yang dipilih
+  let osrmKm = null;
+  try{
+    const url = `${OSRM_BASE}${CKB_LNG},${CKB_LAT};${mapPickedLng},${mapPickedLat}?overview=false`;
+    const res = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    const data = await res.json();
+    if(data.code==="Ok" && data.routes?.[0]){
+      osrmKm = Math.round(data.routes[0].distance / 1000);
+    }
+  } catch(e){}
+
+  // Simpan ke specificLoc
+  specificLoc = {
+    lat: mapPickedLat, lng: mapPickedLng,
+    addr: mapPickedAddr,
+    spmKey: mapPickedSpmKey,
+    kmOsrm: osrmKm
+  };
+
+  // Set input kota ke SPM terdekat (untuk lookup harga)
+  el("f_dest").value = mapPickedSpmKey;
+
+  // Simpan override km ke cache OSRM agar dipakai saat preview/simpan
+  if(osrmKm !== null){
+    osrmCache["CKB Cakung|" + mapPickedSpmKey] = osrmKm;
+  }
+
+  // Tampilkan info lokasi spesifik di bawah input
+  const sli = el("specificLocInfo");
+  sli.style.display = "block";
+  sli.innerHTML = `📍 <strong>${mapPickedAddr}</strong>
+    ${osrmKm ? `&nbsp;·&nbsp;<strong>${osrmKm.toLocaleString("id-ID")} km</strong>` : ""}
+    &nbsp;·&nbsp;Harga: ${mapPickedSpmKey}
+    <span style="float:right;cursor:pointer;color:var(--muted);" onclick="clearSpecificLoc()">✕</span>`;
+
+  closeMapModal();
+  btn.textContent = "✓ Pakai Lokasi Ini"; btn.disabled = false;
+
+  // Trigger preview update
+  onRouteChange();
+}
+
+function clearSpecificLoc(){
+  specificLoc = null;
+  el("specificLocInfo").style.display = "none";
+  el("f_dest").value = "";
+  el("rp").innerHTML = "";
+  el("pricePreview").innerHTML = "";
+  el("vpLB").textContent = "—"; el("vpSL").textContent = "—";
+  const dt = el("destTag"); if(dt) dt.style.display = "none";
+}
+
+// Tutup map modal jika klik di luar
+el("mapModal").addEventListener("click", e => {
+  if(e.target === el("mapModal")) closeMapModal();
+});
+</script>
+</body>
+</html>

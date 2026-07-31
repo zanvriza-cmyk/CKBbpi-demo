@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Jalur Rute — PT Cipta Krida Bahari</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Instrument+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  
+:root{
+  --bg:#f4faf6;--bg2:#ffffff;--hdr:#ffffff;
+  --amber:#0a7c3e;--amber2:#12a854;--amber-pale:#f0faf4;--amber-light:#c6ecd8;
+  --teal:#16a34a;--teal-pale:#dcfce7;--blue:#2563eb;
+  --text:#0d1f15;--text2:#2d4a36;--muted:#5a7a65;--border:#d1e8da;--border2:#e2f2e9;
+  --card:#ffffff;--success:#16a34a;--danger:#dc2626;--warning:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+  --radius:12px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;}
+body{font-family:"Sora",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 50% at 100% 0%,rgba(10,124,62,.07) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 40% at 0% 100%,rgba(22,163,74,.05) 0%,transparent 50%);}
+
+header{position:sticky;top:0;z-index:200;background:var(--hdr);border-bottom:2px solid var(--amber-light);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;height:62px;flex-shrink:0;
+  box-shadow:0 2px 12px rgba(10,124,62,.08);}
+.logo{display:flex;align-items:center;gap:.7rem;}
+.logo-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--amber),var(--amber2));
+  display:flex;align-items:center;justify-content:center;font-size:1.15rem;box-shadow:0 2px 8px rgba(10,124,62,.3);}
+.logo-t1{font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:.3px;line-height:1.1;}
+.logo-t2{font-size:.62rem;color:var(--amber);font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.hdr-r{display:flex;align-items:center;gap:.6rem;}
+.hdate{font-family:"Instrument Mono",monospace;font-size:.75rem;color:var(--muted);
+  background:var(--bg);border:1px solid var(--border);padding:4px 11px;border-radius:20px;}
+
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;border-radius:var(--radius-sm);
+  font-size:.82rem;font-family:"Sora",sans-serif;cursor:pointer;border:1.5px solid transparent;transition:all .18s;font-weight:600;}
+.btn-amber{background:var(--amber);color:#fff;border-color:var(--amber);}
+.btn-amber:hover{background:#057a35;transform:translateY(-1px);box-shadow:0 4px 12px rgba(10,124,62,.3);}
+.btn-teal{background:var(--teal);color:#fff;border-color:var(--teal);}
+.btn-teal:hover{background:#087a68;transform:translateY(-1px);}
+.btn-outline{background:transparent;color:var(--amber);border-color:var(--amber-light);}
+.btn-outline:hover{background:var(--amber-pale);border-color:var(--amber);}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{border-color:var(--danger);color:var(--danger);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{background:#b91c1c;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-success:hover{background:#15803d;}
+.btn-sm{padding:.3rem .7rem;font-size:.76rem;}
+
+/* LAYOUT */
+.app{display:flex;flex:1;min-height:0;position:relative;z-index:1;}
+
+/* LEFT PANEL — Route List */
+.panel-left{width:340px;flex-shrink:0;background:var(--card);border-right:2px solid var(--border2);
+  display:flex;flex-direction:column;height:calc(100vh - 62px);position:sticky;top:62px;overflow:hidden;}
+.pl-head{padding:.9rem 1.2rem .8rem;border-bottom:1.5px solid var(--border2);
+  background:linear-gradient(135deg,var(--amber-pale),#fff);}
+.pl-title{font-size:.78rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:.5rem;}
+.pl-sub{font-size:.72rem;color:var(--muted);margin-top:3px;}
+.pl-search{padding:.7rem 1.2rem;border-bottom:1px solid var(--border2);}
+.pl-search input{width:100%;padding:.45rem .8rem;font-size:.82rem;background:#f7fdf9;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-family:"Sora",sans-serif;outline:none;transition:border-color .18s;}
+.pl-search input:focus{border-color:var(--amber);}
+.pl-origin{padding:.5rem 1.2rem;border-bottom:1px solid var(--border2);}
+.pl-origin select{width:100%;padding:.4rem .7rem;font-size:.82rem;background:#f7fdf9;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-family:"Sora",sans-serif;outline:none;cursor:pointer;}
+.pl-origin select:focus{border-color:var(--amber);}
+.pl-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.pl-add{padding:.7rem 1.2rem;border-top:1.5px solid var(--border2);}
+
+.route-item{padding:.7rem 1.2rem;border-bottom:1px solid var(--border2);cursor:pointer;
+  transition:background .15s;display:flex;align-items:flex-start;gap:.65rem;position:relative;}
+.route-item:hover{background:var(--amber-pale);}
+.route-item.active{background:var(--amber-pale);border-left:3px solid var(--amber);}
+.ri-icon{width:32px;height:32px;border-radius:8px;background:var(--bg);border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;margin-top:2px;}
+.route-item.active .ri-icon{background:var(--amber-pale);border-color:var(--amber-light);}
+.ri-info{flex:1;min-width:0;}
+.ri-dest{font-weight:700;font-size:.88rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ri-origin{font-size:.7rem;color:var(--muted);margin-top:1px;}
+.ri-meta{display:flex;gap:.4rem;margin-top:3px;flex-wrap:wrap;}
+.ri-tag{font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:10px;border:1px solid;}
+.ri-tag-tol{background:var(--amber-pale);color:var(--amber);border-color:var(--amber-light);}
+.ri-tag-cross{background:var(--teal-pale);color:var(--teal);border-color:rgba(22,163,74,.25);}
+.ri-del{position:absolute;right:.6rem;top:.7rem;width:24px;height:24px;border-radius:6px;
+  border:none;cursor:pointer;background:transparent;color:transparent;font-size:.75rem;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.route-item:hover .ri-del{background:rgba(220,38,38,.1);color:var(--danger);}
+.ri-del:hover{background:var(--danger)!important;color:#fff!important;}
+.empty-state{text-align:center;padding:3rem 1.5rem;color:var(--muted);}
+.empty-state .ei{font-size:2.5rem;opacity:.25;margin-bottom:.75rem;}
+.empty-state p{font-size:.82rem;font-weight:500;}
+
+/* RIGHT PANEL — Editor */
+.panel-right{flex:1;display:flex;flex-direction:column;height:calc(100vh - 62px);overflow:hidden;}
+.pr-head{padding:.9rem 1.4rem .8rem;border-bottom:1.5px solid var(--border2);
+  background:linear-gradient(135deg,#fff,var(--teal-pale));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pr-title{font-size:.78rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:.5rem;}
+.pr-dest{font-size:1.2rem;font-weight:800;color:var(--text);margin-top:2px;}
+.pr-origin-badge{font-size:.7rem;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:.3rem;margin-top:2px;}
+.pr-actions{display:flex;gap:.5rem;align-items:center;}
+.pr-body{flex:1;overflow-y:auto;padding:1.2rem 1.4rem;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+
+/* WELCOME STATE */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:3rem;gap:1rem;color:var(--muted);}
+.welcome-icon{font-size:4rem;opacity:.3;}
+.welcome h2{font-size:1.1rem;font-weight:700;color:var(--text2);}
+.welcome p{font-size:.82rem;line-height:1.6;max-width:340px;}
+
+/* SECTION CARD */
+.ecard{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius);margin-bottom:1rem;overflow:hidden;box-shadow:var(--shadow);}
+.ecard-head{padding:.7rem 1rem;border-bottom:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);}
+.ecard-title{font-size:.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:.4rem;}
+.ecard-body{padding:1rem;}
+
+/* ROUTE META FORM */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.fg{margin-bottom:.75rem;}.fg:last-child{margin-bottom:0;}
+.flabel{display:block;font-size:.78rem;font-weight:600;color:var(--text2);margin-bottom:.28rem;}
+.flabel small{font-weight:400;color:var(--muted);font-size:.72rem;}
+input[type=text],input[type=number],textarea,select.finput{width:100%;background:#f7fdf9;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);padding:.5rem .75rem;font-family:"Sora",sans-serif;font-size:.88rem;outline:none;
+  transition:border-color .18s,background .18s,box-shadow .18s;}
+input:focus,textarea:focus,select.finput:focus{border-color:var(--amber);background:#fff;box-shadow:0 0 0 3px rgba(10,124,62,.1);}
+textarea{resize:vertical;min-height:56px;line-height:1.5;}
+
+/* SEGMENT LIST */
+.seg-list{display:flex;flex-direction:column;gap:.5rem;min-height:40px;}
+.seg-item{display:flex;align-items:center;gap:.5rem;background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:.5rem .75rem;position:relative;transition:background .15s;cursor:grab;}
+.seg-item:active{cursor:grabbing;}
+.seg-item.drag-over{border-color:var(--amber);background:var(--amber-pale);}
+.seg-item.dragging{opacity:.45;}
+.seg-handle{color:var(--muted);font-size:1rem;cursor:grab;flex-shrink:0;padding:0 2px;user-select:none;}
+.seg-type-icon{font-size:1rem;flex-shrink:0;}
+.seg-info{flex:1;min-width:0;}
+.seg-name{font-size:.85rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.seg-tarif{font-size:.7rem;color:var(--muted);font-family:"Instrument Mono",monospace;margin-top:1px;}
+.seg-badge{font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:8px;border:1px solid;flex-shrink:0;}
+.seg-badge-tol{background:var(--amber-pale);color:var(--amber);border-color:var(--amber-light);}
+.seg-badge-cross{background:var(--teal-pale);color:var(--teal);border-color:rgba(22,163,74,.25);}
+.seg-del{width:26px;height:26px;border-radius:6px;border:none;cursor:pointer;flex-shrink:0;
+  background:rgba(220,38,38,.08);color:var(--danger);font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.seg-del:hover{background:var(--danger);color:#fff;}
+.seg-empty{text-align:center;padding:1.2rem;color:var(--muted);font-size:.82rem;border:2px dashed var(--border2);border-radius:var(--radius-sm);}
+
+/* ADD SEGMENT DROPDOWN */
+.add-seg-wrap{margin-top:.65rem;display:flex;gap:.5rem;flex-wrap:wrap;}
+.seg-select{flex:1;min-width:200px;padding:.4rem .7rem;font-size:.82rem;background:#f7fdf9;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-family:"Sora",sans-serif;outline:none;cursor:pointer;}
+.seg-select:focus{border-color:var(--amber);}
+
+/* TOTAL PREVIEW */
+.total-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1rem;}
+.total-item{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius);padding:.7rem .85rem;box-shadow:var(--shadow);}
+.ti-label{font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.ti-val{font-size:.95rem;font-weight:800;font-family:"Instrument Mono",monospace;color:var(--text);}
+.ti-val.amber{color:var(--amber);}
+.ti-val.teal{color:var(--teal);}
+
+/* STATUS */
+.status-bar{display:flex;align-items:center;gap:.5rem;padding:.5rem .85rem;
+  border-radius:var(--radius-sm);font-size:.78rem;font-weight:600;margin-bottom:1rem;}
+.status-unsaved{background:#fef3c7;border:1px solid #fde68a;color:var(--warning);}
+.status-saved{background:#dcfce7;border:1px solid #bbf7d0;color:var(--success);}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(26,18,8,.4);backdrop-filter:blur(6px);
+  z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg2);border:1.5px solid var(--border2);border-radius:16px;
+  width:640px;max-width:96vw;max-height:92vh;overflow-y:auto;
+  box-shadow:0 24px 80px rgba(0,0,0,.18);animation:fadeUp .22s ease;}
+.modal-sm{width:460px;}
+.m-head{padding:1.1rem 1.5rem .9rem;border-bottom:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,var(--amber-pale),#fff);position:sticky;top:0;z-index:10;}
+.m-title{font-size:1rem;font-weight:800;color:var(--text);}
+.m-close{width:32px;height:32px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
+  cursor:pointer;background:var(--bg);color:var(--muted);font-size:1rem;
+  display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.m-close:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+.m-body{padding:1.3rem 1.5rem;}
+.m-foot{padding:.85rem 1.5rem;border-top:1.5px solid var(--border2);display:flex;gap:.5rem;justify-content:flex-end;background:var(--bg);}
+.m-alert{padding:.6rem .9rem;border-radius:var(--radius-sm);font-size:.8rem;font-weight:500;
+  display:flex;align-items:flex-start;gap:.5rem;margin-bottom:1rem;}
+.m-alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;}
+.m-alert-warning{background:#fef3c7;border:1px solid #fde68a;color:var(--warning);}
+
+/* AVAILABLE ITEMS GRID */
+.avail-list{display:flex;flex-direction:column;gap:.4rem;max-height:320px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.avail-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .75rem;
+  border:1.5px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;background:var(--bg);}
+.avail-item:hover{border-color:var(--amber);background:var(--amber-pale);}
+.avail-item.in-route{border-color:var(--teal);background:var(--teal-pale);}
+.avail-item.in-route:hover{border-color:var(--teal);background:#d0f0ea;}
+.ai-icon{font-size:1rem;flex-shrink:0;}
+.ai-info{flex:1;min-width:0;}
+.ai-name{font-size:.83rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ai-tarif{font-size:.68rem;color:var(--muted);font-family:"Instrument Mono",monospace;}
+.ai-status{font-size:.65rem;font-weight:700;padding:1px 7px;border-radius:10px;flex-shrink:0;}
+.ai-status-in{background:var(--teal-pale);color:var(--teal);border:1px solid rgba(22,163,74,.25);}
+.ai-status-out{background:var(--bg);color:var(--muted);border:1px solid var(--border2);}
+
+/* ADD ROUTE FORM */
+.add-form .fg{margin-bottom:.75rem;}
+.add-form select{width:100%;padding:.55rem .8rem;font-size:.88rem;background:#f7fdf9;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-family:"Sora",sans-serif;outline:none;cursor:pointer;}
+.add-form select:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(10,124,62,.1);}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;border:1px solid;}
+.badge-new{background:#eff6ff;color:var(--blue);border-color:#bfdbfe;}
+.badge-edited{background:#fef3c7;color:var(--warning);border-color:#fde68a;}
+.badge-saved{background:#dcfce7;color:var(--success);border-color:#bbf7d0;}
+
+/* SYNC INFO BOX */
+.sync-box{background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1.5px solid #bfdbfe;
+  border-radius:var(--radius);padding:.9rem 1.1rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:.75rem;}
+.sync-icon{font-size:1.4rem;flex-shrink:0;}
+.sync-text{font-size:.78rem;color:#1d4ed8;line-height:1.5;}
+.sync-text strong{font-weight:700;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+/* DRAG PLACEHOLDER */
+.drag-placeholder{border:2px dashed var(--amber);border-radius:var(--radius-sm);background:var(--amber-pale);height:44px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--amber);font-weight:600;}
+
+
+/* =========================================================
+   CORPORATE UI OVERRIDE - SUJ Jalur
+   Clara revision: corporate look + readable typography
+   ========================================================= */
+:root{
+  --bg:#F5F7F6;
+  --bg2:#FFFFFF;
+  --hdr:#FFFFFF;
+  --amber:#22543D;
+  --amber2:#2F6B4F;
+  --amber-pale:#F3F7F4;
+  --amber-light:#C7D6CC;
+  --teal:#2F6B4F;
+  --teal-pale:#EEF5F0;
+  --blue:#24527A;
+  --text:#14251B;
+  --text2:#33483B;
+  --muted:#66766C;
+  --border:#C7D6CC;
+  --border2:#E1E8E3;
+  --card:#FFFFFF;
+  --success:#2F6B4F;
+  --danger:#B42318;
+  --warning:#8A5B12;
+  --shadow:none;
+  --radius:8px;
+  --radius-sm:6px;
+}
+html{font-size:15.5px !important;}
+body{
+  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+  background:var(--bg) !important;
+  color:var(--text) !important;
+  letter-spacing:-.01em;
+  font-size:15px !important;
+}
+body::before{display:none !important;}
+*,button,input,select,textarea{
+  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+}
+
+/* Header */
+header{
+  height:60px !important;
+  padding:0 1.25rem !important;
+  background:#fff !important;
+  border-bottom:1px solid #DBE3DE !important;
+  box-shadow:none !important;
+}
+.logo{gap:.65rem !important;}
+.logo-mark{
+  width:34px !important;
+  height:34px !important;
+  border-radius:6px !important;
+  background:var(--amber) !important;
+  background-image:none !important;
+  box-shadow:none !important;
+  color:#fff !important;
+  font-size:1rem !important;
+  filter:grayscale(1);
+}
+.logo-t1{font-size:1.08rem !important;font-weight:800 !important;color:var(--text) !important;letter-spacing:-.02em !important;}
+.logo-t2{font-size:.68rem !important;color:var(--muted) !important;letter-spacing:1.6px !important;font-weight:700 !important;}
+.hdate{
+  border-radius:6px !important;
+  background:#F8FAF9 !important;
+  border:1px solid var(--border2) !important;
+  color:var(--muted) !important;
+  padding:5px 10px !important;
+  font-size:.8rem !important;
+}
+
+/* Buttons */
+.btn,.btn-sm,.m-close,.seg-del,.ri-del{
+  border-radius:6px !important;
+  box-shadow:none !important;
+  transform:none !important;
+  transition:background .12s ease,border-color .12s ease,color .12s ease !important;
+}
+.btn{font-size:.9rem !important;}
+.btn-sm{font-size:.82rem !important;padding:.38rem .75rem !important;}
+.btn-amber,.btn-teal,.btn-success{
+  background:var(--amber) !important;
+  background-image:none !important;
+  color:#fff !important;
+  border-color:var(--amber) !important;
+}
+.btn-amber:hover,.btn-teal:hover,.btn-success:hover{
+  background:#183528 !important;
+  border-color:#183528 !important;
+  transform:none !important;
+  box-shadow:none !important;
+}
+.btn-outline,.btn-ghost{
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  color:var(--text2) !important;
+}
+.btn-outline:hover,.btn-ghost:hover{
+  background:var(--amber-pale) !important;
+  color:var(--amber) !important;
+  border-color:var(--amber) !important;
+}
+.btn-danger{background:var(--danger) !important;color:#fff !important;border-color:var(--danger) !important;}
+
+/* Layout panels */
+.app{background:var(--bg) !important;}
+.panel-left{
+  width:350px !important;
+  background:#fff !important;
+  border-right:1px solid #DBE3DE !important;
+  height:calc(100vh - 60px) !important;
+  top:60px !important;
+}
+.panel-right{
+  height:calc(100vh - 60px) !important;
+  background:var(--bg) !important;
+}
+.pl-head,.pr-head{
+  background:#fff !important;
+  background-image:none !important;
+  border-bottom:1px solid var(--border2) !important;
+  padding:.9rem 1.15rem !important;
+}
+.pl-title,.pr-title{
+  font-size:.84rem !important;
+  color:var(--amber) !important;
+  letter-spacing:1.4px !important;
+  font-weight:800 !important;
+  filter:grayscale(1);
+}
+.pl-sub,.pr-origin-badge{font-size:.78rem !important;color:var(--muted) !important;}
+.pr-dest{font-size:1.28rem !important;color:var(--text) !important;letter-spacing:-.02em !important;}
+.pr-body{padding:1.1rem 1.25rem !important;}
+
+/* Search and filters */
+.pl-search,.pl-origin,.pl-add{border-color:var(--border2) !important;background:#fff !important;}
+.pl-search input,.pl-origin select,
+input[type=text],input[type=number],textarea,select.finput,.seg-select,.add-form select{
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  border-radius:6px !important;
+  color:var(--text) !important;
+  font-size:.95rem !important;
+  padding:.55rem .75rem !important;
+  box-shadow:none !important;
+}
+.pl-search input{font-size:.9rem !important;}
+.pl-origin select{font-size:.9rem !important;}
+input:focus,textarea:focus,select:focus,select.finput:focus,.seg-select:focus,.add-form select:focus{
+  border-color:var(--amber) !important;
+  background:#fff !important;
+  box-shadow:0 0 0 2px rgba(34,84,61,.10) !important;
+}
+textarea{line-height:1.5 !important;}
+input[readonly]{background:#F8FAF9 !important;color:var(--muted) !important;}
+
+/* Route list */
+.route-item{
+  border-bottom:1px solid #EDF2EF !important;
+  padding:.76rem 1.1rem !important;
+  background:#fff !important;
+}
+.route-item:hover{background:#F8FAF9 !important;}
+.route-item.active{
+  background:var(--amber-pale) !important;
+  border-left:3px solid var(--amber) !important;
+}
+.ri-icon{
+  width:32px !important;height:32px !important;
+  border-radius:6px !important;
+  background:var(--amber-pale) !important;
+  border:1px solid var(--border) !important;
+  color:var(--amber) !important;
+  filter:grayscale(1);
+}
+.ri-dest{font-size:.95rem !important;font-weight:800 !important;color:var(--text) !important;}
+.ri-origin{font-size:.78rem !important;color:var(--muted) !important;}
+.ri-tag,.seg-badge,.badge{
+  border-radius:4px !important;
+  font-size:.7rem !important;
+  padding:2px 7px !important;
+  letter-spacing:.2px !important;
+}
+.ri-tag-tol,.seg-badge-tol,.badge-edited,.badge-saved,.badge-new{
+  background:var(--amber-pale) !important;
+  color:var(--amber) !important;
+  border:1px solid var(--border) !important;
+}
+.ri-tag-cross,.seg-badge-cross{
+  background:var(--teal-pale) !important;
+  color:var(--teal) !important;
+  border:1px solid var(--border) !important;
+}
+.ri-del{font-size:.82rem !important;}
+.empty-state p{font-size:.9rem !important;}
+.empty-state .ei{filter:grayscale(1);}
+
+/* Welcome */
+.welcome-icon{filter:grayscale(1);opacity:.25 !important;}
+.welcome h2{font-size:1.2rem !important;color:var(--text) !important;}
+.welcome p{font-size:.9rem !important;color:var(--muted) !important;}
+
+/* Cards */
+.ecard,.total-item,.modal{
+  background:#fff !important;
+  border:1px solid var(--border2) !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+}
+.ecard{margin-bottom:.95rem !important;}
+.ecard-head{
+  background:#F8FAF9 !important;
+  border-bottom:1px solid var(--border2) !important;
+  padding:.72rem .95rem !important;
+}
+.ecard-title{
+  font-size:.78rem !important;
+  color:var(--amber) !important;
+  letter-spacing:1.4px !important;
+  font-weight:800 !important;
+  filter:grayscale(1);
+}
+.ecard-body{padding:.95rem !important;}
+.flabel{font-size:.86rem !important;color:var(--text2) !important;font-weight:700 !important;}
+.flabel small{font-size:.78rem !important;color:var(--muted) !important;}
+.fgrid{gap:.7rem !important;}
+.fg{margin-bottom:.7rem !important;}
+
+/* Sync box */
+.sync-box{
+  background:#fff !important;
+  border:1px solid var(--border2) !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+}
+.sync-icon{filter:grayscale(1);}
+.sync-text{font-size:.86rem !important;color:var(--text2) !important;line-height:1.55 !important;}
+.sync-text strong{color:var(--amber) !important;}
+
+/* Segment list */
+.seg-item{
+  background:#fff !important;
+  border:1px solid var(--border2) !important;
+  border-radius:6px !important;
+  padding:.58rem .75rem !important;
+}
+.seg-item:hover{background:#F8FAF9 !important;border-color:var(--border) !important;}
+.seg-item.drag-over{background:var(--amber-pale) !important;border-color:var(--amber) !important;}
+.seg-handle{color:var(--muted) !important;}
+.seg-type-icon{filter:grayscale(1);}
+.seg-name{font-size:.92rem !important;font-weight:700 !important;color:var(--text) !important;}
+.seg-tarif{font-family:"Instrument Mono",monospace !important;font-size:.78rem !important;color:var(--muted) !important;}
+.seg-del{background:#fff !important;border:1px solid #F3B4AE !important;color:var(--danger) !important;}
+.seg-del:hover{background:#FEF2F2 !important;border-color:var(--danger) !important;}
+.seg-empty{
+  border:1px dashed var(--border) !important;
+  background:#F8FAF9 !important;
+  border-radius:6px !important;
+  color:var(--muted) !important;
+  font-size:.9rem !important;
+}
+.add-seg-wrap{gap:.5rem !important;}
+.seg-select{font-size:.9rem !important;}
+
+/* Total preview */
+.total-bar{gap:.6rem !important;}
+.total-item{
+  padding:.75rem .85rem !important;
+  background:#fff !important;
+}
+.ti-label{font-size:.7rem !important;color:var(--muted) !important;letter-spacing:1.2px !important;}
+.ti-val{font-size:1.02rem !important;color:var(--text) !important;font-family:"Instrument Mono",monospace !important;}
+.ti-val.amber,.ti-val.teal{color:var(--amber) !important;}
+#segBreakdown{font-size:.86rem !important;color:var(--muted) !important;}
+
+/* Status */
+.status-bar{border-radius:6px !important;font-size:.86rem !important;}
+.badge-saved{background:var(--amber-pale) !important;color:var(--amber) !important;}
+.badge-edited{background:#FFF9EA !important;color:var(--warning) !important;border-color:#E8D9B2 !important;}
+
+/* Modal */
+.modal-bg{background:rgba(20,37,27,.38) !important;backdrop-filter:blur(3px) !important;}
+.modal{
+  border-radius:10px !important;
+  box-shadow:0 12px 28px rgba(20,37,27,.12) !important;
+}
+.m-head{
+  background:#fff !important;
+  border-bottom:1px solid var(--border2) !important;
+}
+.m-title{font-size:1.12rem !important;color:var(--text) !important;filter:grayscale(1);}
+.m-body{padding:1.25rem !important;}
+.m-foot{background:#F8FAF9 !important;border-top:1px solid var(--border2) !important;}
+.m-close{background:#fff !important;border:1px solid var(--border) !important;color:var(--muted) !important;}
+.m-close:hover{background:#FEF2F2 !important;color:var(--danger) !important;border-color:#F3B4AE !important;}
+.m-alert{font-size:.88rem !important;border-radius:6px !important;}
+.m-alert-info{background:var(--amber-pale) !important;border:1px solid var(--border) !important;color:var(--amber) !important;}
+.m-alert-warning{background:#FFF9EA !important;border:1px solid #E8D9B2 !important;color:var(--warning) !important;}
+#cfMsg{font-size:.95rem !important;}
+
+/* Available items */
+.avail-item{
+  background:#fff !important;
+  border:1px solid var(--border2) !important;
+  border-radius:6px !important;
+}
+.avail-item:hover,.avail-item.in-route{
+  background:var(--amber-pale) !important;
+  border-color:var(--amber) !important;
+}
+.ai-icon{filter:grayscale(1);}
+.ai-name{font-size:.9rem !important;font-weight:700 !important;}
+.ai-tarif{font-size:.76rem !important;color:var(--muted) !important;}
+.ai-status{font-size:.72rem !important;border-radius:4px !important;}
+.ai-status-in,.ai-status-out{background:var(--amber-pale) !important;color:var(--amber) !important;border:1px solid var(--border) !important;}
+
+/* Toast and scrollbar */
+#_toast{
+  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+  font-size:.92rem !important;
+  border-radius:8px !important;
+  box-shadow:0 12px 28px rgba(20,37,27,.12) !important;
+}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:#CBD6D0;border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:#9FB0A6;}
+.drag-placeholder{background:var(--amber-pale) !important;border:1px dashed var(--amber) !important;border-radius:6px !important;color:var(--amber) !important;}
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">🗺</div>
+    <div class="logo-texts">
+      <div class="logo-t1">Cipta Krida Bahari</div>
+      <div class="logo-t2">Kelola Jalur Rute</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="hdate" id="hdate"></div>
+    <button class="btn btn-outline btn-sm" onclick="exportJSON()">↓ Export JSON</button>
+    <button class="btn btn-amber btn-sm" onclick="saveAllRoutes()" id="btnSaveAll" style="display:none">💾 Simpan Semua</button>
+  </div>
+</header>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- LEFT: Route List -->
+  <div class="panel-left">
+    <div class="pl-head">
+      <div class="pl-title">🗺 Daftar Jalur</div>
+      <div class="pl-sub" id="pl-count">0 jalur tersimpan</div>
+    </div>
+    <div class="pl-origin">
+      <select id="filterOrigin" onchange="renderRouteList()">
+        <option value="">— Semua Cabang Asal —</option>
+        <option value="CKB Cakung">CKB Cakung</option>
+      </select>
+    </div>
+    <div class="pl-search">
+      <input type="text" id="searchRoute" placeholder="🔍 Cari tujuan..." oninput="renderRouteList()">
+    </div>
+    <div class="pl-list" id="routeList">
+      <div class="empty-state"><div class="ei">🗺</div><p>Belum ada jalur. Tambahkan jalur baru.</p></div>
+    </div>
+    <div class="pl-add">
+      <button class="btn btn-amber" style="width:100%" onclick="openAddRouteModal()">+ Tambah Jalur Baru</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Editor -->
+  <div class="panel-right">
+    <div class="pr-head" id="prHead" style="display:none">
+      <div>
+        <div class="pr-title">✏️ Edit Jalur</div>
+        <div class="pr-dest" id="prDest">—</div>
+        <div class="pr-origin-badge">📍 <span id="prOrigin">—</span></div>
+      </div>
+      <div class="pr-actions">
+        <span id="routeStatusBadge"></span>
+        <button class="btn btn-ghost btn-sm" onclick="discardEdit()">↩ Batal</button>
+        <button class="btn btn-success btn-sm" onclick="saveCurrentRoute()">💾 Simpan Jalur</button>
+      </div>
+    </div>
+    <div class="pr-body" id="prBody">
+
+      <!-- Welcome state -->
+      <div class="welcome" id="welcomeState">
+        <div class="welcome-icon">🛣</div>
+        <h2>Pilih atau tambah jalur</h2>
+        <p>Pilih jalur dari daftar di kiri untuk mengedit susunan tol dan penyeberangan, atau klik <strong>Tambah Jalur Baru</strong> untuk membuat jalur baru.</p>
+      </div>
+
+      <!-- Editor state (hidden initially) -->
+      <div id="editorState" style="display:none">
+
+        <div class="sync-box">
+          <div class="sync-icon">🔄</div>
+          <div class="sync-text">
+            <strong>Sinkronisasi otomatis:</strong> Perubahan jalur yang disimpan akan terupdate ke <em>Sistem Uang Jalan v9</em> melalui localStorage. Buka halaman Uang Jalan untuk melihat hasilnya.
+          </div>
+        </div>
+
+        <!-- Meta info -->
+        <div class="ecard">
+          <div class="ecard-head">
+            <div class="ecard-title">📋 Info Jalur</div>
+          </div>
+          <div class="ecard-body">
+            <div class="fgrid">
+              <div class="fg">
+                <label class="flabel">Cabang Asal</label>
+                <input type="text" id="e_origin" placeholder="CKB Cakung" readonly style="background:#f1ede8;cursor:not-allowed;">
+              </div>
+              <div class="fg">
+                <label class="flabel">Tujuan <small>— nama kota/kawasan</small></label>
+                <input type="text" id="e_dest" placeholder="SURABAYA">
+              </div>
+              <div class="fg">
+                <label class="flabel">Jarak 1 Arah (km)</label>
+                <input type="number" id="e_km" placeholder="810" min="0" step="0.1">
+              </div>
+              <div class="fg">
+                <label class="flabel">Jarak PP (km) <small>— otomatis ×2</small></label>
+                <input type="number" id="e_kmpp" placeholder="1620" min="0" step="0.1" readonly style="background:#f1ede8;cursor:not-allowed;">
+              </div>
+              <div class="fg">
+                <label class="flabel">Hari Lowbed</label>
+                <input type="number" id="e_hLB" placeholder="4" min="0.5" step="0.5">
+              </div>
+              <div class="fg">
+                <label class="flabel">Hari Selfloader</label>
+                <input type="number" id="e_hSL" placeholder="4" min="0.5" step="0.5">
+              </div>
+              <div class="fg">
+                <label class="flabel">Uang Jalan Lowbed (Rp)</label>
+                <input type="number" id="e_ujLB" placeholder="10730000" min="0" step="1000">
+              </div>
+              <div class="fg">
+                <label class="flabel">Uang Jalan Selfloader (Rp)</label>
+                <input type="number" id="e_ujSL" placeholder="8110000" min="0" step="1000">
+              </div>
+            </div>
+            <div class="fg">
+              <label class="flabel">Keterangan Tol <small>— teks deskriptif untuk tampilan</small></label>
+              <textarea id="e_tolDesc" placeholder="Tol Jakarta-Cikampek, Tol Cipali, ..." rows="2"></textarea>
+            </div>
+            <div class="fg" style="margin-top:.5rem">
+              <label class="flabel">Keterangan Penyeberangan <small>— teks deskriptif (kosong jika tidak ada)</small></label>
+              <textarea id="e_crossDesc" placeholder="⛴ Ketapang–Gilimanuk (Bali)" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toll Segments -->
+        <div class="ecard">
+          <div class="ecard-head">
+            <div class="ecard-title">🛣 Susunan Tol <span id="tolCount" style="font-size:.65rem;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--amber);color:#fff;margin-left:.3rem"></span></div>
+            <div style="font-size:.7rem;color:var(--muted);">Seret untuk mengurutkan</div>
+          </div>
+          <div class="ecard-body">
+            <div id="tolSegList" class="seg-list"></div>
+            <div class="add-seg-wrap">
+              <select id="addTolSelect" class="seg-select">
+                <option value="">— Pilih ruas tol untuk ditambahkan —</option>
+              </select>
+              <button class="btn btn-amber btn-sm" onclick="addTolSeg()">+ Tambah</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crossing Segments -->
+        <div class="ecard">
+          <div class="ecard-head">
+            <div class="ecard-title">⛴ Penyeberangan <span id="crossCount" style="font-size:.65rem;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--teal);color:#fff;margin-left:.3rem"></span></div>
+            <div style="font-size:.7rem;color:var(--muted);">Seret untuk mengurutkan</div>
+          </div>
+          <div class="ecard-body">
+            <div id="crossSegList" class="seg-list"></div>
+            <div class="add-seg-wrap">
+              <select id="addCrossSelect" class="seg-select">
+                <option value="">— Pilih penyeberangan untuk ditambahkan —</option>
+              </select>
+              <button class="btn btn-teal btn-sm" onclick="addCrossSeg()">+ Tambah</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Preview -->
+        <div class="ecard">
+          <div class="ecard-head">
+            <div class="ecard-title">💰 Ringkasan Tarif Tol & Penyeberangan</div>
+            <div style="font-size:.7rem;color:var(--muted);">PP = ×2 arah</div>
+          </div>
+          <div class="ecard-body">
+            <div class="total-bar" id="totalBar">
+              <div class="total-item"><div class="ti-label">Total Tol LB (1 arah)</div><div class="ti-val amber" id="totTolLB">—</div></div>
+              <div class="total-item"><div class="ti-label">Total Tol SL (1 arah)</div><div class="ti-val amber" id="totTolSL">—</div></div>
+              <div class="total-item"><div class="ti-label">Total Penyeb. LB</div><div class="ti-val teal" id="totCrossLB">—</div></div>
+              <div class="total-item"><div class="ti-label">Total Penyeb. SL</div><div class="ti-val teal" id="totCrossSL">—</div></div>
+            </div>
+            <div id="segBreakdown" style="font-size:.78rem;color:var(--muted);line-height:1.8;margin-top:.3rem;"></div>
+          </div>
+        </div>
+
+      </div><!-- /editorState -->
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: Add New Route -->
+<div class="modal-bg" id="modalAddRoute">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-title">➕ Tambah Jalur Baru</div>
+      <button class="m-close" onclick="closeModal('modalAddRoute')">✕</button>
+    </div>
+    <div class="m-body add-form">
+      <div class="m-alert m-alert-info">ℹ️ Setelah membuat jalur, Anda bisa menambahkan tol dan penyeberangan di editor.</div>
+      <div class="fg">
+        <label class="flabel">Cabang Asal</label>
+        <select id="nr_origin">
+          <option value="CKB Cakung">CKB Cakung</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="flabel">Tujuan <small>— ketik nama kota/kawasan (huruf besar)</small></label>
+        <input type="text" id="nr_dest" placeholder="Contoh: SURABAYA" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+        <div class="fg">
+          <label class="flabel">Jarak 1 Arah (km)</label>
+          <input type="number" id="nr_km" placeholder="810" min="0" step="0.1">
+        </div>
+        <div class="fg">
+          <label class="flabel">Hari Lowbed</label>
+          <input type="number" id="nr_hLB" placeholder="4" min="0.5" step="0.5">
+        </div>
+        <div class="fg">
+          <label class="flabel">Uang Jalan Lowbed (Rp)</label>
+          <input type="number" id="nr_ujLB" placeholder="10730000" min="0" step="1000">
+        </div>
+        <div class="fg">
+          <label class="flabel">Hari Selfloader</label>
+          <input type="number" id="nr_hSL" placeholder="4" min="0.5" step="0.5">
+        </div>
+        <div class="fg">
+          <label class="flabel">Uang Jalan Selfloader (Rp)</label>
+          <input type="number" id="nr_ujSL" placeholder="8110000" min="0" step="1000">
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalAddRoute')">Batal</button>
+      <button class="btn btn-amber" onclick="createNewRoute()">Buat Jalur & Edit →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Confirm Delete -->
+<div class="modal-bg" id="modalConfirm">
+  <div class="modal modal-sm">
+    <div class="m-head">
+      <div class="m-title" id="cfTitle">Konfirmasi</div>
+      <button class="m-close" onclick="closeModal('modalConfirm')">✕</button>
+    </div>
+    <div class="m-body">
+      <div id="cfMsg" style="font-size:.88rem;color:var(--text2);line-height:1.6;"></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalConfirm')">Batal</button>
+      <button class="btn btn-danger" id="cfOkBtn">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// CKB — KELOLA JALUR RUTE
+// Membaca TOL_MASTER dan CROSSING_MASTER dari localStorage
+// (disimpan oleh ckb-tarif-tol-penyeberangan.html)
+// dan menyimpan ROUTE_PATHS yang dipakai oleh uang jalan
+// ══════════════════════════════════════════════════════════
+
+// ── DEFAULTS (jika belum ada di localStorage) ──
+const DEFAULT_TOL = [
+  {id:"tol_001", name:"Tol Dalam Kota Jakarta",             lb:22000,   sl:16500},
+  {id:"tol_002", name:"Tol Jakarta-Cikampek",               lb:54000,   sl:40500},
+  {id:"tol_003", name:"Tol Jakarta-Tangerang",              lb:11500,   sl:8500},
+  {id:"tol_004", name:"Tol TB Simatupang",                  lb:16000,   sl:12000},
+  {id:"tol_005", name:"Tol JORR",                           lb:31500,   sl:23500},
+  {id:"tol_006", name:"Tol Jagorawi",                       lb:29500,   sl:22000},
+  {id:"tol_007", name:"Tol Bocimi",                         lb:42000,   sl:31500},
+  {id:"tol_008", name:"Tol Cipali",                         lb:273000,  sl:217500},
+  {id:"tol_009", name:"Tol Cipularang",                     lb:104000,  sl:78000},
+  {id:"tol_010", name:"Tol Padaleunyi",                     lb:22500,   sl:17000},
+  {id:"tol_011", name:"Tol Soroja",                         lb:30000,   sl:22500},
+  {id:"tol_012", name:"Tol Palimanan-Kanci",                lb:32000,   sl:19500},
+  {id:"tol_013", name:"Tol Kanci-Pejagan",                  lb:59500,   sl:44500},
+  {id:"tol_014", name:"Tol Pejagan-Pemalang",               lb:132000,  sl:90500},
+  {id:"tol_015", name:"Tol Pemalang-Batang",                lb:95000,   sl:71000},
+  {id:"tol_016", name:"Tol Batang-Semarang",                lb:223000,  sl:167500},
+  {id:"tol_017", name:"Tol Semarang-Solo",                  lb:140500,  sl:105500},
+  {id:"tol_018", name:"Tol Solo-Yogyakarta",                lb:85500,   sl:64000},
+  {id:"tol_019", name:"Tol Solo-Ngawi",                     lb:250000,  sl:187500},
+  {id:"tol_020", name:"Tol Ngawi-Kertosono",                lb:196000,  sl:147000},
+  {id:"tol_021", name:"Tol Kertosono-Mojokerto",            lb:110000,  sl:82500},
+  {id:"tol_022", name:"Tol Mojokerto-Surabaya",             lb:107500,  sl:65500},
+  {id:"tol_023", name:"Tol Surabaya-Gresik",                lb:14000,   sl:10500},
+  {id:"tol_024", name:"Tol Pandaan-Malang",                 lb:71500,   sl:53500},
+  {id:"tol_025", name:"Tol Gempol-Pasuruan",                lb:93000,   sl:70000},
+  {id:"tol_026", name:"Tol Tangerang-Merak",                lb:116500,  sl:87500},
+  {id:"tol_027", name:"Tol Cipali (sebagian, exit Kertajati)", lb:181500, sl:144500},
+];
+
+const DEFAULT_CROSS = [
+  {id:"cross_001", name:"Ketapang–Gilimanuk",  route:"Banyuwangi → Bali",   lb:1243000,  sl:897600},
+  {id:"cross_002", name:"Padangbai–Lembar",    route:"Bali → Lombok (NTB)", lb:8808400,  sl:6074300},
+  {id:"cross_003", name:"Kayangan–Pototano",   route:"Lombok → Sumbawa",    lb:2265000,  sl:2153000},
+];
+
+// Default routes extracted from SPM_ROUTES
+const DEFAULT_ROUTES = [
+  {id:"rt_001",no:1,  origin:"CKB Cakung",dest:"TG PRIOK, MARUNDA CENTRE AREA",km:18,   kmpp:36,   hLB:1, hSL:1, ujLB:450000,  ujSL:400000,  tols:["tol_001"],crossings:[],tolDesc:"Tol Dalam Kota Jakarta (segmen Cakung–Priok)",crossDesc:""},
+  {id:"rt_002",no:2,  origin:"CKB Cakung",dest:"BSD",                          km:61.5, kmpp:123,  hLB:1, hSL:1, ujLB:910000,  ujSL:780000,  tols:["tol_003","tol_004","tol_005"],crossings:[],tolDesc:"Tol Jakarta-Tangerang, Tol TB Simatupang, Tol JORR",crossDesc:""},
+  {id:"rt_003",no:3,  origin:"CKB Cakung",dest:"KUNINGAN, JAKSEL",             km:40,   kmpp:80,   hLB:1, hSL:1, ujLB:770000,  ujSL:610000,  tols:["tol_001"],crossings:[],tolDesc:"Tol Dalam Kota Jakarta (segmen Cawang–Gatot Subroto)",crossDesc:""},
+  {id:"rt_004",no:4,  origin:"CKB Cakung",dest:"BEKASI",                       km:34,   kmpp:68,   hLB:1, hSL:1, ujLB:790000,  ujSL:650000,  tols:["tol_002"],crossings:[],tolDesc:"Tol Jakarta-Cikampek (segmen Cakung–Bekasi Barat)",crossDesc:""},
+  {id:"rt_005",no:5,  origin:"CKB Cakung",dest:"BOGOR",                        km:66.6, kmpp:133.2,hLB:1, hSL:1, ujLB:1540000, ujSL:1230000, tols:["tol_005","tol_006"],crossings:[],tolDesc:"Tol JORR, Tol Jagorawi (Jakarta–Bogor)",crossDesc:""},
+  {id:"rt_006",no:6,  origin:"CKB Cakung",dest:"SUKABUMI",                     km:123,  kmpp:246,  hLB:1, hSL:1, ujLB:1790000, ujSL:1500000, tols:["tol_005","tol_007"],crossings:[],tolDesc:"Tol JORR, Tol Jagorawi, Tol Bocimi (Bogor–Sukabumi)",crossDesc:""},
+  {id:"rt_007",no:7,  origin:"CKB Cakung",dest:"CIBINONG",                     km:63,   kmpp:126,  hLB:1, hSL:1, ujLB:1420000, ujSL:1210000, tols:["tol_005","tol_006"],crossings:[],tolDesc:"Tol JORR, Tol Jagorawi (segmen Cibinong)",crossDesc:""},
+  {id:"rt_008",no:8,  origin:"CKB Cakung",dest:"CIBITUNG",                     km:39.1, kmpp:78.2, hLB:1, hSL:1, ujLB:1270000, ujSL:1110000, tols:["tol_002"],crossings:[],tolDesc:"Tol Jakarta-Cikampek (segmen Cibitung)",crossDesc:""},
+  {id:"rt_009",no:9,  origin:"CKB Cakung",dest:"CIKARANG",                     km:46.9, kmpp:93.8, hLB:1, hSL:1, ujLB:1320000, ujSL:1140000, tols:["tol_002"],crossings:[],tolDesc:"Tol Jakarta-Cikampek (segmen Cikarang)",crossDesc:""},
+  {id:"rt_010",no:10, origin:"CKB Cakung",dest:"KERAWANG",                     km:75,   kmpp:150,  hLB:1, hSL:1, ujLB:1490000, ujSL:1260000, tols:["tol_002"],crossings:[],tolDesc:"Tol Jakarta-Cikampek (Cikampek–Karawang Timur)",crossDesc:""},
+  {id:"rt_011",no:11, origin:"CKB Cakung",dest:"BANDUNG",                      km:146,  kmpp:292,  hLB:2, hSL:2, ujLB:2890000, ujSL:2490000, tols:["tol_002","tol_009","tol_010"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipularang, Tol Padaleunyi",crossDesc:""},
+  {id:"rt_012",no:12, origin:"CKB Cakung",dest:"TASIKMALAYA",                  km:286,  kmpp:572,  hLB:4, hSL:3, ujLB:4200000, ujSL:3390000, tols:["tol_002","tol_027"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali (exit Kertajati/Majalengka), lanjut arteri",crossDesc:""},
+  {id:"rt_013",no:13, origin:"CKB Cakung",dest:"CILACAP",                      km:374,  kmpp:748,  hLB:4, hSL:3, ujLB:4740000, ujSL:3750000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang",crossDesc:""},
+  {id:"rt_014",no:14, origin:"CKB Cakung",dest:"CIREBON",                      km:214,  kmpp:428,  hLB:2, hSL:2, ujLB:3680000, ujSL:3240000, tols:["tol_002","tol_008"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci (keluar Kanci/Cirebon)",crossDesc:""},
+  {id:"rt_015",no:15, origin:"CKB Cakung",dest:"TEGAL",                        km:290,  kmpp:580,  hLB:3, hSL:2, ujLB:4380000, ujSL:3550000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang",crossDesc:""},
+  {id:"rt_016",no:16, origin:"CKB Cakung",dest:"CILEGON",                      km:129,  kmpp:258,  hLB:1, hSL:1, ujLB:1780000, ujSL:1510000, tols:["tol_003","tol_026"],crossings:[],tolDesc:"Tol Jakarta-Tangerang, Tol Tangerang-Merak (segmen Cilegon)",crossDesc:""},
+  {id:"rt_017",no:17, origin:"CKB Cakung",dest:"SERANG",                       km:108,  kmpp:216,  hLB:1, hSL:1, ujLB:1650000, ujSL:1430000, tols:["tol_003","tol_026"],crossings:[],tolDesc:"Tol Jakarta-Tangerang, Tol Tangerang-Merak (segmen Serang)",crossDesc:""},
+  {id:"rt_018",no:18, origin:"CKB Cakung",dest:"BALARAJA",                     km:81,   kmpp:162,  hLB:1, hSL:1, ujLB:1480000, ujSL:1320000, tols:["tol_003"],crossings:[],tolDesc:"Tol Jakarta-Tangerang, Tol Tangerang-Merak (segmen Balaraja)",crossDesc:""},
+  {id:"rt_019",no:19, origin:"CKB Cakung",dest:"SEMARANG",                     km:429,  kmpp:858,  hLB:3, hSL:3, ujLB:6090000, ujSL:5210000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang, Tol Batang-Semarang",crossDesc:""},
+  {id:"rt_020",no:20, origin:"CKB Cakung",dest:"PURWOKERTO",                   km:351,  kmpp:702,  hLB:4, hSL:4, ujLB:5830000, ujSL:5110000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang",crossDesc:""},
+  {id:"rt_021",no:21, origin:"CKB Cakung",dest:"SOLO",                         km:533,  kmpp:1066, hLB:4, hSL:4, ujLB:7110000, ujSL:6020000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Semarang-Solo",crossDesc:""},
+  {id:"rt_022",no:22, origin:"CKB Cakung",dest:"JOGJA",                        km:559,  kmpp:1118, hLB:4, hSL:4, ujLB:7270000, ujSL:6120000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_018"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Solo-Yogyakarta",crossDesc:""},
+  {id:"rt_023",no:23, origin:"CKB Cakung",dest:"KEDIRI",                       km:707,  kmpp:1414, hLB:4, hSL:4, ujLB:10090000,ujSL:7640000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Ngawi-Kertosono",crossDesc:""},
+  {id:"rt_024",no:24, origin:"CKB Cakung",dest:"TUBAN",                        km:653,  kmpp:1306, hLB:4, hSL:4, ujLB:9760000, ujSL:7420000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Ngawi-Kertosono (keluar Tuban)",crossDesc:""},
+  {id:"rt_025",no:25, origin:"CKB Cakung",dest:"GRESIK",                       km:736,  kmpp:1472, hLB:4, hSL:4, ujLB:10270000,ujSL:7760000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022","tol_023"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Surabaya-Gresik",crossDesc:""},
+  {id:"rt_026",no:26, origin:"CKB Cakung",dest:"LAMONGAN",                     km:790,  kmpp:1580, hLB:4, hSL:4, ujLB:10600000,ujSL:7980000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya (keluar Lamongan)",crossDesc:""},
+  {id:"rt_027",no:27, origin:"CKB Cakung",dest:"SURABAYA",                     km:810,  kmpp:1620, hLB:4, hSL:4, ujLB:10730000,ujSL:8110000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya",crossDesc:""},
+  {id:"rt_028",no:28, origin:"CKB Cakung",dest:"MALANG",                       km:842,  kmpp:1684, hLB:5, hSL:5, ujLB:10840000,ujSL:9110000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022","tol_024"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Pandaan-Malang",crossDesc:""},
+  {id:"rt_029",no:29, origin:"CKB Cakung",dest:"BANYUWANGI",                   km:1053, kmpp:2106, hLB:5, hSL:5, ujLB:12140000,ujSL:9970000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya",crossDesc:""},
+  {id:"rt_030",no:30, origin:"CKB Cakung",dest:"BALI",                         km:1200, kmpp:2400, hLB:10,hSL:10,ujLB:19170000,ujSL:16200000,tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:["cross_001"],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya",crossDesc:"⛴ Penyeberangan Ketapang (Banyuwangi) – Gilimanuk (Bali)"},
+  {id:"rt_031",no:31, origin:"CKB Cakung",dest:"MATARAM",                      km:1299, kmpp:2598, hLB:11,hSL:11,ujLB:46510000,ujSL:36230000,tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:["cross_001","cross_002"],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya",crossDesc:"⛴ Ketapang–Gilimanuk (Bali) + Padangbai–Lembar (NTB)"},
+  {id:"rt_032",no:32, origin:"CKB Cakung",dest:"BATU HIJAU",                   km:1372.5,kmpp:2745,hLB:11,hSL:11,ujLB:48960000,ujSL:38100000,tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:["cross_001","cross_002","cross_003"],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya",crossDesc:"⛴ Ketapang–Gilimanuk + Padangbai–Lembar + Kayangan–Pototano"},
+  {id:"rt_033",no:33, origin:"CKB Cakung",dest:"GARUT",                        km:280,  kmpp:560,  hLB:2, hSL:2, ujLB:6340000, ujSL:2560000, tols:["tol_002","tol_009","tol_010","tol_011"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipularang, Tol Padaleunyi, Tol Soroja",crossDesc:""},
+  {id:"rt_034",no:34, origin:"CKB Cakung",dest:"SUMBAWA",                      km:1498, kmpp:2996, hLB:11,hSL:11,ujLB:56910000,ujSL:37610000,tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:["cross_001","cross_002","cross_003"],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya",crossDesc:"⛴ Ketapang–Gilimanuk + Padangbai–Lembar + Kayangan–Pototano"},
+  {id:"rt_035",no:35, origin:"CKB Cakung",dest:"TPA IJOBAIT LOMBOK",           km:990,  kmpp:1980, hLB:11,hSL:11,ujLB:44600000,ujSL:34180000,tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022"],crossings:["cross_001","cross_002"],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Mojokerto-Surabaya",crossDesc:"⛴ Ketapang–Gilimanuk (Bali) + Padangbai–Lembar (NTB)"},
+  {id:"rt_036",no:36, origin:"CKB Cakung",dest:"BOJONEGORO",                   km:680,  kmpp:1360, hLB:4, hSL:4, ujLB:10110000,ujSL:7880000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Solo-Ngawi (keluar Bojonegoro)",crossDesc:""},
+  {id:"rt_037",no:37, origin:"CKB Cakung",dest:"SENTOLO, GARUT",               km:330,  kmpp:660,  hLB:3, hSL:3, ujLB:4720000, ujSL:4340000, tols:["tol_002","tol_009","tol_010","tol_011"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipularang, Tol Padaleunyi, Tol Soroja (sebagian)",crossDesc:""},
+  {id:"rt_038",no:38, origin:"CKB Cakung",dest:"CIANJUR",                      km:130,  kmpp:260,  hLB:2, hSL:2, ujLB:2760000, ujSL:2750000, tols:["tol_002","tol_009","tol_007"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipularang (sebagian), kemudian via Puncak atau Tol Bocimi",crossDesc:""},
+  {id:"rt_039",no:39, origin:"CKB Cakung",dest:"BANJARNEGARA, WADUK MRICAN",   km:410,  kmpp:820,  hLB:3, hSL:3, ujLB:3710000, ujSL:4480000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali, Tol Palimanan-Kanci, Tol Kanci-Pejagan, Tol Pejagan-Pemalang, Tol Pemalang-Batang",crossDesc:""},
+  {id:"rt_040",no:40, origin:"CKB Cakung",dest:"PATIMBAN, SUBANG",             km:145,  kmpp:290,  hLB:2, hSL:2, ujLB:1950000, ujSL:1800000, tols:["tol_002","tol_008"],crossings:[],tolDesc:"Tol Jakarta-Cikampek, Tol Cipali (keluar Subang–Patimban)",crossDesc:""},
+  {id:"rt_041",no:41, origin:"CKB Cakung",dest:"PROBOLINGGO",                  km:920,  kmpp:1840, hLB:4, hSL:4, ujLB:7880000, ujSL:9050000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020","tol_021","tol_022","tol_025"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Gempol-Pasuruan (menuju Probolinggo)",crossDesc:""},
+  {id:"rt_042",no:42, origin:"CKB Cakung",dest:"PANGGUNG REJO, BLITAR",        km:785,  kmpp:1570, hLB:4, hSL:4, ujLB:8830000, ujSL:7090000, tols:["tol_002","tol_008","tol_012","tol_013","tol_014","tol_015","tol_016","tol_017","tol_019","tol_020"],crossings:[],tolDesc:"Tol Jakarta-Cikampek s.d. Tol Ngawi-Kertosono (keluar Blitar)",crossDesc:""},
+];
+
+// ── STATE ──
+let TOL_MASTER = [];
+let CROSSING_MASTER = [];
+let ROUTES = [];
+let activeRouteId = null;
+let dirtyRouteId = null;
+let dirtyEdits = {};
+
+// ── INIT ──
+function loadData(){
+  // Load toll master (from tarif page or defaults)
+  const st = localStorage.getItem("ckb_tol_master");
+  const sc = localStorage.getItem("ckb_cross_master");
+  TOL_MASTER = st ? JSON.parse(st) : DEFAULT_TOL;
+  CROSSING_MASTER = sc ? JSON.parse(sc) : DEFAULT_CROSS;
+
+  // Load route paths
+  const sr = localStorage.getItem("ckb_route_paths");
+  ROUTES = sr ? JSON.parse(sr) : JSON.parse(JSON.stringify(DEFAULT_ROUTES));
+  if(!sr) saveRoutes(); // persist defaults
+}
+
+function saveRoutes(){
+  localStorage.setItem("ckb_route_paths", JSON.stringify(ROUTES));
+  // Also sync to uang jalan key
+  syncToUangJalan();
+}
+
+function syncToUangJalan(){
+  // Build a map keyed by "ORIGIN|DEST" for the uang jalan page
+  const syncMap = {};
+  ROUTES.forEach(r => {
+    const key = (r.origin + "|" + r.dest).toUpperCase();
+    // Build tolSegs for breakdown
+    const tolSegs = {};
+    r.tols.forEach(tid => {
+      const t = TOL_MASTER.find(x=>x.id===tid);
+      if(t) tolSegs[t.name] = {lb:t.lb, sl:t.sl};
+    });
+    // Build crossSegs
+    const crossSegs = {};
+    r.crossings.forEach(cid => {
+      const c = CROSSING_MASTER.find(x=>x.id===cid);
+      if(c) crossSegs[c.name] = {lb:c.lb, sl:c.sl};
+    });
+    syncMap[key] = {
+      origin: r.origin, dest: r.dest,
+      km: r.km, kmpp: r.kmpp,
+      hLB: r.hLB, hSL: r.hSL,
+      ujLB: r.ujLB, ujSL: r.ujSL,
+      tol: r.tolDesc, crossing: r.crossDesc,
+      tolSegs, crossSegs,
+      _routeId: r.id
+    };
+  });
+  localStorage.setItem("ckb_route_sync", JSON.stringify(syncMap));
+}
+
+// ── UTILS ──
+const fmt = n => "Rp\u00a0" + Math.round(n||0).toLocaleString("id-ID");
+const el = id => document.getElementById(id);
+const now = () => new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+
+// ── DATE ──
+el("hdate").textContent = now();
+
+// ── ROUTE LIST ──
+function renderRouteList(){
+  const origin = el("filterOrigin").value;
+  const q = el("searchRoute").value.toLowerCase();
+  const filtered = ROUTES.filter(r =>
+    (!origin || r.origin === origin) &&
+    (!q || r.dest.toLowerCase().includes(q) || r.origin.toLowerCase().includes(q))
+  );
+  el("pl-count").textContent = `${ROUTES.length} jalur tersimpan`;
+  const container = el("routeList");
+  if(!filtered.length){
+    container.innerHTML = `<div class="empty-state"><div class="ei">🔍</div><p>Tidak ada jalur yang cocok.</p></div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(r => {
+    const isDirty = dirtyRouteId === r.id;
+    const tolCount = r.tols.length;
+    const crossCount = r.crossings.length;
+    return `
+      <div class="route-item ${activeRouteId===r.id?'active':''}" onclick="selectRoute('${r.id}')">
+        <div class="ri-icon">${crossCount>0?'⛴':'🛣'}</div>
+        <div class="ri-info">
+          <div class="ri-dest">${r.dest}${isDirty?' <span style="color:var(--warning)">●</span>':''}</div>
+          <div class="ri-origin">📍 ${r.origin} · ${r.km} km</div>
+          <div class="ri-meta">
+            ${tolCount>0?`<span class="ri-tag ri-tag-tol">🛣 ${tolCount} tol</span>`:''}
+            ${crossCount>0?`<span class="ri-tag ri-tag-cross">⛴ ${crossCount} penyeb.</span>`:''}
+          </div>
+        </div>
+        <button class="ri-del" onclick="confirmDelete('${r.id}',event)" title="Hapus jalur">✕</button>
+      </div>`;
+  }).join("");
+}
+
+// ── SELECT ROUTE ──
+function selectRoute(id){
+  activeRouteId = id;
+  const r = ROUTES.find(x=>x.id===id);
+  if(!r) return;
+
+  // Save dirty state for previous
+  if(dirtyRouteId && dirtyRouteId !== id){
+    const confirm = window.confirm("Ada perubahan yang belum disimpan pada jalur sebelumnya. Buang perubahan?");
+    if(!confirm) return;
+    dirtyRouteId = null;
+    dirtyEdits = {};
+  }
+
+  renderRouteList();
+  openEditor(r);
+}
+
+function openEditor(r){
+  el("welcomeState").style.display = "none";
+  el("editorState").style.display = "block";
+  el("prHead").style.display = "flex";
+  el("prDest").textContent = r.dest;
+  el("prOrigin").textContent = r.origin;
+
+  // Populate fields
+  el("e_origin").value = r.origin;
+  el("e_dest").value = r.dest;
+  el("e_km").value = r.km;
+  el("e_kmpp").value = r.kmpp;
+  el("e_hLB").value = r.hLB;
+  el("e_hSL").value = r.hSL;
+  el("e_ujLB").value = r.ujLB;
+  el("e_ujSL").value = r.ujSL;
+  el("e_tolDesc").value = r.tolDesc||"";
+  el("e_crossDesc").value = r.crossDesc||"";
+
+  // km auto-calc
+  el("e_km").oninput = () => {
+    el("e_kmpp").value = Math.round((parseFloat(el("e_km").value)||0)*2*10)/10;
+    markDirty();
+  };
+  ["e_dest","e_hLB","e_hSL","e_ujLB","e_ujSL","e_tolDesc","e_crossDesc"].forEach(fid=>{
+    el(fid).oninput = markDirty;
+  });
+
+  renderSegLists(r);
+  populateSegSelects(r);
+  updateTotals(r);
+  updateStatusBadge(false);
+  el("btnSaveAll").style.display = "none";
+}
+
+function markDirty(){
+  if(!activeRouteId) return;
+  dirtyRouteId = activeRouteId;
+  updateStatusBadge(true);
+  el("btnSaveAll").style.display = "inline-flex";
+  renderRouteList();
+}
+
+function updateStatusBadge(dirty){
+  const badge = el("routeStatusBadge");
+  if(dirty){
+    badge.innerHTML = `<span class="badge badge-edited">● Belum disimpan</span>`;
+  } else {
+    badge.innerHTML = `<span class="badge badge-saved">✓ Tersimpan</span>`;
+  }
+}
+
+// ── SEGMENT LISTS ──
+function renderSegLists(r){
+  renderTolSegs(r);
+  renderCrossSegs(r);
+  updateTotals(r);
+}
+
+function renderTolSegs(r){
+  const list = el("tolSegList");
+  el("tolCount").textContent = r.tols.length;
+  if(!r.tols.length){
+    list.innerHTML = `<div class="seg-empty">Belum ada ruas tol. Tambahkan dari dropdown di bawah.</div>`;
+    return;
+  }
+  list.innerHTML = r.tols.map((tid,i)=>{
+    const t = TOL_MASTER.find(x=>x.id===tid);
+    const name = t ? t.name : `[${tid}] — tidak ditemukan`;
+    const tarif = t ? `LB: ${fmt(t.lb)} | SL: ${fmt(t.sl)} (1 arah)` : "";
+    return `<div class="seg-item" draggable="true" data-type="tol" data-idx="${i}" 
+        ondragstart="dragStart(event,'tol',${i})" ondragover="dragOver(event,'tol',${i})" 
+        ondrop="dragDrop(event,'tol',${i})" ondragleave="dragLeave(event)">
+      <div class="seg-handle">⠿</div>
+      <div class="seg-type-icon">🛣</div>
+      <div class="seg-info">
+        <div class="seg-name">${name}</div>
+        <div class="seg-tarif">${tarif}</div>
+      </div>
+      <span class="seg-badge seg-badge-tol">Gol.V</span>
+      <button class="seg-del" onclick="removeTol(${i})" title="Hapus">✕</button>
+    </div>`;
+  }).join("");
+}
+
+function renderCrossSegs(r){
+  const list = el("crossSegList");
+  el("crossCount").textContent = r.crossings.length;
+  if(!r.crossings.length){
+    list.innerHTML = `<div class="seg-empty">Belum ada penyeberangan. Tambahkan dari dropdown di bawah.</div>`;
+    return;
+  }
+  list.innerHTML = r.crossings.map((cid,i)=>{
+    const c = CROSSING_MASTER.find(x=>x.id===cid);
+    const name = c ? c.name : `[${cid}] — tidak ditemukan`;
+    const tarif = c ? `LB: ${fmt(c.lb)} | SL: ${fmt(c.sl)} (1 arah)` : "";
+    const route = c ? ` · ${c.route}` : "";
+    return `<div class="seg-item" draggable="true" data-type="cross" data-idx="${i}"
+        ondragstart="dragStart(event,'cross',${i})" ondragover="dragOver(event,'cross',${i})"
+        ondrop="dragDrop(event,'cross',${i})" ondragleave="dragLeave(event)">
+      <div class="seg-handle">⠿</div>
+      <div class="seg-type-icon">⛴</div>
+      <div class="seg-info">
+        <div class="seg-name">${name}${route}</div>
+        <div class="seg-tarif">${tarif}</div>
+      </div>
+      <span class="seg-badge seg-badge-cross">Kapal Ferry</span>
+      <button class="seg-del" onclick="removeCross(${i})" title="Hapus">✕</button>
+    </div>`;
+  }).join("");
+}
+
+function populateSegSelects(r){
+  // Tol select — show all tol, mark if already in route
+  const tSelect = el("addTolSelect");
+  tSelect.innerHTML = `<option value="">— Pilih ruas tol untuk ditambahkan —</option>`;
+  TOL_MASTER.forEach(t=>{
+    const inRoute = r.tols.includes(t.id);
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = (inRoute?"✓ ":"") + t.name + ` (LB: ${fmt(t.lb)})`;
+    if(inRoute) opt.style.color = "var(--teal)";
+    tSelect.appendChild(opt);
+  });
+
+  // Cross select
+  const cSelect = el("addCrossSelect");
+  cSelect.innerHTML = `<option value="">— Pilih penyeberangan untuk ditambahkan —</option>`;
+  CROSSING_MASTER.forEach(c=>{
+    const inRoute = r.crossings.includes(c.id);
+    const opt = document.createElement("option");
+    opt.value = c.id;
+    opt.textContent = (inRoute?"✓ ":"") + c.name + (c.route?` (${c.route})`:"") + ` (LB: ${fmt(c.lb)})`;
+    if(inRoute) opt.style.color = "var(--teal)";
+    cSelect.appendChild(opt);
+  });
+}
+
+function addTolSeg(){
+  const r = ROUTES.find(x=>x.id===activeRouteId);
+  if(!r) return;
+  const val = el("addTolSelect").value;
+  if(!val){ showToast("Pilih ruas tol terlebih dahulu!","warning"); return; }
+  if(r.tols.includes(val)){ showToast("Ruas tol sudah ada di jalur ini!","warning"); return; }
+  r.tols.push(val);
+  renderSegLists(r);
+  populateSegSelects(r);
+  markDirty();
+  el("addTolSelect").value = "";
+  showToast("✓ Tol ditambahkan ke jalur", "success");
+}
+
+function addCrossSeg(){
+  const r = ROUTES.find(x=>x.id===activeRouteId);
+  if(!r) return;
+  const val = el("addCrossSelect").value;
+  if(!val){ showToast("Pilih penyeberangan terlebih dahulu!","warning"); return; }
+  if(r.crossings.includes(val)){ showToast("Penyeberangan sudah ada di jalur ini!","warning"); return; }
+  r.crossings.push(val);
+  renderSegLists(r);
+  populateSegSelects(r);
+  markDirty();
+  el("addCrossSelect").value = "";
+  showToast("✓ Penyeberangan ditambahkan ke jalur", "success");
+}
+
+function removeTol(idx){
+  const r = ROUTES.find(x=>x.id===activeRouteId);
+  if(!r) return;
+  const t = TOL_MASTER.find(x=>x.id===r.tols[idx]);
+  r.tols.splice(idx,1);
+  renderSegLists(r);
+  populateSegSelects(r);
+  markDirty();
+  showToast(`Tol ${t?t.name:''} dihapus dari jalur`, "info");
+}
+
+function removeCross(idx){
+  const r = ROUTES.find(x=>x.id===activeRouteId);
+  if(!r) return;
+  const c = CROSSING_MASTER.find(x=>x.id===r.crossings[idx]);
+  r.crossings.splice(idx,1);
+  renderSegLists(r);
+  populateSegSelects(r);
+  markDirty();
+  showToast(`Penyeberangan ${c?c.name:''} dihapus dari jalur`, "info");
+}
+
+// ── DRAG & DROP ──
+let dragSrc = null;
+function dragStart(e, type, idx){ dragSrc = {type, idx}; e.currentTarget.classList.add("dragging"); }
+function dragOver(e, type, idx){
+  e.preventDefault();
+  if(!dragSrc || dragSrc.type !== type) return;
+  e.currentTarget.classList.add("drag-over");
+}
+function dragLeave(e){ e.currentTarget.classList.remove("drag-over"); }
+function dragDrop(e, type, idx){
+  e.preventDefault();
+  e.currentTarget.classList.remove("drag-over");
+  if(!dragSrc || dragSrc.type !== type || dragSrc.idx === idx) { dragSrc=null; return; }
+  const r = ROUTES.find(x=>x.id===activeRouteId);
+  if(!r){ dragSrc=null; return; }
+  const arr = type==="tol" ? r.tols : r.crossings;
+  const [moved] = arr.splice(dragSrc.idx,1);
+  arr.splice(idx,0,moved);
+  dragSrc=null;
+  renderSegLists(r);
+  populateSegSelects(r);
+  markDirty();
+}
+
+// ── TOTALS ──
+function updateTotals(r){
+  let tolLB=0,tolSL=0,crossLB=0,crossSL=0;
+  let breakdown = [];
+  r.tols.forEach(tid=>{
+    const t = TOL_MASTER.find(x=>x.id===tid);
+    if(t){ tolLB+=t.lb; tolSL+=t.sl; breakdown.push(`🛣 ${t.name}: LB ${fmt(t.lb)} / SL ${fmt(t.sl)}`); }
+  });
+  r.crossings.forEach(cid=>{
+    const c = CROSSING_MASTER.find(x=>x.id===cid);
+    if(c){ crossLB+=c.lb; crossSL+=c.sl; breakdown.push(`⛴ ${c.name}: LB ${fmt(c.lb)} / SL ${fmt(c.sl)}`); }
+  });
+  el("totTolLB").textContent = fmt(tolLB);
+  el("totTolSL").textContent = fmt(tolSL);
+  el("totCrossLB").textContent = crossLB>0 ? fmt(crossLB) : "—";
+  el("totCrossSL").textContent = crossSL>0 ? fmt(crossSL) : "—";
+  el("segBreakdown").innerHTML = breakdown.length ? breakdown.join(" &nbsp;|&nbsp; ") : "<em>Belum ada segmen.</em>";
+}
+
+// ── SAVE ROUTE ──
+function saveCurrentRoute(){
+  const r = ROUTES.find(x=>x.id===activeRouteId);
+  if(!r){ showToast("Tidak ada jalur aktif!","warning"); return; }
+
+  // Collect form values
+  r.dest = (el("e_dest").value||"").trim().toUpperCase() || r.dest;
+  r.km = parseFloat(el("e_km").value)||r.km;
+  r.kmpp = r.km*2;
+  r.hLB = parseFloat(el("e_hLB").value)||r.hLB;
+  r.hSL = parseFloat(el("e_hSL").value)||r.hSL;
+  r.ujLB = parseInt(el("e_ujLB").value)||r.ujLB;
+  r.ujSL = parseInt(el("e_ujSL").value)||r.ujSL;
+  r.tolDesc = el("e_tolDesc").value.trim();
+  r.crossDesc = el("e_crossDesc").value.trim();
+
+  el("prDest").textContent = r.dest;
+  el("e_kmpp").value = r.kmpp;
+
+  saveRoutes();
+  dirtyRouteId = null;
+  dirtyEdits = {};
+  updateStatusBadge(false);
+  el("btnSaveAll").style.display = "none";
+  renderRouteList();
+  showToast(`✅ Jalur "${r.dest}" berhasil disimpan & disinkronkan!`, "success");
+}
+
+function saveAllRoutes(){
+  saveCurrentRoute();
+}
+
+function discardEdit(){
+  if(dirtyRouteId){
+    loadData(); // reload from storage
+    const r = ROUTES.find(x=>x.id===activeRouteId);
+    if(r) openEditor(r);
+    dirtyRouteId = null;
+    dirtyEdits = {};
+    updateStatusBadge(false);
+    el("btnSaveAll").style.display = "none";
+    renderRouteList();
+    showToast("Perubahan dibatalkan.", "info");
+  }
+}
+
+// ── ADD NEW ROUTE ──
+function openAddRouteModal(){
+  el("nr_dest").value=""; el("nr_km").value=""; el("nr_hLB").value=""; el("nr_hSL").value="";
+  el("nr_ujLB").value=""; el("nr_ujSL").value="";
+  el("modalAddRoute").classList.add("open");
+  setTimeout(()=>el("nr_dest").focus(),100);
+}
+
+function createNewRoute(){
+  const origin = el("nr_origin").value;
+  const dest = (el("nr_dest").value||"").trim().toUpperCase();
+  if(!dest){ el("nr_dest").focus(); showToast("Tujuan wajib diisi!","warning"); return; }
+  if(ROUTES.find(r=>r.origin===origin && r.dest===dest)){
+    showToast("Jalur ke tujuan ini sudah ada!","warning"); return;
+  }
+  const km = parseFloat(el("nr_km").value)||0;
+  const hLB = parseFloat(el("nr_hLB").value)||1;
+  const hSL = parseFloat(el("nr_hSL").value)||1;
+  const ujLB = parseInt(el("nr_ujLB").value)||0;
+  const ujSL = parseInt(el("nr_ujSL").value)||0;
+  const maxNo = ROUTES.reduce((m,r)=>Math.max(m,r.no||0),0);
+  const newRoute = {
+    id: "rt_"+Date.now(), no: maxNo+1,
+    origin, dest, km, kmpp:km*2,
+    hLB, hSL, ujLB, ujSL,
+    tols:[], crossings:[],
+    tolDesc:"", crossDesc:""
+  };
+  ROUTES.push(newRoute);
+  saveRoutes();
+  closeModal("modalAddRoute");
+  activeRouteId = newRoute.id;
+  renderRouteList();
+  openEditor(newRoute);
+  showToast(`✅ Jalur baru "${dest}" dibuat!`, "success");
+}
+
+// ── DELETE ROUTE ──
+function confirmDelete(id, e){
+  e.stopPropagation();
+  const r = ROUTES.find(x=>x.id===id);
+  if(!r) return;
+  el("cfTitle").textContent = "🗑 Hapus Jalur";
+  el("cfMsg").innerHTML = `Anda yakin ingin menghapus jalur ke <strong>${r.dest}</strong>?<br><small style="color:var(--muted)">Tindakan ini tidak bisa dibatalkan.</small>`;
+  el("cfOkBtn").onclick = () => {
+    ROUTES = ROUTES.filter(x=>x.id!==id);
+    saveRoutes();
+    if(activeRouteId === id){
+      activeRouteId = null;
+      el("welcomeState").style.display = "";
+      el("editorState").style.display = "none";
+      el("prHead").style.display = "none";
+    }
+    closeModal("modalConfirm");
+    renderRouteList();
+    showToast("Jalur dihapus.", "info");
+  };
+  el("modalConfirm").classList.add("open");
+}
+
+// ── EXPORT ──
+function exportJSON(){
+  const data = { exportTime: new Date().toISOString(), routes: ROUTES, tolMaster: TOL_MASTER, crossingMaster: CROSSING_MASTER };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href=url;
+  a.download=`ckb-jalur-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── MODAL ──
+function closeModal(id){ el(id).classList.remove("open"); }
+document.querySelectorAll(".modal-bg").forEach(m=>{
+  m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); });
+});
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg, type="success"){
+  let t = document.getElementById("_toast");
+  if(!t){
+    t = document.createElement("div"); t.id="_toast";
+    Object.assign(t.style,{position:"fixed",bottom:"1.5rem",right:"1.5rem",zIndex:999,
+      padding:".65rem 1.1rem",borderRadius:"10px",fontFamily:"Sora,sans-serif",
+      fontSize:".85rem",fontWeight:"600",boxShadow:"0 8px 28px rgba(0,0,0,.15)",
+      transition:"all .25s"});
+    document.body.appendChild(t);
+  }
+  const c={success:["#dcfce7","#15803d","#bbf7d0"],warning:["#fef3c7","#d97706","#fde68a"],info:["#eff6ff","#2563eb","#bfdbfe"]};
+  const [bg,clr,bdr]=c[type]||c.success;
+  Object.assign(t.style,{background:bg,color:clr,border:`1.5px solid ${bdr}`,opacity:"1",transform:"translateY(0)"});
+  t.textContent=msg;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{t.style.opacity="0";t.style.transform="translateY(8px)";},3200);
+}
+
+// ── LISTEN for tarif updates from other tabs ──
+window.addEventListener("storage", e => {
+  if(e.key === "ckb_tol_master" || e.key === "ckb_cross_master"){
+    TOL_MASTER = JSON.parse(localStorage.getItem("ckb_tol_master")||JSON.stringify(DEFAULT_TOL));
+    CROSSING_MASTER = JSON.parse(localStorage.getItem("ckb_cross_master")||JSON.stringify(DEFAULT_CROSS));
+    // refresh active editor if open
+    if(activeRouteId){
+      const r = ROUTES.find(x=>x.id===activeRouteId);
+      if(r){ renderSegLists(r); populateSegSelects(r); }
+    }
+    showToast("🔄 Data tarif diperbarui dari halaman Master Tarif", "info");
+  }
+});
+
+// ── BOOTSTRAP ──
+loadData();
+renderRouteList();
+</script>
+</body>
+</html>

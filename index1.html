@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Uang Jalan - CKB Logistics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ckb: {
+                            ink: '#14251B',
+                            dark: '#183528',
+                            main: '#22543D',
+                            mid: '#2F6B4F',
+                            pale: '#F3F7F4',
+                            border: '#C7D6CC',
+                            muted: '#52665B'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'Segoe UI', 'Arial', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { letter-spacing: -0.01em; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 2px; }
+        .menu-btn { border-radius: 6px; }
+        .module-card { border-radius: 8px; transition: border-color .15s ease, background .15s ease; }
+        .module-card:hover { border-color: #22543D; background: #F8FAF9; }
+        .flat-icon { width: 36px; height: 36px; border: 1px solid #C7D6CC; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#22543D; background:#F3F7F4; }
+        iframe { color-scheme: light; }
+    </style>
+</head>
+<body class="bg-[#F5F7F6] text-slate-800 h-screen flex overflow-hidden font-sans">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-ckb-ink text-slate-300 flex flex-col flex-shrink-0 border-r border-black/20">
+        <div class="h-16 flex items-center px-5 border-b border-white/10 bg-[#102018] shrink-0">
+            <div class="w-8 h-8 rounded-md bg-ckb-main flex items-center justify-center text-white mr-3">
+                <i class="fa-solid fa-anchor text-sm"></i>
+            </div>
+            <div>
+                <div class="text-white font800 font-bold text-sm leading-tight">Sistem Uang Jalan</div>
+                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-[.16em]">CKB Logistics</div>
+            </div>
+        </div>
+        <nav class="flex-1 overflow-y-auto sidebar-scroll py-5 px-3">
+            <div class="px-3 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-[.16em]">Main</div>
+            <button id="btnOverview" onclick="loadApp('welcome','Overview Sistem Uang Jalan',this)" class="menu-btn menu-active w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-white bg-ckb-main mb-1">
+                <i class="fa-solid fa-chart-line w-5 text-center"></i><span>Dashboard</span>
+            </button>
+            <div class="px-3 mt-5 mb-2 text-[10px] font-bold text-slate-500 uppercase tracking-[.16em]">Modules</div>
+            <button id="btnDashboard" onclick="loadApp('SUJ-Dashboard_corporate.html','Create Surat Uang jalan',this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white mb-1">
+                <i class="fa-solid fa-file-invoice w-5 text-center"></i><span>Create SUJ</span>
+            </button>
+            <button id="btnTarif" onclick="loadApp('SUJ-tarif.html','Kelola Master Tarif',this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white mb-1">
+                <i class="fa-solid fa-table-list w-5 text-center"></i><span>Kelola Master Tarif</span>
+            </button>
+            <button id="btnJalur" onclick="loadApp('SUJ-Jalur.html','Kelola Jalur Rute',this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white mb-1">
+                <i class="fa-solid fa-route w-5 text-center"></i><span>Kelola Jalur</span>
+            </button>
+        </nav>
+        <div class="p-4 border-t border-white/10 text-[11px] text-slate-500 leading-relaxed">
+            <div class="font-bold text-slate-400">Internal Build</div>
+            <div>CKB BPI OPS Demo</div>
+            <div>&copy; 2026</div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-7 shrink-0">
+            <div class="flex items-center gap-2 text-sm">
+                <span class="text-slate-400 font-semibold"><i class="fa-solid fa-house-chimney mr-1"></i>BPI Portal</span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
+                <span id="pageTitle" class="text-slate-800 font-bold">Overview Sistem Uang Jalan</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="currentDate" class="text-xs text-slate-500 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-md"></div>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-slate-800 leading-tight">Zaki</div>
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Business Process & System Officer</div>
+                    </div>
+                    <div class="w-9 h-9 rounded-md bg-ckb-pale border border-ckb-border flex items-center justify-center text-ckb-main font-bold">Z</div>
+                </div>
+            </div>
+        </header>
+        <main class="flex-1 overflow-hidden p-5">
+            <section id="welcomeScreen" class="w-full h-full overflow-y-auto bg-white border border-slate-200 rounded-lg">
+                <div class="border-b border-slate-200 px-7 py-6 bg-white">
+                    <div class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[.16em] font-bold text-ckb-main bg-ckb-pale border border-ckb-border px-3 py-1 rounded-md mb-4">
+                        <i class="fa-solid fa-circle-nodes"></i> -
+                    </div>
+                    <h1 class="text-3xl font-extrabold text-ckb-ink tracking-tight">Sistem Uang Jalan</h1>
+                    <p class="mt-2 text-sm text-ckb-muted max-w-3xl leading-relaxed">Halo Warrior! Selamat Datang di SUJ! Portal untuk membuat Surat Uang Jalan, mengelola standar biaya operasional, dan mengatur jalur rute Armada.</p>
+                    <div class="flex flex-wrap gap-2 mt-5">
+                        <button onclick="openModule('dashboard')" class="inline-flex items-center gap-2 bg-ckb-main text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-ckb-dark"><i class="fa-solid fa-file-invoice"></i>Buat SUJ</button>
+                        <button onclick="openModule('tarif')" class="inline-flex items-center gap-2 bg-white border border-ckb-border text-ckb-main px-4 py-2 rounded-md text-sm font-bold hover:bg-ckb-pale"><i class="fa-solid fa-table-list"></i>Master Tarif</button>
+                        <button onclick="openModule('jalur')" class="inline-flex items-center gap-2 bg-white border border-ckb-border text-ckb-main px-4 py-2 rounded-md text-sm font-bold hover:bg-ckb-pale"><i class="fa-solid fa-route"></i>Master Jalur</button>
+                    </div>
+                </div>
+
+                <div class="p-7">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <article class="module-card border border-slate-200 bg-white p-5">
+                            <div class="flat-icon mb-4"><i class="fa-solid fa-file-invoice"></i></div>
+                            <h2 class="font-extrabold text-slate-900">Dashboard Surat Uang Jalan</h2>
+                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Create SUJ, pilih rute, kendaraan, delivery type, safety factor, BBM composition, dan lihat breakdown biaya.</p>
+                            <ul class="text-xs text-slate-600 mt-4 space-y-2">
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Create and Calculate SUJ</li>
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Review</li>
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Export</li>
+                            </ul>
+                            <button onclick="openModule('dashboard')" class="mt-5 w-full rounded-md bg-ckb-main text-white py-2 text-sm font-bold hover:bg-ckb-dark">Open Dashboard</button>
+                        </article>
+
+                        <article class="module-card border border-slate-200 bg-white p-5">
+                            <div class="flat-icon mb-4"><i class="fa-solid fa-table-list"></i></div>
+                            <h2 class="font-extrabold text-slate-900">Kelola Master Tarif</h2>
+                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Maintain tarif tol, ferry, BBM, fixed cost, crew, standar uang makan, dan rule komposisi BBM.</p>
+                            <ul class="text-xs text-slate-600 mt-4 space-y-2">
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Master Standarisasi Uang Makan</li>
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Master BBM Composition Rule</li>
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>History perubahan master</li>
+                            </ul>
+                            <button onclick="openModule('tarif')" class="mt-5 w-full rounded-md border border-ckb-border text-ckb-main py-2 text-sm font-bold hover:bg-ckb-pale">Open Master Tarif</button>
+                        </article>
+
+                        <article class="module-card border border-slate-200 bg-white p-5">
+                            <div class="flat-icon mb-4"><i class="fa-solid fa-route"></i></div>
+                            <h2 class="font-extrabold text-slate-900">Kelola Jalur Rute</h2>
+                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Maintain rute, KM, leadtime, uang jalan dasar, susunan ruas tol, dan penyeberangan untuk setiap tujuan.</p>
+                            <ul class="text-xs text-slate-600 mt-4 space-y-2">
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Route path per destination</li>
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Ordered toll and crossing</li>
+                                <li><i class="fa-solid fa-check text-ckb-main mr-2"></i>Sync to Dashboard</li>
+                            </ul>
+                            <button onclick="openModule('jalur')" class="mt-5 w-full rounded-md border border-ckb-border text-ckb-main py-2 text-sm font-bold hover:bg-ckb-pale">Open Master Jalur</button>
+                        </article>
+                    </div>
+
+                    <div class="mt-6 border border-slate-200 rounded-lg bg-slate-50 p-5">
+                        <h2 class="font-extrabold text-slate-900 mb-3">Process Overview</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
+                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">01</div><b>Maintain Tarif</b><p class="text-xs text-slate-500 mt-1">Tarif, BBM, FC, crew, meal standard.</p></div>
+                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">02</div><b>Maintain Jalur</b><p class="text-xs text-slate-500 mt-1">KM, LT, toll, crossing.</p></div>
+                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">03</div><b>Create SUJ</b><p class="text-xs text-slate-500 mt-1">Route, vehicle, delivery type.</p></div>
+                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">04</div><b>Calculate</b><p class="text-xs text-slate-500 mt-1">Safety factor, BBM, meal.</p></div>
+                            <div class="bg-white border border-slate-200 rounded-md p-3"><div class="text-[10px] font-bold text-ckb-main">05</div><b>Export</b><p class="text-xs text-slate-500 mt-1">Breakdown PDF/Excel.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <iframe id="appFrame" class="hidden w-full h-full rounded-lg border border-slate-200 bg-white" src="about:blank"></iframe>
+        </main>
+    </div>
+
+    <script>
+        const dateOptions = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
+        const modules = {
+            overview: { url:'welcome', title:'Overview Sistem Uang Jalan', btn:'btnOverview' },
+            dashboard: { url:'SUJ-Dashboard.html', title:'Dashboard Surat Uang Jalan', btn:'btnDashboard' },
+            tarif: { url:'SUJ-tarif.html', title:'Kelola Master Tarif', btn:'btnTarif' },
+            jalur: { url:'SUJ-Jalur.html', title:'Kelola Jalur Rute', btn:'btnJalur' }
+        };
+        function openModule(key){ const m=modules[key]; if(m) loadApp(m.url,m.title,document.getElementById(m.btn)); }
+        function loadApp(url,title,element){
+            document.querySelectorAll('.menu-btn').forEach(btn=>{
+                btn.classList.remove('bg-ckb-main','text-white');
+                btn.classList.add('text-slate-300','hover:bg-white/5','hover:text-white');
+            });
+            if(element){
+                element.classList.add('bg-ckb-main','text-white');
+                element.classList.remove('text-slate-300','hover:bg-white/5','hover:text-white');
+            }
+            document.getElementById('pageTitle').innerText = title;
+
+            const welcome = document.getElementById('welcomeScreen');
+            const frame = document.getElementById('appFrame');
+
+            if(url === 'welcome'){
+                frame.classList.add('hidden');
+                frame.src = 'about:blank';
+                welcome.classList.remove('hidden');
+            } else {
+                welcome.classList.add('hidden');
+                frame.classList.remove('hidden');
+                frame.src = url;
+            }
+        }
+    </script>
+</body>
+</html>

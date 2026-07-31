@@ -1,0 +1,3031 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Tarif Tol & Penyeberangan — PT Cipta Krida Bahari</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Instrument+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4faf6;--bg2:#ffffff;--sidebar:#ffffff;--hdr:#ffffff;
+  --amber:#0a7c3e;--amber2:#12a854;--amber-pale:#f0faf4;--amber-light:#c6ecd8;
+  --coral:#057a35;--teal:#16a34a;--teal-pale:#dcfce7;--blue:#2563eb;
+  --text:#0d1f15;--text2:#2d4a36;--muted:#5a7a65;--border:#d1e8da;--border2:#e2f2e9;
+  --card:#ffffff;--success:#16a34a;--danger:#dc2626;--warning:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+  --radius:12px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;}
+body{font-family:"Sora",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 50% at 100% 0%,rgba(10,124,62,.07) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 40% at 0% 100%,rgba(22,163,74,.05) 0%,transparent 50%);}
+
+header{position:sticky;top:0;z-index:200;background:var(--hdr);border-bottom:2px solid var(--amber-light);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;height:62px;flex-shrink:0;
+  box-shadow:0 2px 12px rgba(10,124,62,.08);}
+.logo{display:flex;align-items:center;gap:.7rem;}
+.logo-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--amber),var(--amber2));
+  display:flex;align-items:center;justify-content:center;font-size:1.15rem;box-shadow:0 2px 8px rgba(10,124,62,.3);}
+.logo-t1{font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:.3px;line-height:1.1;}
+.logo-t2{font-size:.62rem;color:var(--amber);font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.hdr-r{display:flex;align-items:center;gap:.6rem;}
+.hdate{font-family:"Instrument Mono",monospace;font-size:.75rem;color:var(--muted);
+  background:var(--bg);border:1px solid var(--border);padding:4px 11px;border-radius:20px;}
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;border-radius:var(--radius-sm);
+  font-size:.82rem;font-family:"Sora",sans-serif;cursor:pointer;border:1.5px solid transparent;transition:all .18s;font-weight:600;}
+.btn-amber{background:var(--amber);color:#fff;border-color:var(--amber);}
+.btn-amber:hover{background:#057a35;border-color:#057a35;transform:translateY(-1px);box-shadow:0 4px 12px rgba(10,124,62,.3);}
+.btn-outline{background:transparent;color:var(--amber);border-color:var(--amber-light);}
+.btn-outline:hover{background:var(--amber-pale);border-color:var(--amber);}
+.btn-teal{background:var(--teal);color:#fff;border-color:var(--teal);}
+.btn-teal:hover{background:#087a68;transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{border-color:var(--danger);color:var(--danger);}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger);}
+.btn-danger:hover{background:#b91c1c;}
+.btn-sm{padding:.3rem .7rem;font-size:.76rem;}
+
+/* NAV TABS */
+.nav-tabs{display:flex;gap:0;border-bottom:2px solid var(--border2);background:var(--bg2);
+  padding:0 1.5rem;position:sticky;top:62px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.nav-tab{padding:.75rem 1.3rem;font-size:.85rem;font-weight:700;color:var(--muted);
+  cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;margin-bottom:-2px;
+  display:flex;align-items:center;gap:.4rem;white-space:nowrap;}
+.nav-tab:hover{color:var(--text2);background:var(--amber-pale);}
+.nav-tab.active{color:var(--amber);border-bottom-color:var(--amber);background:var(--amber-pale);}
+.nav-tab .tab-cnt{font-size:.65rem;background:var(--amber-light);color:var(--amber);
+  padding:1px 7px;border-radius:10px;font-weight:700;}
+.nav-tab.active .tab-cnt{background:var(--amber);color:#fff;}
+
+/* MAIN */
+.main{flex:1;overflow:auto;padding:1.4rem 1.5rem;position:relative;z-index:1;}
+
+/* PAGE SECTION */
+.page{display:none;}
+.page.active{display:block;}
+
+/* SECTION HEADER */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.6rem;}
+.sec-ttl{font-size:1rem;font-weight:800;letter-spacing:.3px;display:flex;align-items:center;gap:.5rem;color:var(--text);}
+.sec-sub{font-size:.75rem;color:var(--muted);margin-top:2px;font-weight:500;}
+.fbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+.fbar input{padding:.4rem .7rem;font-size:.82rem;width:200px;background:#fff;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-family:"Sora",sans-serif;outline:none;transition:border-color .18s;}
+.fbar input:focus{border-color:var(--amber);}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-bottom:1.2rem;}
+.stat-card{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius);
+  padding:.9rem 1rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.3rem;}
+.stat-label{font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.stat-val{font-size:1.4rem;font-weight:800;color:var(--text);font-family:"Instrument Mono",monospace;}
+.stat-val.amber{color:var(--amber);}
+.stat-val.teal{color:var(--teal);}
+.stat-note{font-size:.7rem;color:var(--muted);}
+
+/* TABLE */
+.twrap{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl thead tr{background:var(--bg);}
+.tbl th{font-size:.69rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  padding:.6rem .85rem;text-align:left;border-bottom:1.5px solid var(--border2);white-space:nowrap;}
+.tbl th.r{text-align:right;}
+.tbl td{padding:.65rem .85rem;font-size:.88rem;border-bottom:1px solid var(--border2);vertical-align:middle;color:var(--text);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tbody tr:hover td{background:var(--amber-pale);}
+.tbl td.r{text-align:right;font-family:"Instrument Mono",monospace;white-space:nowrap;}
+.tbl td.mono{font-family:"Instrument Mono",monospace;}
+.tbl .changed-row td{background:#fef9c3!important;}
+
+/* EDITABLE CELL */
+.editable-cell{display:flex;align-items:center;gap:.4rem;justify-content:flex-end;}
+.price-input{width:120px;padding:.32rem .6rem;border:1.5px solid var(--border);border-radius:6px;
+  font-family:"Instrument Mono",monospace;font-size:.88rem;text-align:right;
+  background:#fff;color:var(--text);outline:none;transition:border-color .18s,box-shadow .18s;}
+.price-input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(10,124,62,.12);}
+.price-input.modified{border-color:var(--warning);background:#fef9c3;}
+.price-input.saved{border-color:var(--success);background:#f0fdf4;}
+
+/* BADGE */
+.badge{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;}
+.badge-amber{background:var(--amber-pale);color:var(--amber);border:1px solid var(--amber-light);}
+.badge-teal{background:var(--teal-pale);color:var(--teal);border:1px solid rgba(22,163,74,.25);}
+.badge-gray{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;}
+.badge-success{background:#dcfce7;color:var(--success);border:1px solid rgba(22,163,74,.2);}
+.badge-warning{background:#fef3c7;color:var(--warning);border:1px solid rgba(217,119,6,.2);}
+
+/* ACT CELL */
+.act-cell{display:flex;gap:.3rem;justify-content:flex-end;}
+.aBtn{width:30px;height:30px;border-radius:var(--radius-sm);border:none;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .15s;flex-shrink:0;}
+.ab-reset{background:#f1f5f9;color:#64748b;}.ab-reset:hover{background:#64748b;color:#fff;}
+
+/* ══ BBM SECTION — REDESIGN ══ */
+.bbm-hero{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;align-items:stretch;margin-bottom:1.6rem;}
+.bbm-price-card{position:relative;border-radius:18px;padding:1.4rem 1.5rem;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.08);}
+.bbm-price-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.14);}
+.bbm-price-card.subsidi{background:linear-gradient(135deg,#0a7c3e 0%,#15a854 100%);color:#fff;}
+.bbm-price-card.nonsubsidi{background:linear-gradient(135deg,#854d0e 0%,#b8630f 100%);color:#fff;}
+.bbm-price-card::after{content:"⛽";position:absolute;right:-14px;bottom:-22px;font-size:6.5rem;opacity:.1;transform:rotate(-12deg);pointer-events:none;}
+.bbm-price-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;position:relative;z-index:1;}
+.bbm-price-icon{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.15rem;backdrop-filter:blur(4px);}
+.bbm-price-tag{font-size:.62rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;background:rgba(255,255,255,.22);padding:4px 11px;border-radius:20px;}
+.bbm-price-name{font-size:1.08rem;font-weight:800;margin-bottom:2px;position:relative;z-index:1;}
+.bbm-price-sub{font-size:.71rem;opacity:.88;font-weight:500;position:relative;z-index:1;}
+.bbm-price-input-wrap{display:flex;align-items:center;gap:.5rem;margin-top:1.1rem;background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.32);border-radius:10px;padding:.7rem .9rem;transition:all .18s;}
+.bbm-price-input-wrap:focus-within{background:rgba(255,255,255,.24);border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.18);}
+.bbm-price-rp{font-weight:700;font-size:1rem;opacity:.85;color:#fff;flex-shrink:0;}
+.bbm-price-input{flex:1;min-width:0;width:100%;background:transparent;border:none;
+  color:#fff;padding:0;font-family:'Instrument Mono',monospace;font-size:1.35rem;font-weight:700;
+  outline:none;}
+.bbm-price-input::placeholder{color:rgba(255,255,255,.55);}
+.bbm-price-preview{margin-top:.65rem;font-size:.79rem;font-weight:700;opacity:.95;position:relative;z-index:1;}
+.bbm-group-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.65rem;padding-left:.1rem;}
+.bbm-group-title{font-size:.7rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);}
+.bbm-group-count{font-size:.62rem;font-weight:700;background:var(--amber-pale);color:var(--amber);padding:2px 9px;border-radius:20px;border:1px solid var(--amber-light);}
+
+.bbm-veh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:.7rem;}
+.bbm-veh-card{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius);padding:.95rem;
+  position:relative;transition:all .18s;border-top:3px solid var(--accent,var(--amber));}
+.bbm-veh-card:hover{box-shadow:var(--shadow);transform:translateY(-2px);}
+.bbm-veh-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;}
+.bbm-veh-icon{width:29px;height:29px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.15);}
+.bbm-veh-name{font-weight:800;font-size:.79rem;color:var(--text);line-height:1.2;}
+.bbm-veh-plate{font-size:.6rem;color:var(--muted);font-weight:600;font-family:'Instrument Mono',monospace;margin-top:1px;}
+.bbm-veh-label{font-size:.68rem;font-weight:600;color:var(--text2);margin-bottom:.4rem;display:block;}
+.bbm-veh-input-row{display:flex;align-items:center;gap:.4rem;}
+.bbm-veh-input{width:100%;padding:.45rem .5rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-family:'Instrument Mono',monospace;font-size:.92rem;font-weight:700;text-align:center;
+  background:#f7fdf9;color:var(--text);outline:none;transition:border-color .18s,box-shadow .18s;}
+.bbm-veh-input:focus{border-color:var(--accent,var(--amber));box-shadow:0 0 0 3px rgba(10,124,62,.12);}
+.bbm-veh-unit{font-size:.68rem;color:var(--muted);font-weight:700;white-space:nowrap;}
+.bbm-veh-stats{margin-top:.6rem;padding-top:.55rem;border-top:1px dashed var(--border2);display:flex;flex-direction:column;gap:.2rem;font-size:.64rem;color:var(--muted);line-height:1.5;}
+.bbm-veh-stats b{font-weight:700;}
+
+.bbm-sl-card{background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius);padding:1.05rem 1.15rem;
+  display:flex;gap:1.6rem;flex-wrap:wrap;align-items:flex-start;border-top:3px solid #7c3aed;}
+.bbm-sl-plates{display:flex;flex-wrap:wrap;gap:.4rem;}
+.bbm-sl-plate-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.32rem .68rem;background:#f5f3ff;border:1px solid #ddd6fe;
+  border-radius:20px;font-size:.72rem;font-weight:700;color:#6d28d9;font-family:'Instrument Mono',monospace;}
+
+.bbm-sim-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.9rem;}
+.bbm-sim-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--amber),var(--amber2));
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;box-shadow:0 2px 6px rgba(10,124,62,.3);}
+
+.bbm-actionbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;background:var(--card);border:1.5px solid var(--border2);
+  border-radius:var(--radius);padding:.9rem 1.1rem;box-shadow:var(--shadow);margin-top:1.3rem;}
+
+@media(max-width:720px){
+  .bbm-hero{grid-template-columns:1fr;}
+}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(26,18,8,.4);backdrop-filter:blur(6px);
+  z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg2);border:1.5px solid var(--border2);border-radius:16px;
+  width:640px;max-width:96vw;max-height:92vh;overflow-y:auto;
+  box-shadow:0 24px 80px rgba(0,0,0,.18);animation:fadeUp .22s ease;}
+.m-head{padding:1.1rem 1.5rem .9rem;border-bottom:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,var(--amber-pale),#fff);position:sticky;top:0;z-index:10;}
+.m-title{font-size:1.1rem;font-weight:800;color:var(--text);}
+.m-close{width:32px;height:32px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
+  cursor:pointer;background:var(--bg);color:var(--muted);font-size:1rem;
+  display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.m-close:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+.m-body{padding:1.4rem 1.5rem;}
+.m-foot{padding:.85rem 1.5rem;border-top:1.5px solid var(--border2);display:flex;gap:.5rem;justify-content:flex-end;background:var(--bg);}
+
+/* FORM */
+.fg{margin-bottom:.85rem;}
+.fg:last-child{margin-bottom:0;}
+.flabel{display:block;font-size:.82rem;font-weight:600;color:var(--text2);margin-bottom:.35rem;}
+.flabel small{font-weight:400;color:var(--muted);font-size:.75rem;}
+input[type=text],input[type=number]{width:100%;background:#f7fdf9;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);padding:.55rem .9rem;font-family:"Sora",sans-serif;font-size:.92rem;outline:none;
+  transition:border-color .18s,background .18s,box-shadow .18s;}
+input[type=text]:focus,input[type=number]:focus{border-color:var(--amber);background:#fff;box-shadow:0 0 0 3px rgba(10,124,62,.12);}
+.input-group{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.prefix-input{position:relative;}
+.prefix-input::before{content:"Rp";position:absolute;left:.75rem;top:50%;transform:translateY(-50%);
+  font-size:.82rem;color:var(--muted);font-weight:600;pointer-events:none;}
+.prefix-input input{padding-left:2.4rem;}
+
+/* SAVE BAR */
+.save-bar{position:fixed;bottom:1.2rem;right:1.5rem;z-index:400;
+  display:flex;align-items:center;gap:.6rem;
+  background:#fff;border:1.5px solid var(--amber-light);border-radius:var(--radius);
+  padding:.6rem 1rem;box-shadow:0 8px 32px rgba(10,124,62,.2);
+  animation:fadeUp .28s ease;transition:all .25s;}
+.save-bar.hidden{display:none;}
+.hidden{display:none!important;}
+input.modified{border-color:var(--warning)!important;background:#fef9c3!important;}
+.save-bar-msg{font-size:.82rem;font-weight:600;color:var(--amber);}
+
+/* ALERT */
+.alert{padding:.65rem 1rem;border-radius:var(--radius-sm);font-size:.82rem;font-weight:500;
+  display:flex;align-items:center;gap:.5rem;margin-bottom:.9rem;}
+.alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;}
+.alert-warning{background:#fef3c7;border:1px solid #fde68a;color:var(--warning);}
+.alert-success{background:#dcfce7;border:1px solid #bbf7d0;color:var(--success);}
+
+/* TARIF DETAIL GROUP */
+.tarif-group{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--radius);
+  margin-bottom:1rem;overflow:hidden;}
+.tarif-group-head{padding:.75rem 1rem;background:var(--bg);border-bottom:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+  transition:background .18s;}
+.tarif-group-head:hover{background:var(--amber-pale);}
+.tarif-group-head.open{background:linear-gradient(135deg,var(--amber-pale),#fff);}
+.tgh-left{display:flex;align-items:center;gap:.6rem;}
+.tgh-name{font-weight:700;font-size:.9rem;color:var(--text);}
+.tgh-segs{font-size:.72rem;color:var(--muted);}
+.tgh-arrow{font-size:.8rem;color:var(--muted);transition:transform .2s;}
+.tarif-group-head.open .tgh-arrow{transform:rotate(180deg);}
+.tarif-group-body{display:none;padding:.5rem 0;}
+.tarif-group-body.open{display:block;}
+
+/* EMPTY */
+.empty{text-align:center;padding:3rem 2rem;color:var(--muted);}
+.empty .ei{font-size:2.5rem;opacity:.25;margin-bottom:.75rem;}
+.empty p{font-size:.88rem;font-weight:500;}
+
+/* HISTORY */
+.history-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;
+  border-bottom:1px solid var(--border2);}
+.history-item:last-child{border-bottom:none;}
+.history-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;}
+.history-dot.old{background:var(--muted);}
+.history-text{flex:1;font-size:.82rem;color:var(--text2);}
+.history-time{font-size:.7rem;color:var(--muted);font-family:"Instrument Mono",monospace;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+
+/* Vehicle Unit mock-up master */
+.vehicle-type-badge{
+  display:inline-flex;align-items:center;gap:.3rem;
+  padding:3px 8px;border-radius:6px;font-size:.72rem;font-weight:800;
+  border:1px solid var(--border);background:var(--amber-pale);color:var(--amber);
+}
+.vehicle-type-badge.sl{background:#F8FAF9;color:var(--text2);border-color:var(--border2);}
+.vehicle-plate{font-family:"Instrument Mono",monospace;font-weight:800;color:var(--text);letter-spacing:.3px;}
+.vehicle-remarks{color:var(--muted);font-size:.86rem;line-height:1.4;}
+#page-vehicle .tbl td{vertical-align:middle;}
+#page-vehicle .fbar input{min-width:260px;}
+
+
+
+/* BBM Composition Rule */
+.bbm-comp-wrap{overflow-x:auto;}
+.bbm-comp-table{min-width:1080px;}
+.bbm-comp-table th{text-align:center !important;vertical-align:middle;}
+.bbm-comp-table td{text-align:center;vertical-align:middle;}
+.bbm-comp-table td:first-child{text-align:left;font-weight:700;color:var(--text);}
+.comp-input-wrap{display:inline-flex;align-items:center;justify-content:center;gap:2px;}
+.comp-input{width:54px !important;text-align:right !important;padding:.32rem .4rem !important;font-family:"Instrument Mono",monospace !important;font-weight:800 !important;font-size:.84rem !important;}
+.comp-pct{font-size:.78rem;color:var(--muted);font-weight:700;}
+.comp-input.comp-modified{background:#fffbeb !important;border-color:var(--warning) !important;}
+.comp-status{display:inline-flex;align-items:center;justify-content:center;border-radius:4px;padding:2px 7px;font-size:.68rem;font-weight:800;border:1px solid var(--border);background:var(--amber-pale);color:var(--amber);}
+.comp-status.warn{background:#fff9ea;color:var(--warning);border-color:#e8d9b2;}
+.comp-status.invalid{background:#fef2f2;color:var(--danger);border-color:#f3b4ae;}
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">⚓</div>
+    <div class="logo-texts">
+      <div class="logo-t1">Cipta Krida Bahari</div>
+      <div class="logo-t2">Master Tarif — Tol & Penyeberangan</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="hdate" id="hdate"></div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab" onclick="switchTab('vehicle')" id="tab-vehicle">
+    🚚 Vehicle Unit <span class="tab-cnt" id="cnt-vehicle">0</span>
+  </div>
+  <div class="nav-tab active" onclick="switchTab('tol')" id="tab-tol">
+    🛣 Tarif Tol <span class="tab-cnt" id="cnt-tol">0</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('crossing')" id="tab-crossing">
+    ⛴ Penyeberangan <span class="tab-cnt" id="cnt-crossing">0</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('bbm')" id="tab-bbm">
+    ⛽ Harga BBM
+  </div>
+  <div class="nav-tab" onclick="switchTab('bbmcomp')" id="tab-bbmcomp">
+    ⚗️ Komposisi BBM <span class="tab-cnt" id="cnt-bbmcomp">0</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('fixedcost')" id="tab-fixedcost">
+    📦 Fixed Cost
+  </div>
+  <div class="nav-tab" onclick="switchTab('crew')" id="tab-crew">
+    👤 Driver &amp; Helper
+  </div>
+  <div class="nav-tab" onclick="switchTab('jarak')" id="tab-jarak">
+    🗺 Master Jarak &amp; Leadtime <span class="tab-cnt" id="cnt-jarak">0</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('history')" id="tab-history">
+    📋 Riwayat Perubahan <span class="tab-cnt" id="cnt-history">0</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+
+  <!-- PAGE: VEHICLE UNIT -->
+  <div class="page" id="page-vehicle">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">🚚 Master Vehicle Unit</div>
+        <div class="sec-sub">Mock-up master data untuk daftar unit kendaraan. Data ini hanya menyimpan jenis armada, nomor polisi, merk kendaraan, dan remarks.</div>
+      </div>
+      <div class="fbar">
+        <input type="text" id="srch-vehicle" placeholder="🔍 Cari nomor polisi / merk..." oninput="renderVehicleTable()">
+        <button class="btn btn-amber" onclick="openVehicleModal()">+ Tambah Vehicle Unit</button>
+      </div>
+    </div>
+
+    <div class="twrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Jenis Armada</th>
+            <th>Nomor Polisi</th>
+            <th>Merk Kendaraan</th>
+            <th>Remarks</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="vehicle-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAGE: TOL -->
+  <div class="page active" id="page-tol">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">🛣 Master Tarif Tol — Golongan V & III</div>
+        <div class="sec-sub">Harga per ruas (1 arah). Sistem otomatis menghitung ×2 untuk PP.</div>
+      </div>
+      <div class="fbar">
+        <input type="text" id="srch-tol" placeholder="🔍 Cari nama tol..." oninput="renderTolTable()">
+        <button class="btn btn-amber" onclick="openAddTolModal()">+ Tambah Tol</button>
+      </div>
+    </div>
+
+    <div id="tol-container"></div>
+  </div>
+
+  <!-- PAGE: CROSSING -->
+  <div class="page" id="page-crossing">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">⛴ Master Tarif Penyeberangan</div>
+        <div class="sec-sub">Harga per penyeberangan (1 arah). Sistem otomatis menghitung ×2 untuk PP.</div>
+      </div>
+      <div class="fbar">
+        <button class="btn btn-amber" onclick="openAddCrossModal()">+ Tambah Penyeberangan</button>
+      </div>
+    </div>
+
+    <div class="twrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>#</th>
+          <th>Nama Penyeberangan</th>
+          <th>Rute</th>
+          <th class="r">Tarif Lowbed (1 arah)</th>
+          <th class="r">Tarif Selfloader (1 arah)</th>
+          <th class="r">PP Lowbed</th>
+          <th class="r">PP Selfloader</th>
+          <th>Dipakai di Rute</th>
+          <th>Aksi</th>
+        </tr></thead>
+        <tbody id="crossing-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAGE: BBM -->
+  <div class="page" id="page-bbm">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">⛽ Harga BBM Solar</div>
+        <div class="sec-sub">Pengaturan harga Solar Subsidi dan Non-Subsidi. Perubahan akan langsung mempengaruhi perhitungan uang jalan.</div>
+      </div>
+    </div>
+
+    <div style="max-width:980px;margin:0 auto;">
+      <!-- ── HERO: Harga BBM ── -->
+      <div class="bbm-hero">
+
+        <!-- Subsidi -->
+        <div class="bbm-price-card subsidi">
+          <div class="bbm-price-top">
+            <div class="bbm-price-icon">⛽</div>
+            <div class="bbm-price-tag">Subsidi</div>
+          </div>
+          <div class="bbm-price-name">Solar Subsidi</div>
+          <div class="bbm-price-sub">Bio Solar B35</div>
+          <div class="bbm-price-input-wrap">
+            <span class="bbm-price-rp">Rp</span>
+            <input class="bbm-price-input" type="number" id="bbm_subsidi" value="6800" min="1000" step="100"
+              oninput="onBBMChange()">
+          </div>
+          <div class="bbm-price-preview" id="bbm_subsidi_preview"></div>
+        </div>
+
+        <!-- Non-Subsidi -->
+        <div class="bbm-price-card nonsubsidi">
+          <div class="bbm-price-top">
+            <div class="bbm-price-icon">⛽</div>
+            <div class="bbm-price-tag">Non-Subsidi</div>
+          </div>
+          <div class="bbm-price-name">Non-Subsidi</div>
+          <div class="bbm-price-sub">Dex / Pertamina Dex</div>
+          <div class="bbm-price-input-wrap">
+            <span class="bbm-price-rp">Rp</span>
+            <input class="bbm-price-input" type="number" id="bbm_nonsubsidi" value="13950" min="1000" step="100"
+              oninput="onBBMChange()">
+          </div>
+          <div class="bbm-price-preview" id="bbm_nonsubsidi_preview"></div>
+        </div>
+
+      </div>
+
+      <!-- ── RASIO PEMAKAIAN PER KENDARAAN ── -->
+      <div style="margin-bottom:1.4rem;">
+        <div class="bbm-group-hdr" style="margin-bottom:1rem;">
+          <span style="font-size:1rem;">🚛</span>
+          <span class="bbm-group-title" style="color:var(--teal);font-size:.75rem;">Rasio Pemakaian per Kendaraan</span>
+        </div>
+
+        <!-- LOW BED GROUP -->
+        <div style="margin-bottom:1.1rem;">
+          <div class="bbm-group-hdr">
+            <span class="bbm-group-title">Low Bed</span>
+            <span class="bbm-group-count">5 unit</span>
+          </div>
+          <div class="bbm-veh-grid">
+
+            <!-- Hino FM350 TH -->
+            <div class="bbm-veh-card" style="--accent:#ea580c;">
+              <div class="bbm-veh-top">
+                <div class="bbm-veh-icon" style="background:linear-gradient(135deg,#ea580c,#f97316);">🟠</div>
+                <div>
+                  <div class="bbm-veh-name">Hino FM350 TH</div>
+                  <div class="bbm-veh-plate">B 9068 SEI</div>
+                </div>
+              </div>
+              <label class="bbm-veh-label">Konsumsi <small style="font-weight:400;color:var(--muted);">km/L</small></label>
+              <div class="bbm-veh-input-row">
+                <input class="bbm-veh-input" type="number" id="bbm_kml_hino_lb" value="3" min="0.5" max="20" step="0.1"
+                  oninput="onBBMChange()">
+                <span class="bbm-veh-unit">km/L</span>
+              </div>
+              <div class="bbm-veh-stats">
+                <div>1 L → <b id="bbm_kml_hino_lb_inv" style="color:#ea580c;">3,00 km</b></div>
+                <div>100 km → <b id="bbm_lper100_hino_lb" style="color:var(--text);">33,3 L</b></div>
+              </div>
+            </div>
+
+            <!-- Iveco HD9 66.54T -->
+            <div class="bbm-veh-card" style="--accent:#1d4ed8;">
+              <div class="bbm-veh-top">
+                <div class="bbm-veh-icon" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);">🔵</div>
+                <div>
+                  <div class="bbm-veh-name">Iveco HD9 66.54T</div>
+                  <div class="bbm-veh-plate">B 9300 SEI</div>
+                </div>
+              </div>
+              <label class="bbm-veh-label">Konsumsi <small style="font-weight:400;color:var(--muted);">km/L</small></label>
+              <div class="bbm-veh-input-row">
+                <input class="bbm-veh-input" type="number" id="bbm_kml_iveco_hd54" value="3" min="0.5" max="20" step="0.1"
+                  oninput="onBBMChange()">
+                <span class="bbm-veh-unit">km/L</span>
+              </div>
+              <div class="bbm-veh-stats">
+                <div>1 L → <b id="bbm_kml_iveco_hd54_inv" style="color:#1d4ed8;">3,00 km</b></div>
+                <div>100 km → <b id="bbm_lper100_iveco_hd54" style="color:var(--text);">33,3 L</b></div>
+              </div>
+            </div>
+
+            <!-- Iveco HD9 66.56T -->
+            <div class="bbm-veh-card" style="--accent:#1d4ed8;">
+              <div class="bbm-veh-top">
+                <div class="bbm-veh-icon" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);">🔵</div>
+                <div>
+                  <div class="bbm-veh-name">Iveco HD9 66.56T</div>
+                  <div class="bbm-veh-plate">B 9809 SEI</div>
+                </div>
+              </div>
+              <label class="bbm-veh-label">Konsumsi <small style="font-weight:400;color:var(--muted);">km/L</small></label>
+              <div class="bbm-veh-input-row">
+                <input class="bbm-veh-input" type="number" id="bbm_kml_iveco_hd56" value="3" min="0.5" max="20" step="0.1"
+                  oninput="onBBMChange()">
+                <span class="bbm-veh-unit">km/L</span>
+              </div>
+              <div class="bbm-veh-stats">
+                <div>1 L → <b id="bbm_kml_iveco_hd56_inv" style="color:#1d4ed8;">3,00 km</b></div>
+                <div>100 km → <b id="bbm_lper100_iveco_hd56" style="color:var(--text);">33,3 L</b></div>
+              </div>
+            </div>
+
+            <!-- Iveco T-WAY -->
+            <div class="bbm-veh-card" style="--accent:#1d4ed8;">
+              <div class="bbm-veh-top">
+                <div class="bbm-veh-icon" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);">🔵</div>
+                <div>
+                  <div class="bbm-veh-name">Iveco T-WAY 6x4</div>
+                  <div class="bbm-veh-plate">B 9786 SEI</div>
+                </div>
+              </div>
+              <label class="bbm-veh-label">Konsumsi <small style="font-weight:400;color:var(--muted);">km/L</small></label>
+              <div class="bbm-veh-input-row">
+                <input class="bbm-veh-input" type="number" id="bbm_kml_iveco_tway" value="3" min="0.5" max="20" step="0.1"
+                  oninput="onBBMChange()">
+                <span class="bbm-veh-unit">km/L</span>
+              </div>
+              <div class="bbm-veh-stats">
+                <div>1 L → <b id="bbm_kml_iveco_tway_inv" style="color:#1d4ed8;">3,00 km</b></div>
+                <div>100 km → <b id="bbm_lper100_iveco_tway" style="color:var(--text);">33,3 L</b></div>
+              </div>
+            </div>
+
+            <!-- Scania RM580LA -->
+            <div class="bbm-veh-card" style="--accent:#dc2626;">
+              <div class="bbm-veh-top">
+                <div class="bbm-veh-icon" style="background:linear-gradient(135deg,#dc2626,#ef4444);">🔴</div>
+                <div>
+                  <div class="bbm-veh-name">Scania RM580LA 6x4</div>
+                  <div class="bbm-veh-plate">B 9995 SYN</div>
+                </div>
+              </div>
+              <label class="bbm-veh-label">Konsumsi <small style="font-weight:400;color:var(--muted);">km/L</small></label>
+              <div class="bbm-veh-input-row">
+                <input class="bbm-veh-input" type="number" id="bbm_kml_scania_lb" value="3" min="0.5" max="20" step="0.1"
+                  oninput="onBBMChange()">
+                <span class="bbm-veh-unit">km/L</span>
+              </div>
+              <div class="bbm-veh-stats">
+                <div>1 L → <b id="bbm_kml_scania_lb_inv" style="color:#dc2626;">3,00 km</b></div>
+                <div>100 km → <b id="bbm_lper100_scania_lb" style="color:var(--text);">33,3 L</b></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SELF LOADER GROUP — 1 input, 4 plat sama -->
+        <div>
+          <div class="bbm-group-hdr">
+            <span class="bbm-group-title">Self Loader</span>
+            <span class="bbm-group-count">4 unit</span>
+          </div>
+          <div class="bbm-sl-card">
+
+            <!-- Input konsumsi -->
+            <div style="flex-shrink:0;min-width:170px;">
+              <div class="bbm-veh-top">
+                <div class="bbm-veh-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">🚚</div>
+                <div>
+                  <div class="bbm-veh-name">Hino 500 FM280JW 6x4</div>
+                  <div class="bbm-veh-plate">4 unit · konsumsi sama</div>
+                </div>
+              </div>
+              <label class="bbm-veh-label">Konsumsi <small style="font-weight:400;color:var(--muted);">km/L</small></label>
+              <div class="bbm-veh-input-row">
+                <input class="bbm-veh-input" type="number" id="bbm_kml_sl" value="3.5" min="0.5" max="20" step="0.1"
+                  style="--accent:#7c3aed;"
+                  oninput="onBBMChange()">
+                <span class="bbm-veh-unit">km/L</span>
+              </div>
+              <div class="bbm-veh-stats">
+                <div>1 L → <b id="bbm_kml_sl_inv" style="color:#7c3aed;">3,50 km</b></div>
+                <div>100 km → <b id="bbm_lper100_sl" style="color:var(--text);">28,6 L</b></div>
+              </div>
+            </div>
+
+            <!-- Daftar plat -->
+            <div style="flex:1;min-width:200px;">
+              <div class="bbm-group-title" style="margin-bottom:.55rem;font-size:.65rem;">Unit Kendaraan</div>
+              <div class="bbm-sl-plates">
+                <span class="bbm-sl-plate-chip">🚚 B 9170 SIU</span>
+                <span class="bbm-sl-plate-chip">🚚 B 9171 SIU</span>
+                <span class="bbm-sl-plate-chip">🚚 B 9172 SIU</span>
+                <span class="bbm-sl-plate-chip">🚚 B 9173 SIU</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ── BAGIAN 3: Simulasi ── -->
+      <div class="twrap" style="padding:1.2rem 1.3rem;margin-bottom:1.2rem;">
+        <div class="bbm-sim-hdr">
+          <div class="bbm-sim-icon">📊</div>
+          <div style="font-size:.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);">Simulasi Biaya Bahan Bakar</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="tbl" style="min-width:600px;">
+            <thead><tr>
+              <th>Kendaraan</th>
+              <th>Plat</th>
+              <th class="r">Konsumsi</th>
+              <th class="r">L / 100 km</th>
+              <th class="r" style="color:var(--success);">Subsidi / 100 km</th>
+              <th class="r" style="color:var(--amber);">Non-Subsidi / 100 km</th>
+            </tr></thead>
+            <tbody id="bbm_sim_body"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:.75rem;font-size:.72rem;color:var(--muted);background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:.55rem .75rem;">
+          💡 Biaya di atas untuk <strong>1 arah per 100 km</strong>. Sistem uang jalan menghitung PP (pulang pergi), sehingga dikalikan 2 × total km rute.
+        </div>
+      </div>
+
+      <!-- Reset button -->
+      <div class="bbm-actionbar" style="margin-top:0;">
+        <button class="btn btn-ghost btn-sm" onclick="resetBBMPrices()">↺ Reset ke Default</button>
+      </div>
+
+      <!-- Riwayat BBM -->
+      <div style="margin-top:1.3rem;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--radius);padding:1rem 1.1rem;">
+        <div style="font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem;">
+          <span>🕒</span> Riwayat Perubahan BBM
+        </div>
+        <div id="bbm_history" style="font-size:.82rem;color:var(--text2);line-height:1.8;"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PAGE: BBM COMPOSITION -->
+  <div class="page" id="page-bbmcomp">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">⚗️ Master Komposisi BBM</div>
+        <div class="sec-sub">Standard komposisi Biosolar dan Dexlite berdasarkan tujuan dan jenis armada. Data ini akan menjadi rule untuk auto-set slider BBM di Dashboard.</div>
+      </div>
+      <div class="fbar">
+        <input type="text" id="srch-bbmcomp" placeholder="🔍 Cari tujuan..." oninput="renderBBMCompositionPage()">
+        <button class="btn btn-ghost" onclick="resetBBMCompositionRules()">↺ Reset Default</button>
+        <button class="btn btn-amber" onclick="saveBBMCompositionRules()">💾 Simpan Komposisi</button>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span>ℹ️</span>
+      <span>Jika user memilih tujuan dan jenis armada di Dashboard, slider BBM dapat otomatis mengikuti rule ini. User tetap bisa manual override slider jika kondisi aktual berbeda.</span>
+    </div>
+
+    <div class="twrap bbm-comp-wrap">
+      <table class="tbl bbm-comp-table">
+        <thead>
+          <tr>
+            <th rowspan="2" style="min-width:160px;">Tujuan</th>
+            <th colspan="2">Tronton</th>
+            <th colspan="2">Trinton</th>
+            <th colspan="2">Trailer / Lowbed<br>Pulang Kosong</th>
+            <th colspan="2">Trailer / Lowbed<br>Pulang Isi</th>
+            <th rowspan="2" style="min-width:110px;">Status</th>
+          </tr>
+          <tr>
+            <th>Biosolar</th><th>Dexlite</th>
+            <th>Biosolar</th><th>Dexlite</th>
+            <th>Biosolar</th><th>Dexlite</th>
+            <th>Biosolar</th><th>Dexlite</th>
+          </tr>
+        </thead>
+        <tbody id="bbmcomp-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAGE: FIXED COST -->
+  <div class="page" id="page-fixedcost">
+
+    <div style="max-width:860px;margin:0 auto;padding-top:.4rem;">
+      <!-- top action bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.6rem;gap:.75rem;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:.2px;">Fixed Cost Kendaraan</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px;">Rp / hari per unit · tersinkronisasi ke Uang Jalan</div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <div id="fc_pending_bar" class="hidden" style="display:flex;gap:.5rem;align-items:center;">
+            <span id="fc_save_status" style="font-size:.78rem;color:var(--warning);font-weight:600;">● Ada perubahan belum disimpan</span>
+            <button class="btn btn-amber" onclick="saveFixedCosts()">💾 Simpan</button>
+            <button class="btn btn-ghost" onclick="cancelFCChanges()">✕ Batal</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="resetFixedCosts()">↺ Reset ke Default</button>
+        </div>
+      </div>
+
+      <!-- VEHICLE LIST -->
+      <div style="background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:1rem;">
+
+        <!-- LOW BED header -->
+        <div style="padding:.55rem 1.1rem;background:var(--bg);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:.5rem;">
+          <span style="font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);">Low Bed</span>
+        </div>
+
+        <!-- Row: Hino FM350 TH -->
+        <div class="fc-row">
+          <div class="fc-dot" style="background:#ea580c;"></div>
+          <div class="fc-info">
+            <span class="fc-name">Hino FM350 TH</span>
+            <span class="fc-plate">B 9068 SEI</span>
+          </div>
+          <div class="fc-input-wrap">
+            <span class="fc-rp">Rp</span>
+            <input type="number" id="fc_hino_lb" class="fc-input" value="988967" min="0" step="1000" oninput="onFCChange()">
+            <span class="fc-unit">/hari</span>
+          </div>
+        </div>
+
+        <!-- Row: Iveco HD9 66.54T -->
+        <div class="fc-row">
+          <div class="fc-dot" style="background:#2563eb;"></div>
+          <div class="fc-info">
+            <span class="fc-name">Iveco HD9 66.54T</span>
+            <span class="fc-plate">B 9300 SEI</span>
+          </div>
+          <div class="fc-input-wrap">
+            <span class="fc-rp">Rp</span>
+            <input type="number" id="fc_iveco_hd54" class="fc-input" value="988967" min="0" step="1000" oninput="onFCChange()">
+            <span class="fc-unit">/hari</span>
+          </div>
+        </div>
+
+        <!-- Row: Iveco HD9 66.56T -->
+        <div class="fc-row">
+          <div class="fc-dot" style="background:#2563eb;"></div>
+          <div class="fc-info">
+            <span class="fc-name">Iveco HD9 66.56T</span>
+            <span class="fc-plate">B 9809 SEI</span>
+          </div>
+          <div class="fc-input-wrap">
+            <span class="fc-rp">Rp</span>
+            <input type="number" id="fc_iveco_hd56" class="fc-input" value="988967" min="0" step="1000" oninput="onFCChange()">
+            <span class="fc-unit">/hari</span>
+          </div>
+        </div>
+
+        <!-- Row: Iveco T-WAY -->
+        <div class="fc-row">
+          <div class="fc-dot" style="background:#2563eb;"></div>
+          <div class="fc-info">
+            <span class="fc-name">Iveco T-WAY 6x4</span>
+            <span class="fc-plate">B 9786 SEI</span>
+          </div>
+          <div class="fc-input-wrap">
+            <span class="fc-rp">Rp</span>
+            <input type="number" id="fc_iveco_tway" class="fc-input" value="988967" min="0" step="1000" oninput="onFCChange()">
+            <span class="fc-unit">/hari</span>
+          </div>
+        </div>
+
+        <!-- Row: Scania RM580LA -->
+        <div class="fc-row" style="border-bottom:none;">
+          <div class="fc-dot" style="background:#dc2626;"></div>
+          <div class="fc-info">
+            <span class="fc-name">Scania RM580LA 6x4</span>
+            <span class="fc-plate">B 9995 SYN</span>
+          </div>
+          <div class="fc-input-wrap">
+            <span class="fc-rp">Rp</span>
+            <input type="number" id="fc_scania_lb" class="fc-input" value="988967" min="0" step="1000" oninput="onFCChange()">
+            <span class="fc-unit">/hari</span>
+          </div>
+        </div>
+
+        <!-- SELF LOADER header -->
+        <div style="padding:.55rem 1.1rem;background:var(--bg);border-top:1.5px solid var(--border2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:.5rem;">
+          <span style="font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);">Self Loader</span>
+        </div>
+
+        <!-- Row: Hino 500 FM280JW — shared for 4 units -->
+        <div class="fc-row" style="border-bottom:none;">
+          <div class="fc-dot" style="background:#7c3aed;"></div>
+          <div class="fc-info">
+            <span class="fc-name">Hino 500 FM280JW 6x4</span>
+            <span class="fc-plate">B 9170 · 9171 · 9172 · 9173 SIU &nbsp;·&nbsp; 4 unit</span>
+          </div>
+          <div class="fc-input-wrap">
+            <span class="fc-rp">Rp</span>
+            <input type="number" id="fc_sl" class="fc-input" value="982145" min="0" step="1000" oninput="onFCChange()">
+            <span class="fc-unit">/hari</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SYNC INFO BAR -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
+        <div style="background:var(--amber-pale);border:1.5px solid var(--amber-light);border-radius:var(--radius);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:.75rem;font-weight:600;color:var(--amber);">Rata-rata Low Bed / hari</span>
+          <span id="fc_avg_lb" style="font-family:'Instrument Mono',monospace;font-weight:800;font-size:.95rem;color:var(--amber);">Rp 988.967</span>
+        </div>
+        <div style="background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:var(--radius);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:.75rem;font-weight:600;color:#7c3aed;">Self Loader / hari</span>
+          <span id="fc_avg_sl" style="font-family:'Instrument Mono',monospace;font-weight:800;font-size:.95rem;color:#7c3aed;">Rp 982.145</span>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="fc_history_container" style="font-size:.82rem;color:var(--muted);min-height:1.5rem;"></div>
+
+    </div>
+  </div>
+
+  <style>
+  .fc-row {
+    display:flex;align-items:center;gap:.9rem;
+    padding:.7rem 1.1rem;
+    border-bottom:1px solid var(--border2);
+    transition:background .15s;
+  }
+  .fc-row:hover { background:var(--amber-pale); }
+  .fc-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+  .fc-info { flex:1;display:flex;align-items:baseline;gap:.65rem;min-width:0; }
+  .fc-name { font-weight:700;font-size:.88rem;color:var(--text);white-space:nowrap; }
+  .fc-plate { font-size:.72rem;color:var(--muted);font-family:'Instrument Mono',monospace;white-space:nowrap; }
+  .fc-input-wrap { display:flex;align-items:center;gap:.3rem;flex-shrink:0; }
+  .fc-rp { font-size:.78rem;font-weight:600;color:var(--muted); }
+  .fc-unit { font-size:.72rem;color:var(--muted);font-weight:500; }
+  .fc-input {
+    width:130px;padding:.38rem .6rem;
+    border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    font-family:'Instrument Mono',monospace;font-size:.95rem;font-weight:700;
+    text-align:right;background:var(--bg);color:var(--text);
+    outline:none;transition:border-color .18s,box-shadow .18s;
+  }
+  .fc-input:focus { border-color:var(--amber);box-shadow:0 0 0 3px rgba(10,124,62,.1); }
+  .fc-input.fc-modified { border-color:var(--warning);background:#fef9c3; }
+  </style>
+
+  <!-- PAGE: DRIVER & HELPER -->
+  <div class="page" id="page-crew">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">👤 Tarif Driver &amp; Helper</div>
+        <div class="sec-sub">Tarif harian awak kendaraan, termasuk makan &amp; inap. Perubahan langsung tersinkronisasi ke Uang Jalan.</div>
+      </div>
+    </div>
+
+    <div style="max-width:960px;margin:0 auto;">
+      <!-- ── GRID: Driver & Helper ── -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;align-items:start;">
+
+        <div style="grid-column:1/3;">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem;">
+            <span>👤</span> Tarif Harian per Awak
+          </div>
+        </div>
+
+        <!-- Driver -->
+        <div style="background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:2px solid rgba(22,163,74,.25);border-radius:var(--radius);padding:1.1rem 1rem;">
+          <div style="display:flex;align-items:center;gap:.45rem;margin-bottom:.85rem;">
+            <div style="width:30px;height:30px;background:#16a34a;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 2px 6px rgba(22,163,74,.3);flex-shrink:0;">🚚</div>
+            <div>
+              <div style="font-weight:800;font-size:.82rem;color:#15803d;line-height:1.2;">Driver</div>
+              <div style="font-size:.62rem;color:#166534;font-weight:500;">Sopir kendaraan</div>
+            </div>
+          </div>
+          <label class="flabel" style="color:#166534;font-size:.76rem;">Tarif / Hari</label>
+          <div class="prefix-input">
+            <input type="number" id="crew_driver" value="150000" min="0" step="5000"
+              style="border-color:rgba(22,163,74,.4);background:#fff;"
+              oninput="onCrewChange()">
+          </div>
+        </div>
+
+        <!-- Helper -->
+        <div style="background:linear-gradient(135deg,#fef9c3,#fefce8);border:2px solid rgba(133,77,14,.2);border-radius:var(--radius);padding:1.1rem 1rem;">
+          <div style="display:flex;align-items:center;gap:.45rem;margin-bottom:.85rem;">
+            <div style="width:30px;height:30px;background:#854d0e;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 2px 6px rgba(133,77,14,.3);flex-shrink:0;">🧑‍🔧</div>
+            <div>
+              <div style="font-weight:800;font-size:.82rem;color:#854d0e;line-height:1.2;">Helper</div>
+              <div style="font-size:.62rem;color:#713f12;font-weight:500;">Kenek kendaraan</div>
+            </div>
+          </div>
+          <label class="flabel" style="color:#713f12;font-size:.76rem;">Tarif / Hari</label>
+          <div class="prefix-input">
+            <input type="number" id="crew_helper" value="75000" min="0" step="5000"
+              style="border-color:rgba(133,77,14,.25);background:#fff;"
+              oninput="onCrewChange()">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ACTION BAR -->
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:.5rem;margin-bottom:1rem;">
+        <div id="crew_pending_bar" class="hidden" style="display:flex;align-items:center;gap:.5rem;">
+          <span id="crew_save_status" style="font-size:.78rem;color:var(--warning);font-weight:600;">● Ada perubahan belum disimpan</span>
+          <button class="btn btn-amber" onclick="saveCrewRates()">💾 Simpan</button>
+          <button class="btn btn-ghost" onclick="cancelCrewChanges()">✕ Batal</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="resetCrewRates()">↺ Reset ke Default</button>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="crew_history_container" style="font-size:.82rem;color:var(--muted);min-height:1.5rem;"></div>
+
+    </div>
+  </div>
+
+  <!-- PAGE: JARAK & LEADTIME -->
+  <div class="page" id="page-jarak">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">🗺 Master Jarak &amp; Leadtime</div>
+        <div class="sec-sub">Jarak dan hari perjalanan per jalur. Perubahan tersinkronisasi ke Sistem Uang Jalan.</div>
+      </div>
+      <div class="fbar">
+        <select id="jarak-filter-origin" onchange="renderJarakTable()"
+          style="padding:.4rem .7rem;font-size:.82rem;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Sora',sans-serif;outline:none;color:var(--text);cursor:pointer;">
+          <option value="">Semua Origin</option>
+        </select>
+        <input type="text" id="srch-jarak" placeholder="🔍 Cari tujuan..." oninput="renderJarakTable()" style="width:180px;">
+        <button class="btn btn-amber" onclick="saveJarakChanges()">💾 Simpan Jarak &amp; LT</button>
+      </div>
+    </div>
+
+
+
+    <div class="twrap" style="overflow-x:auto;">
+      <table class="tbl" style="min-width:900px;">
+        <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th class="r" style="min-width:110px;">KM 1 Arah</th>
+            <!-- LT per tipe kendaraan — side by side -->
+            <th class="r" colspan="2" style="text-align:center;background:var(--amber-pale);border-left:2px solid var(--amber-light);border-right:2px solid var(--amber-light);">
+              LT ke Destination (hari)
+            </th>
+            <th class="r" style="min-width:100px;">KM Total PP</th>
+            <!-- LT Total per tipe — side by side -->
+            <th class="r" colspan="2" style="text-align:center;background:#f5f3ff;border-left:2px solid #ddd6fe;border-right:2px solid #ddd6fe;">
+              LT Total PP (hari)
+            </th>
+          </tr>
+          <tr style="background:var(--bg);">
+            <th></th><th></th><th></th>
+            <th></th>
+            <th class="r" style="background:var(--amber-pale);color:var(--amber);border-left:2px solid var(--amber-light);font-size:.65rem;">🚚 Selfloader</th>
+            <th class="r" style="background:var(--amber-pale);color:#854d0e;border-right:2px solid var(--amber-light);font-size:.65rem;">🏗 Lowbed</th>
+            <th></th>
+            <th class="r" style="background:#f5f3ff;color:#7c3aed;border-left:2px solid #ddd6fe;font-size:.65rem;">🚚 Selfloader</th>
+            <th class="r" style="background:#f5f3ff;color:#854d0e;border-right:2px solid #ddd6fe;font-size:.65rem;">🏗 Lowbed</th>
+          </tr>
+        </thead>
+        <tbody id="jarak-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <style>
+  .jarak-input{
+    width:72px;padding:.3rem .45rem;
+    border:1.5px solid var(--border);border-radius:6px;
+    font-family:'Instrument Mono',monospace;font-size:.88rem;font-weight:700;
+    text-align:right;background:#fff;color:var(--text);
+    outline:none;transition:border-color .18s,box-shadow .18s;
+  }
+  .jarak-input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(10,124,62,.12);}
+  .jarak-input.jmodified{border-color:var(--warning);background:#fef9c3;}
+  .jarak-input.jsaved{border-color:var(--success);background:#f0fdf4;}
+  .lt-cell-sl{background:rgba(124,58,237,.04);}
+  .lt-cell-lb{background:rgba(133,77,14,.04);}
+  .lt-total-sl{font-family:'Instrument Mono',monospace;font-weight:700;color:#7c3aed;font-size:.88rem;}
+  .lt-total-lb{font-family:'Instrument Mono',monospace;font-weight:700;color:#854d0e;font-size:.88rem;}
+  </style>
+
+  <!-- PAGE: HISTORY -->
+
+  <div class="page" id="page-history">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-ttl">📋 Riwayat Perubahan Tarif</div>
+        <div class="sec-sub">Semua perubahan tarif yang sudah disimpan.</div>
+      </div>
+      <div class="fbar">
+        <button class="btn btn-ghost" onclick="clearHistory()">🗑 Hapus Riwayat</button>
+      </div>
+    </div>
+    <div class="twrap" style="padding:1rem 1.4rem;" id="history-container">
+      <div class="empty"><div class="ei">📋</div><p>Belum ada riwayat perubahan.</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar hidden" id="saveBar">
+  <span class="save-bar-msg" id="saveMsg">Ada perubahan yang belum disimpan</span>
+  <button class="btn btn-amber btn-sm" onclick="saveAllChanges()">💾 Simpan</button>
+  <button class="btn btn-ghost btn-sm" onclick="discardChanges()">✕ Batal</button>
+</div>
+
+<!-- MODAL ADD TOL -->
+<div class="modal-bg" id="modalAddTol">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-title" id="modalAddTolTitle">➕ Tambah Ruas Tol Baru</div>
+      <button class="m-close" onclick="closeModal('modalAddTol')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="fg">
+        <label class="flabel">Nama Ruas Tol <small>— contoh: Tol Jakarta-Cikampek</small></label>
+        <input type="text" id="m_tol_name" placeholder="Nama ruas tol...">
+      </div>
+      <div class="input-group">
+        <div class="fg">
+          <label class="flabel">Tarif Lowbed (Gol.V) <small>— 1 arah</small></label>
+          <div class="prefix-input"><input type="number" id="m_tol_lb" placeholder="0" min="0" step="500"></div>
+        </div>
+        <div class="fg">
+          <label class="flabel">Tarif Selfloader (Gol.III) <small>— 1 arah</small></label>
+          <div class="prefix-input"><input type="number" id="m_tol_sl" placeholder="0" min="0" step="500"></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="flabel">Digunakan di Rute Tujuan <small>— pisahkan dengan koma</small></label>
+        <input type="text" id="m_tol_routes" placeholder="BANDUNG, TASIKMALAYA, CIREBON, ...">
+        <div style="font-size:.72rem;color:var(--muted);margin-top:.3rem;">
+          Kosongkan jika ingin memilih nanti. Contoh: <code>BANDUNG, CIREBON, SEMARANG</code>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalAddTol')">Batal</button>
+      <button class="btn btn-amber" onclick="saveTolFromModal()">💾 Simpan Tol</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADD CROSSING -->
+<div class="modal-bg" id="modalAddCross">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-title">⛴ Tambah Penyeberangan Baru</div>
+      <button class="m-close" onclick="closeModal('modalAddCross')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="fg">
+        <label class="flabel">Nama Penyeberangan <small>— contoh: Ketapang–Gilimanuk</small></label>
+        <input type="text" id="m_cross_name" placeholder="Nama penyeberangan...">
+      </div>
+      <div class="fg">
+        <label class="flabel">Rute (asal–tujuan) <small>— untuk tampilan</small></label>
+        <input type="text" id="m_cross_route" placeholder="Banyuwangi → Bali">
+      </div>
+      <div class="input-group">
+        <div class="fg">
+          <label class="flabel">Tarif Lowbed <small>— 1 arah</small></label>
+          <div class="prefix-input"><input type="number" id="m_cross_lb" placeholder="0" min="0" step="1000"></div>
+        </div>
+        <div class="fg">
+          <label class="flabel">Tarif Selfloader <small>— 1 arah</small></label>
+          <div class="prefix-input"><input type="number" id="m_cross_sl" placeholder="0" min="0" step="1000"></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="flabel">Digunakan di Tujuan <small>— pisahkan dengan koma</small></label>
+        <input type="text" id="m_cross_routes" placeholder="BALI, MATARAM, BATU HIJAU, ...">
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalAddCross')">Batal</button>
+      <button class="btn btn-amber" onclick="saveCrossFromModal()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL VEHICLE UNIT -->
+<div class="modal-bg" id="modalVehicle">
+  <div class="modal" style="max-width:560px;">
+    <div class="m-head">
+      <div class="m-title" id="modalVehicleTitle">🚚 Tambah Vehicle Unit</div>
+      <button class="m-close" onclick="closeModal('modalVehicle')">✕</button>
+    </div>
+    <div class="m-body">
+      <input type="hidden" id="m_vehicle_id">
+      <div class="fg">
+        <label class="flabel">Jenis Armada</label>
+        <select id="m_vehicle_type" class="finput">
+          <option value="Low Bed">Low Bed</option>
+          <option value="Self Loader">Self Loader</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="flabel">Nomor Polisi</label>
+        <input type="text" id="m_vehicle_plate" placeholder="Input nomor polisi..." oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="fg">
+        <label class="flabel">Merk Kendaraan</label>
+        <input type="text" id="m_vehicle_brand" placeholder="Input merk / model kendaraan...">
+      </div>
+      <div class="fg">
+        <label class="flabel">Remarks</label>
+        <textarea id="m_vehicle_remarks" placeholder="Catatan tambahan..." rows="3"></textarea>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalVehicle')">Batal</button>
+      <button class="btn btn-amber" onclick="saveVehicleFromModal()">💾 Simpan Vehicle</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRM -->
+<div class="modal-bg" id="modalConfirm">
+  <div class="modal" style="max-width:460px;">
+    <div class="m-head">
+      <div class="m-title" id="confirmTitle">Konfirmasi</div>
+      <button class="m-close" onclick="closeModal('modalConfirm')">✕</button>
+    </div>
+    <div class="m-body">
+      <div id="confirmMsg" style="font-size:.9rem;color:var(--text2);line-height:1.6;"></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalConfirm')">Batal</button>
+      <button class="btn btn-danger" id="confirmOkBtn">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATA MASTER — Tarif Tol & Penyeberangan
+// Sumber: BREAKDOWN data dari Sistem Uang Jalan v9
+// ══════════════════════════════════════════════════
+
+// Semua ruas tol unik dengan tarif Gol.V (Lowbed) dan Gol.III (Selfloader)
+let TOL_MASTER = [
+  {id:"tol_001", name:"Tol Dalam Kota Jakarta",  lb:22000,  sl:16500, routes:["TG PRIOK, MARUNDA CENTRE AREA","KUNINGAN, JAKSEL"]},
+  {id:"tol_002", name:"Tol Jakarta-Cikampek",     lb:54000,  sl:40500, routes:["BEKASI","CIBITUNG","CIKARANG","KERAWANG","BANDUNG","TASIKMALAYA","CILACAP","CIREBON","TEGAL","SEMARANG","PURWOKERTO","SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","GARUT","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","SENTOLO, GARUT","CIANJUR","BANJARNEGARA, WADUK MRICAN","PATIMBAN, SUBANG","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_003", name:"Tol Jakarta-Tangerang",    lb:11500,  sl:8500,  routes:["BSD","CILEGON","SERANG","BALARAJA"]},
+  {id:"tol_004", name:"Tol TB Simatupang",        lb:16000,  sl:12000, routes:["BSD"]},
+  {id:"tol_005", name:"Tol JORR",                 lb:31500,  sl:23500, routes:["BSD","BOGOR","SUKABUMI","CIBINONG"]},
+  {id:"tol_006", name:"Tol Jagorawi",             lb:29500,  sl:22000, routes:["BOGOR"]},
+  {id:"tol_007", name:"Tol Bocimi",               lb:42000,  sl:31500, routes:["SUKABUMI","CIANJUR"]},
+  {id:"tol_008", name:"Tol Cipali",               lb:273000, sl:217500,routes:["TASIKMALAYA","CILACAP","CIREBON","TEGAL","SEMARANG","PURWOKERTO","SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","BANJARNEGARA, WADUK MRICAN","PATIMBAN, SUBANG","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_009", name:"Tol Cipularang",           lb:104000, sl:78000, routes:["BANDUNG","GARUT","SENTOLO, GARUT","CIANJUR"]},
+  {id:"tol_010", name:"Tol Padaleunyi",           lb:22500,  sl:17000, routes:["BANDUNG","GARUT","SENTOLO, GARUT"]},
+  {id:"tol_011", name:"Tol Soroja",               lb:30000,  sl:22500, routes:["GARUT","SENTOLO, GARUT"]},
+  {id:"tol_012", name:"Tol Palimanan-Kanci",      lb:32000,  sl:19500, routes:["CILACAP","CIREBON","TEGAL","SEMARANG","PURWOKERTO","SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","BANJARNEGARA, WADUK MRICAN","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_013", name:"Tol Kanci-Pejagan",        lb:59500,  sl:44500, routes:["CILACAP","TEGAL","SEMARANG","PURWOKERTO","SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","BANJARNEGARA, WADUK MRICAN","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_014", name:"Tol Pejagan-Pemalang",     lb:132000, sl:90500, routes:["CILACAP","TEGAL","SEMARANG","PURWOKERTO","SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","BANJARNEGARA, WADUK MRICAN","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_015", name:"Tol Pemalang-Batang",      lb:95000,  sl:71000, routes:["SEMARANG","SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_016", name:"Tol Batang-Semarang",      lb:223000, sl:167500,routes:["SEMARANG","SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_017", name:"Tol Semarang-Solo",        lb:140500, sl:105500,routes:["SOLO","JOGJA","KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_018", name:"Tol Solo-Yogyakarta",      lb:85500,  sl:64000, routes:["JOGJA"]},
+  {id:"tol_019", name:"Tol Solo-Ngawi",           lb:250000, sl:187500,routes:["KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","BOJONEGORO","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_020", name:"Tol Ngawi-Kertosono",      lb:196000, sl:147000,routes:["KEDIRI","TUBAN","GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","PROBOLINGGO","PANGGUNG REJO, BLITAR"]},
+  {id:"tol_021", name:"Tol Kertosono-Mojokerto",  lb:110000, sl:82500, routes:["GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","PROBOLINGGO"]},
+  {id:"tol_022", name:"Tol Mojokerto-Surabaya",   lb:107500, sl:65500, routes:["GRESIK","LAMONGAN","SURABAYA","MALANG","BANYUWANGI","BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK","PROBOLINGGO"]},
+  {id:"tol_023", name:"Tol Surabaya-Gresik",      lb:14000,  sl:10500, routes:["GRESIK"]},
+  {id:"tol_024", name:"Tol Pandaan-Malang",       lb:71500,  sl:53500, routes:["MALANG"]},
+  {id:"tol_025", name:"Tol Gempol-Pasuruan",      lb:93000,  sl:70000, routes:["PROBOLINGGO"]},
+  {id:"tol_026", name:"Tol Tangerang-Merak",      lb:116500, sl:87500, routes:["CILEGON","SERANG"]},
+  {id:"tol_027", name:"Tol Cipali (sebagian, exit Kertajati)", lb:181500, sl:144500, routes:["TASIKMALAYA"]},
+];
+
+// Data penyeberangan
+let CROSSING_MASTER = [
+  {id:"cross_001", name:"Ketapang–Gilimanuk",    route:"Banyuwangi → Bali",          lb:1243000, sl:897600,  usedIn:["BALI","MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK"]},
+  {id:"cross_002", name:"Padangbai–Lembar",      route:"Bali → Lombok (NTB)",         lb:8808400, sl:6074300, usedIn:["MATARAM","BATU HIJAU","SUMBAWA","TPA IJOBAIT LOMBOK"]},
+  {id:"cross_003", name:"Kayangan–Pototano",     route:"Lombok → Sumbawa",            lb:2265000, sl:2153000, usedIn:["BATU HIJAU","SUMBAWA"]},
+];
+
+// Perubahan yang belum disimpan
+let pendingChanges = {};
+let bbmPending = {};
+let history = JSON.parse(localStorage.getItem("ckb_tarif_history")||"[]");
+
+// Vehicle Unit mock-up master data
+const DEFAULT_VEHICLE_UNITS = [
+  {id:"veh_001", jenisArmada:"Low Bed", nomorPolisi:"B 9068 SEI", merkKendaraan:"Hino FM350 TH", remarks:""},
+  {id:"veh_002", jenisArmada:"Low Bed", nomorPolisi:"B 9300 SEI", merkKendaraan:"Iveco HD9 66.54T", remarks:""},
+  {id:"veh_003", jenisArmada:"Low Bed", nomorPolisi:"B 9809 SEI", merkKendaraan:"Iveco HD9 66.56T", remarks:""},
+  {id:"veh_004", jenisArmada:"Low Bed", nomorPolisi:"B 9786 SEI", merkKendaraan:"Iveco T-WAY 6x4", remarks:""},
+  {id:"veh_005", jenisArmada:"Low Bed", nomorPolisi:"B 9995 SYN", merkKendaraan:"Scania RM580LA 6x4", remarks:""},
+  {id:"veh_006", jenisArmada:"Self Loader", nomorPolisi:"B 9170 SIU", merkKendaraan:"Hino 500 FM280JW 6x4", remarks:""},
+  {id:"veh_007", jenisArmada:"Self Loader", nomorPolisi:"B 9171 SIU", merkKendaraan:"Hino 500 FM280JW 6x4", remarks:""},
+  {id:"veh_008", jenisArmada:"Self Loader", nomorPolisi:"B 9172 SIU", merkKendaraan:"Hino 500 FM280JW 6x4", remarks:""},
+  {id:"veh_009", jenisArmada:"Self Loader", nomorPolisi:"B 9173 SIU", merkKendaraan:"Hino 500 FM280JW 6x4", remarks:""}
+];
+let VEHICLE_UNITS = JSON.parse(localStorage.getItem("ckb_vehicle_units") || JSON.stringify(DEFAULT_VEHICLE_UNITS));
+
+
+// Load saved data if exists
+function loadSavedData(){
+  const saved_tol = localStorage.getItem("ckb_tol_master");
+  const saved_cross = localStorage.getItem("ckb_cross_master");
+  if(saved_tol) TOL_MASTER = JSON.parse(saved_tol);
+  if(saved_cross) CROSSING_MASTER = JSON.parse(saved_cross);
+}
+
+// ── UTILS ──
+const fmt = n => "Rp\u00a0" + Math.round(n||0).toLocaleString("id-ID");
+const el = id => document.getElementById(id);
+const now = () => new Date().toLocaleString("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+
+// ── DATE ──
+function updateDate(){
+  el("hdate").textContent = new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
+
+// ── TAB ──
+function switchTab(tab){
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  el("tab-"+tab).classList.add("active");
+  el("page-"+tab).classList.add("active");
+  if(tab==="vehicle") renderVehicleTable();
+  if(tab==="tol") renderTolTable();
+  if(tab==="crossing") renderCrossingTable();
+  if(tab==="bbm") renderBBMPage();
+  if(tab==="bbmcomp") renderBBMCompositionPage();
+  if(tab==="fixedcost") renderFCPage();
+  if(tab==="crew") renderCrewPage();
+  if(tab==="history") renderHistory();
+  if(tab==="jarak") renderJarakTable();
+}
+
+// ── SAVE BAR ──
+function checkPending(){
+  const count = Object.keys(pendingChanges).length + Object.keys(jarakPending).length + Object.keys(bbmPending).length + (bbmCompPending ? 1 : 0);
+  const bar = el("saveBar");
+  if(count>0){
+    bar.classList.remove("hidden");
+    el("saveMsg").textContent = `${count} perubahan belum disimpan`;
+  } else {
+    bar.classList.add("hidden");
+  }
+  el("cnt-history").textContent = history.length;
+}
+
+
+// ── VEHICLE UNIT MASTER ──
+function saveVehicleUnits(){
+  localStorage.setItem("ckb_vehicle_units", JSON.stringify(VEHICLE_UNITS));
+  el("cnt-vehicle").textContent = VEHICLE_UNITS.length;
+}
+function renderVehicleTable(){
+  const tbody = el("vehicle-body");
+  if(!tbody) return;
+  const q = (el("srch-vehicle")?.value || "").toLowerCase();
+  const rows = VEHICLE_UNITS.filter(v =>
+    !q ||
+    (v.nomorPolisi||"").toLowerCase().includes(q) ||
+    (v.merkKendaraan||"").toLowerCase().includes(q) ||
+    (v.jenisArmada||"").toLowerCase().includes(q)
+  );
+  el("cnt-vehicle").textContent = VEHICLE_UNITS.length;
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="ei">🚚</div><p>Tidak ada vehicle unit yang ditemukan.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map((v,i)=>`
+    <tr>
+      <td>${String(i+1).padStart(2,"0")}</td>
+      <td><span class="vehicle-type-badge ${v.jenisArmada==='Self Loader'?'sl':''}">${v.jenisArmada}</span></td>
+      <td><span class="vehicle-plate">${v.nomorPolisi||"-"}</span></td>
+      <td><strong>${v.merkKendaraan||"-"}</strong></td>
+      <td><div class="vehicle-remarks">${v.remarks||"-"}</div></td>
+      <td>
+        <button class="aBtn" title="Edit" onclick="openVehicleModal('${v.id}')">✎</button>
+        <button class="aBtn" title="Hapus" onclick="confirmDeleteVehicle('${v.id}')">🗑</button>
+      </td>
+    </tr>
+  `).join("");
+}
+function openVehicleModal(id=null){
+  const isEdit = !!id;
+  const v = isEdit ? VEHICLE_UNITS.find(x=>x.id===id) : null;
+  el("modalVehicleTitle").textContent = isEdit ? "✎ Edit Vehicle Unit" : "🚚 Tambah Vehicle Unit";
+  el("m_vehicle_id").value = v?.id || "";
+  el("m_vehicle_type").value = v?.jenisArmada || "Low Bed";
+  el("m_vehicle_plate").value = v?.nomorPolisi || "";
+  el("m_vehicle_brand").value = v?.merkKendaraan || "";
+  el("m_vehicle_remarks").value = v?.remarks || "";
+  el("modalVehicle").classList.add("open");
+  setTimeout(()=>el("m_vehicle_plate").focus(),100);
+}
+function saveVehicleFromModal(){
+  const id = el("m_vehicle_id").value;
+  const jenisArmada = el("m_vehicle_type").value;
+  const nomorPolisi = (el("m_vehicle_plate").value || "").trim().toUpperCase();
+  const merkKendaraan = (el("m_vehicle_brand").value || "").trim();
+  const remarks = (el("m_vehicle_remarks").value || "").trim();
+  if(!nomorPolisi){ showToast("Nomor Polisi wajib diisi!", "warning"); el("m_vehicle_plate").focus(); return; }
+  if(!merkKendaraan){ showToast("Merk Kendaraan wajib diisi!", "warning"); el("m_vehicle_brand").focus(); return; }
+  const duplicate = VEHICLE_UNITS.find(v => v.nomorPolisi === nomorPolisi && v.id !== id);
+  if(duplicate){ showToast("Nomor Polisi sudah terdaftar!", "warning"); return; }
+  if(id){
+    const v = VEHICLE_UNITS.find(x=>x.id===id);
+    if(v){ Object.assign(v,{jenisArmada,nomorPolisi,merkKendaraan,remarks}); }
+    addHistory(`🚚 Vehicle Unit diubah: <b>${nomorPolisi}</b>`);
+  }else{
+    VEHICLE_UNITS.push({id:"veh_"+Date.now(), jenisArmada, nomorPolisi, merkKendaraan, remarks});
+    addHistory(`🚚 Vehicle Unit ditambahkan: <b>${nomorPolisi}</b>`);
+  }
+  saveVehicleUnits();
+  renderVehicleTable();
+  closeModal("modalVehicle");
+  checkPending();
+  showToast("✅ Vehicle Unit berhasil disimpan!", "success");
+}
+function confirmDeleteVehicle(id){
+  const v = VEHICLE_UNITS.find(x=>x.id===id);
+  if(!v) return;
+  el("confirmTitle").textContent = "Hapus Vehicle Unit";
+  el("confirmMsg").innerHTML = `Hapus vehicle unit <b>${v.nomorPolisi}</b> dari master data?`;
+  el("confirmOkBtn").onclick = ()=>{
+    VEHICLE_UNITS = VEHICLE_UNITS.filter(x=>x.id!==id);
+    saveVehicleUnits();
+    renderVehicleTable();
+    addHistory(`🚚 Vehicle Unit dihapus: <b>${v.nomorPolisi}</b>`);
+    closeModal("modalConfirm");
+    checkPending();
+    showToast("Vehicle Unit berhasil dihapus.", "info");
+  };
+  el("modalConfirm").classList.add("open");
+}
+
+// ── RENDER TOL TABLE ──
+function renderTolTable(){
+  const q = (el("srch-tol")?.value||"").toLowerCase();
+  const filtered = TOL_MASTER.filter(t=>t.name.toLowerCase().includes(q));
+
+  const totalTol = TOL_MASTER.length;
+  el("cnt-tol").textContent = totalTol;
+
+  // Group by route commonality — tampilkan per tol satu per satu dalam tabel
+  const container = el("tol-container");
+  if(!filtered.length){
+    container.innerHTML = `<div class="twrap"><div class="empty"><div class="ei">🛣</div><p>Tidak ada ruas tol yang ditemukan.</p></div></div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="twrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>#</th>
+          <th>Nama Ruas Tol</th>
+          <th class="r">Tarif Lowbed / Gol.V <small style="font-weight:400;text-transform:none;">(1 arah)</small></th>
+          <th class="r">PP Lowbed</th>
+          <th class="r">Tarif Selfloader / Gol.III <small style="font-weight:400;text-transform:none;">(1 arah)</small></th>
+          <th class="r">PP Selfloader</th>
+          <th>Dipakai di Rute</th>
+          <th>Aksi</th>
+        </tr></thead>
+        <tbody id="tol-tbody"></tbody>
+      </table>
+    </div>
+  `;
+
+  const tbody = el("tol-tbody");
+  filtered.forEach((tol,i)=>{
+    const isChanged = pendingChanges[tol.id];
+    const tr = document.createElement("tr");
+    if(isChanged) tr.className = "changed-row";
+    tr.innerHTML = `
+      <td class="mono" style="color:var(--muted);font-size:.78rem;">${String(i+1).padStart(2,"0")}</td>
+      <td><strong style="font-size:.9rem;">${tol.name}</strong></td>
+      <td class="r">
+        <div class="editable-cell">
+          <input class="price-input ${isChanged?'modified':''}" 
+            type="number" value="${tol.lb}" min="0" step="500"
+            id="lb_${tol.id}"
+            onchange="onTolChange('${tol.id}','lb',this.value)"
+            onfocus="this.select()">
+        </div>
+      </td>
+      <td class="r" style="color:var(--amber);font-weight:700;">${fmt(tol.lb*2)}</td>
+      <td class="r">
+        <div class="editable-cell">
+          <input class="price-input ${isChanged?'modified':''}" 
+            type="number" value="${tol.sl}" min="0" step="500"
+            id="sl_${tol.id}"
+            onchange="onTolChange('${tol.id}','sl',this.value)"
+            onfocus="this.select()">
+        </div>
+      </td>
+      <td class="r" style="color:var(--teal);font-weight:700;">${fmt(tol.sl*2)}</td>
+      <td>
+        <div style="display:flex;flex-wrap:wrap;gap:.25rem;max-width:260px;">
+          ${tol.routes.slice(0,4).map(r=>`<span class="badge badge-gray" style="font-size:.6rem;">${r}</span>`).join("")}
+          ${tol.routes.length>4?`<span class="badge badge-amber" style="font-size:.6rem;">+${tol.routes.length-4} lagi</span>`:""}
+        </div>
+      </td>
+      <td>
+        <div class="act-cell">
+          <button class="aBtn ab-reset" title="Reset ke nilai asal" onclick="resetTol('${tol.id}')">↺</button>
+          <button class="aBtn" style="background:rgba(220,38,38,.08);color:var(--danger);" title="Hapus ruas tol" onclick="confirmDeleteTol('${tol.id}')">🗑</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function onTolChange(id, field, val){
+  const num = parseInt(val)||0;
+  const tol = TOL_MASTER.find(t=>t.id===id);
+  if(!tol) return;
+  const orig_lb = tol._orig_lb ?? tol.lb;
+  const orig_sl = tol._orig_sl ?? tol.sl;
+  if(!tol._orig_lb) tol._orig_lb = tol.lb;
+  if(!tol._orig_sl) tol._orig_sl = tol.sl;
+  tol[field] = num;
+
+  // Update PP display instantly
+  const row = el("lb_"+id)?.closest("tr");
+  if(row){
+    const ppLB = row.querySelectorAll("td")[3];
+    const ppSL = row.querySelectorAll("td")[5];
+    if(ppLB) ppLB.textContent = fmt(tol.lb*2);
+    if(ppSL) ppSL.textContent = fmt(tol.sl*2);
+  }
+
+  const changed = tol.lb !== orig_lb || tol.sl !== orig_sl;
+  if(changed){
+    pendingChanges[id] = true;
+    const inp_lb = el("lb_"+id);
+    const inp_sl = el("sl_"+id);
+    if(inp_lb) inp_lb.classList.add("modified");
+    if(inp_sl) inp_sl.classList.add("modified");
+    if(row) row.classList.add("changed-row");
+  } else {
+    delete pendingChanges[id];
+    if(row) row.classList.remove("changed-row");
+  }
+  checkPending();
+}
+
+function resetTol(id){
+  const tol = TOL_MASTER.find(t=>t.id===id);
+  if(!tol||!tol._orig_lb) return;
+  tol.lb = tol._orig_lb;
+  tol.sl = tol._orig_sl;
+  delete pendingChanges[id];
+  renderTolTable();
+  checkPending();
+}
+
+function confirmDeleteTol(id){
+  const tol = TOL_MASTER.find(t=>t.id===id);
+  if(!tol) return;
+  el("confirmTitle").textContent = "Hapus Ruas Tol?";
+  el("confirmMsg").innerHTML = `Anda yakin ingin menghapus <strong>${tol.name}</strong>?<br><br>
+    <span style="color:var(--warning);">⚠️ Ini akan mempengaruhi perhitungan breakdown rute yang menggunakan ruas ini.</span>`;
+  el("confirmOkBtn").onclick = ()=>{ deleteTol(id); closeModal("modalConfirm"); };
+  el("modalConfirm").classList.add("open");
+}
+
+function deleteTol(id){
+  const tol = TOL_MASTER.find(t=>t.id===id);
+  if(!tol) return;
+  addHistory(`🗑 Hapus tol "${tol.name}" (LB: ${fmt(tol.lb)}, SL: ${fmt(tol.sl)})`);
+  TOL_MASTER = TOL_MASTER.filter(t=>t.id!==id);
+  delete pendingChanges[id];
+  saveToStorage();
+  renderTolTable();
+  checkPending();
+}
+
+// ── RENDER CROSSING TABLE ──
+function renderCrossingTable(){
+  el("cnt-crossing").textContent = CROSSING_MASTER.length;
+
+  const tbody = el("crossing-body");
+  tbody.innerHTML = "";
+  CROSSING_MASTER.forEach((c,i)=>{
+    const isChanged = pendingChanges[c.id];
+    const tr = document.createElement("tr");
+    if(isChanged) tr.className="changed-row";
+    tr.innerHTML = `
+      <td class="mono" style="color:var(--muted);font-size:.78rem;">${String(i+1).padStart(2,"0")}</td>
+      <td><strong>${c.name}</strong></td>
+      <td style="color:var(--muted);font-size:.82rem;">⛴ ${c.route}</td>
+      <td class="r">
+        <div class="editable-cell">
+          <input class="price-input ${isChanged?'modified':''}" type="number" value="${c.lb}" min="0" step="1000"
+            id="clb_${c.id}" onchange="onCrossChange('${c.id}','lb',this.value)" onfocus="this.select()">
+        </div>
+      </td>
+      <td class="r">
+        <div class="editable-cell">
+          <input class="price-input ${isChanged?'modified':''}" type="number" value="${c.sl}" min="0" step="1000"
+            id="csl_${c.id}" onchange="onCrossChange('${c.id}','sl',this.value)" onfocus="this.select()">
+        </div>
+      </td>
+      <td class="r" style="color:var(--amber);font-weight:700;">${fmt(c.lb*2)}</td>
+      <td class="r" style="color:var(--teal);font-weight:700;">${fmt(c.sl*2)}</td>
+      <td>
+        <div style="display:flex;flex-wrap:wrap;gap:.25rem;max-width:200px;">
+          ${c.usedIn.map(r=>`<span class="badge badge-teal" style="font-size:.6rem;">${r}</span>`).join("")}
+        </div>
+      </td>
+      <td>
+        <div class="act-cell">
+          <button class="aBtn ab-reset" title="Reset" onclick="resetCross('${c.id}')">↺</button>
+          <button class="aBtn" style="background:rgba(220,38,38,.08);color:var(--danger);" title="Hapus" onclick="confirmDeleteCross('${c.id}')">🗑</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function onCrossChange(id, field, val){
+  const num = parseInt(val)||0;
+  const c = CROSSING_MASTER.find(x=>x.id===id);
+  if(!c) return;
+  if(!c._orig_lb) c._orig_lb = c.lb;
+  if(!c._orig_sl) c._orig_sl = c.sl;
+  c[field] = num;
+
+  // Update PP cells
+  const row = el("clb_"+id)?.closest("tr");
+  if(row){
+    const cells = row.querySelectorAll("td");
+    cells[5].textContent = fmt(c.lb*2);
+    cells[6].textContent = fmt(c.sl*2);
+  }
+
+  const changed = c.lb !== c._orig_lb || c.sl !== c._orig_sl;
+  if(changed){
+    pendingChanges[id] = true;
+    if(row) row.classList.add("changed-row");
+    el("clb_"+id)?.classList.add("modified");
+    el("csl_"+id)?.classList.add("modified");
+  } else {
+    delete pendingChanges[id];
+    if(row) row.classList.remove("changed-row");
+  }
+  checkPending();
+}
+
+function resetCross(id){
+  const c = CROSSING_MASTER.find(x=>x.id===id);
+  if(!c||!c._orig_lb) return;
+  c.lb = c._orig_lb; c.sl = c._orig_sl;
+  delete pendingChanges[id];
+  renderCrossingTable();
+  checkPending();
+}
+
+function confirmDeleteCross(id){
+  const c = CROSSING_MASTER.find(x=>x.id===id);
+  if(!c) return;
+  el("confirmTitle").textContent = "Hapus Penyeberangan?";
+  el("confirmMsg").innerHTML = `Anda yakin ingin menghapus <strong>${c.name}</strong>?<br><br>
+    <span style="color:var(--warning);">⚠️ Ini akan mempengaruhi rute: ${c.usedIn.join(", ")}.</span>`;
+  el("confirmOkBtn").onclick = ()=>{ deleteCross(id); closeModal("modalConfirm"); };
+  el("modalConfirm").classList.add("open");
+}
+
+function deleteCross(id){
+  const c = CROSSING_MASTER.find(x=>x.id===id);
+  if(!c) return;
+  addHistory(`🗑 Hapus penyeberangan "${c.name}" (LB: ${fmt(c.lb)}, SL: ${fmt(c.sl)})`);
+  CROSSING_MASTER = CROSSING_MASTER.filter(x=>x.id!==id);
+  delete pendingChanges[id];
+  saveToStorage();
+  renderCrossingTable();
+  checkPending();
+}
+
+// ── SAVE ALL ──
+function saveAllChanges(){
+  const hasTolCross = Object.keys(pendingChanges).length > 0;
+  const hasJarak    = Object.keys(jarakPending).length > 0;
+  const hasBbm      = Object.keys(bbmPending).length > 0;
+
+  if(!hasTolCross && !hasJarak && !hasBbm){
+    showToast("Tidak ada perubahan untuk disimpan.", "info");
+    return;
+  }
+
+  if(hasTolCross){
+    // Build history entry untuk tol/crossing
+    const changed = Object.keys(pendingChanges);
+    const entries = [];
+    changed.forEach(id=>{
+      const tol = TOL_MASTER.find(t=>t.id===id);
+      const cross = CROSSING_MASTER.find(c=>c.id===id);
+      if(tol){
+        const prev_lb = tol._orig_lb??tol.lb, prev_sl = tol._orig_sl??tol.sl;
+        entries.push(`🛣 <strong>${tol.name}</strong>: LB ${fmt(prev_lb)} → ${fmt(tol.lb)}, SL ${fmt(prev_sl)} → ${fmt(tol.sl)}`);
+        delete tol._orig_lb; delete tol._orig_sl;
+      }
+      if(cross){
+        const prev_lb = cross._orig_lb??cross.lb, prev_sl = cross._orig_sl??cross.sl;
+        entries.push(`⛴ <strong>${cross.name}</strong>: LB ${fmt(prev_lb)} → ${fmt(cross.lb)}, SL ${fmt(prev_sl)} → ${fmt(cross.sl)}`);
+        delete cross._orig_lb; delete cross._orig_sl;
+      }
+    });
+    if(entries.length) addHistory(entries.join("<br>"));
+    pendingChanges = {};
+    saveToStorage();
+    renderTolTable();
+    renderCrossingTable();
+  }
+
+  if(hasJarak) saveJarakChanges(true);
+  if(hasBbm) saveBBMPrices(true);
+
+  checkPending();
+  showToast("✅ Semua perubahan berhasil disimpan!", "success");
+}
+
+function discardChanges(){
+  // Reset all pending tol/crossing
+  Object.keys(pendingChanges).forEach(id=>{
+    const tol = TOL_MASTER.find(t=>t.id===id);
+    if(tol && tol._orig_lb){ tol.lb=tol._orig_lb; tol.sl=tol._orig_sl; delete tol._orig_lb; delete tol._orig_sl; }
+    const cross = CROSSING_MASTER.find(c=>c.id===id);
+    if(cross && cross._orig_lb){ cross.lb=cross._orig_lb; cross.sl=cross._orig_sl; delete cross._orig_lb; delete cross._orig_sl; }
+  });
+  pendingChanges = {};
+  renderTolTable();
+  renderCrossingTable();
+
+  // Reset all pending jarak/leadtime
+  Object.keys(jarakPending).forEach(id=>{
+    const r = JARAK_DATA.find(x=>x.id===id);
+    if(r && r._orig){
+      r.km = r._orig.km; r.hSL = r._orig.hSL; r.hLB = r._orig.hLB;
+      delete r._orig;
+    }
+  });
+  jarakPending = {};
+  renderJarakTable();
+
+  // Reset pending BBM
+  if(Object.keys(bbmPending).length){
+    renderBBMPage(); // reloads inputs from last-saved BBM_PRICES & clears bbmPending
+  }
+
+  checkPending();
+}
+
+function saveToStorage(){
+  localStorage.setItem("ckb_tol_master", JSON.stringify(TOL_MASTER));
+  localStorage.setItem("ckb_cross_master", JSON.stringify(CROSSING_MASTER));
+  localStorage.setItem("ckb_tarif_history", JSON.stringify(history));
+}
+
+// ── BBM PRICES ──
+// kmlLB & kmlSL = fallback generic (diwarisi uang jalan lama)
+// kml per-unit: kmlHinoLB, kmlIvecoHD54, kmlIvecoHD56, kmlIvecoTWAY, kmlScaniaLB, kmlSL
+const BBM_DEFAULT = {
+  subsidi: 6800, nonsubsidi: 13950,
+  kmlLB: 3, kmlSL: 3.5,
+  kmlHinoLB: 3,
+  kmlIvecoHD54: 3, kmlIvecoHD56: 3, kmlIvecoTWAY: 3,
+  kmlScaniaLB: 3,
+};
+let BBM_PRICES = { ...BBM_DEFAULT };
+let bbmHistory = JSON.parse(localStorage.getItem("ckb_bbm_history")||"[]");
+
+// Master Komposisi BBM — rule untuk auto-set BBM slider di Dashboard
+const BBM_COMP_DEFAULT = [
+  {id:"bc_001", tujuan:"Lahat", trontonBio:80, trontonDex:20, trintonBio:80, trintonDex:20, lowbedKosongBio:80, lowbedKosongDex:20, lowbedIsiBio:75, lowbedIsiDex:25},
+  {id:"bc_002", tujuan:"PAMA Bangko", trontonBio:90, trontonDex:10, trintonBio:90, trintonDex:10, lowbedKosongBio:80, lowbedKosongDex:20, lowbedIsiBio:75, lowbedIsiDex:25},
+  {id:"bc_003", tujuan:"PAMA Tj Enim", trontonBio:90, trontonDex:10, trintonBio:90, trintonDex:10, lowbedKosongBio:80, lowbedKosongDex:20, lowbedIsiBio:75, lowbedIsiDex:25},
+  {id:"bc_004", tujuan:"Muara Enim", trontonBio:90, trontonDex:10, trintonBio:80, trintonDex:20, lowbedKosongBio:75, lowbedKosongDex:25, lowbedIsiBio:70, lowbedIsiDex:30},
+  {id:"bc_005", tujuan:"Medan", trontonBio:80, trontonDex:20, trintonBio:75, trintonDex:25, lowbedKosongBio:70, lowbedKosongDex:30, lowbedIsiBio:65, lowbedIsiDex:35},
+  {id:"bc_006", tujuan:"Meulaboh", trontonBio:75, trontonDex:25, trintonBio:70, trintonDex:30, lowbedKosongBio:65, lowbedKosongDex:35, lowbedIsiBio:60, lowbedIsiDex:40},
+  {id:"bc_007", tujuan:"Pekanbaru", trontonBio:85, trontonDex:15, trintonBio:80, trintonDex:20, lowbedKosongBio:70, lowbedKosongDex:30, lowbedIsiBio:70, lowbedIsiDex:30},
+  {id:"bc_008", tujuan:"Padang", trontonBio:80, trontonDex:20, trintonBio:75, trintonDex:25, lowbedKosongBio:70, lowbedKosongDex:30, lowbedIsiBio:65, lowbedIsiDex:35},
+  {id:"bc_009", tujuan:"Muara Bungo", trontonBio:90, trontonDex:10, trintonBio:85, trintonDex:15, lowbedKosongBio:80, lowbedKosongDex:20, lowbedIsiBio:75, lowbedIsiDex:25},
+  {id:"bc_010", tujuan:"Musi Banyuasin", trontonBio:90, trontonDex:10, trintonBio:85, trintonDex:15, lowbedKosongBio:80, lowbedKosongDex:20, lowbedIsiBio:75, lowbedIsiDex:25},
+  {id:"bc_011", tujuan:"Jambi", trontonBio:90, trontonDex:10, trintonBio:85, trintonDex:15, lowbedKosongBio:80, lowbedKosongDex:20, lowbedIsiBio:75, lowbedIsiDex:25},
+  {id:"bc_012", tujuan:"Bengkulu", trontonBio:80, trontonDex:20, trintonBio:75, trintonDex:25, lowbedKosongBio:70, lowbedKosongDex:30, lowbedIsiBio:65, lowbedIsiDex:35},
+  {id:"bc_013", tujuan:"Palembang", trontonBio:100, trontonDex:0, trintonBio:90, trintonDex:10, lowbedKosongBio:85, lowbedKosongDex:15, lowbedIsiBio:80, lowbedIsiDex:20},
+  {id:"bc_014", tujuan:"Lampung", trontonBio:100, trontonDex:0, trintonBio:100, trintonDex:0, lowbedKosongBio:95, lowbedKosongDex:5, lowbedIsiBio:90, lowbedIsiDex:10}
+];
+let BBM_COMP_RULES = JSON.parse(localStorage.getItem("ckb_bbm_composition_rules") || JSON.stringify(BBM_COMP_DEFAULT));
+let bbmCompPending = false;
+
+
+function loadBBMPrices(){
+  const saved = localStorage.getItem("ckb_bbm_prices");
+  if(saved){
+    try { BBM_PRICES = { ...BBM_DEFAULT, ...JSON.parse(saved) }; } catch(e){}
+  }
+}
+
+function renderBBMPage(){
+  el("bbm_subsidi").value     = BBM_PRICES.subsidi;
+  el("bbm_nonsubsidi").value  = BBM_PRICES.nonsubsidi;
+  el("bbm_kml_hino_lb").value    = BBM_PRICES.kmlHinoLB;
+  el("bbm_kml_iveco_hd54").value = BBM_PRICES.kmlIvecoHD54;
+  el("bbm_kml_iveco_hd56").value = BBM_PRICES.kmlIvecoHD56;
+  el("bbm_kml_iveco_tway").value = BBM_PRICES.kmlIvecoTWAY;
+  el("bbm_kml_scania_lb").value  = BBM_PRICES.kmlScaniaLB;
+  el("bbm_kml_sl").value         = BBM_PRICES.kmlSL;
+  updateBBMPreviews();
+  renderBBMSim();
+  renderBBMHistory();
+  delete bbmPending.bbm;
+  checkPending();
+}
+
+function onBBMChange(){
+  updateBBMPreviews();
+  renderBBMSim();
+  if(isBBMDirty()){ bbmPending.bbm = true; } else { delete bbmPending.bbm; }
+  checkPending();
+}
+
+function isBBMDirty(){
+  const cur = {
+    subsidi:      parseInt(el("bbm_subsidi")?.value)||0,
+    nonsubsidi:   parseInt(el("bbm_nonsubsidi")?.value)||0,
+    kmlHinoLB:    parseFloat(el("bbm_kml_hino_lb")?.value)||0,
+    kmlIvecoHD54: parseFloat(el("bbm_kml_iveco_hd54")?.value)||0,
+    kmlIvecoHD56: parseFloat(el("bbm_kml_iveco_hd56")?.value)||0,
+    kmlIvecoTWAY: parseFloat(el("bbm_kml_iveco_tway")?.value)||0,
+    kmlScaniaLB:  parseFloat(el("bbm_kml_scania_lb")?.value)||0,
+    kmlSL:        parseFloat(el("bbm_kml_sl")?.value)||0,
+  };
+  return Object.keys(cur).some(k => cur[k] !== BBM_PRICES[k]);
+}
+
+function cancelBBMChanges(){
+  renderBBMPage();
+  showToast("Perubahan BBM dibatalkan.", "info");
+}
+
+function updateBBMPreviews(){
+  const s = parseInt(el("bbm_subsidi")?.value)||BBM_DEFAULT.subsidi;
+  const n = parseInt(el("bbm_nonsubsidi")?.value)||BBM_DEFAULT.nonsubsidi;
+
+  if(el("bbm_subsidi_preview"))    el("bbm_subsidi_preview").textContent    = "Rp\u00a0" + s.toLocaleString("id-ID") + " / liter";
+  if(el("bbm_nonsubsidi_preview")) el("bbm_nonsubsidi_preview").textContent = "Rp\u00a0" + n.toLocaleString("id-ID") + " / liter";
+
+  const VMAP = [
+    {id:"bbm_kml_hino_lb",    inv:"bbm_kml_hino_lb_inv",    l100:"bbm_lper100_hino_lb",    col:"#ea580c"},
+    {id:"bbm_kml_iveco_hd54", inv:"bbm_kml_iveco_hd54_inv", l100:"bbm_lper100_iveco_hd54", col:"#1d4ed8"},
+    {id:"bbm_kml_iveco_hd56", inv:"bbm_kml_iveco_hd56_inv", l100:"bbm_lper100_iveco_hd56", col:"#1d4ed8"},
+    {id:"bbm_kml_iveco_tway", inv:"bbm_kml_iveco_tway_inv", l100:"bbm_lper100_iveco_tway", col:"#1d4ed8"},
+    {id:"bbm_kml_scania_lb",  inv:"bbm_kml_scania_lb_inv",  l100:"bbm_lper100_scania_lb",  col:"#dc2626"},
+    {id:"bbm_kml_sl",         inv:"bbm_kml_sl_inv",         l100:"bbm_lper100_sl",         col:"#7c3aed"},
+  ];
+  VMAP.forEach(v => {
+    const k = parseFloat(el(v.id)?.value)||3;
+    if(v.inv && el(v.inv)) el(v.inv).textContent = k.toFixed(2).replace(".",",") + " km";
+    if(el(v.l100)) el(v.l100).textContent = (100/k).toFixed(1) + " L";
+  });
+}
+
+function renderBBMSim(){
+  const s = parseInt(el("bbm_subsidi")?.value)||BBM_DEFAULT.subsidi;
+  const n = parseInt(el("bbm_nonsubsidi")?.value)||BBM_DEFAULT.nonsubsidi;
+  const tbody = el("bbm_sim_body");
+  if(!tbody) return;
+  const kSL = parseFloat(el("bbm_kml_sl")?.value)||BBM_DEFAULT.kmlSL;
+  const vehicles = [
+    {name:"🟠 Hino FM350 TH",         plate:"B 9068 SEI",       kmL: parseFloat(el("bbm_kml_hino_lb")?.value)||BBM_DEFAULT.kmlHinoLB,     col:"#ea580c", group:"Low Bed"},
+    {name:"🔵 Iveco HD9 66.54T",       plate:"B 9300 SEI",       kmL: parseFloat(el("bbm_kml_iveco_hd54")?.value)||BBM_DEFAULT.kmlIvecoHD54, col:"#1d4ed8", group:"Low Bed"},
+    {name:"🔵 Iveco HD9 66.56T",       plate:"B 9809 SEI",       kmL: parseFloat(el("bbm_kml_iveco_hd56")?.value)||BBM_DEFAULT.kmlIvecoHD56, col:"#1d4ed8", group:"Low Bed"},
+    {name:"🔵 Iveco T-WAY AT720T48TH", plate:"B 9786 SEI",       kmL: parseFloat(el("bbm_kml_iveco_tway")?.value)||BBM_DEFAULT.kmlIvecoTWAY, col:"#1d4ed8", group:"Low Bed"},
+    {name:"🔴 Scania RM580LA 6x4",     plate:"B 9995 SYN",       kmL: parseFloat(el("bbm_kml_scania_lb")?.value)||BBM_DEFAULT.kmlScaniaLB,  col:"#dc2626", group:"Low Bed"},
+    {name:"🚚 Hino 500 FM280JW 6x4",   plate:"B 9170 SIU",       kmL: kSL, col:"#7c3aed", group:"Self Loader"},
+    {name:"🚚 Hino 500 FM280JW 6x4",   plate:"B 9171 SIU",       kmL: kSL, col:"#7c3aed", group:"Self Loader"},
+    {name:"🚚 Hino 500 FM280JW 6x4",   plate:"B 9172 SIU",       kmL: kSL, col:"#7c3aed", group:"Self Loader"},
+    {name:"🚚 Hino 500 FM280JW 6x4",   plate:"B 9173 SIU",       kmL: kSL, col:"#7c3aed", group:"Self Loader"},
+  ];
+  let lastGroup = "";
+  tbody.innerHTML = vehicles.map(v=>{
+    const groupRow = v.group !== lastGroup
+      ? `<tr><td colspan="6" style="background:var(--bg);font-size:.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:.35rem .75rem;">${v.group}</td></tr>`
+      : "";
+    lastGroup = v.group;
+    const lPer100 = 100 / v.kmL;
+    const costS = Math.round(lPer100 * s);
+    const costN = Math.round(lPer100 * n);
+    return groupRow + `<tr>
+      <td><strong style="color:${v.col};">${v.name}</strong></td>
+      <td style="font-size:.72rem;color:var(--muted);font-family:'Instrument Mono',monospace;">${v.plate}</td>
+      <td class="r" style="font-family:'Instrument Mono',monospace;font-weight:700;color:${v.col};">${v.kmL.toFixed(1)} km/L</td>
+      <td class="r" style="font-family:'Instrument Mono',monospace;color:var(--muted);">${lPer100.toFixed(2)} L</td>
+      <td class="r" style="color:var(--success);font-weight:700;font-family:'Instrument Mono',monospace;">Rp&nbsp;${costS.toLocaleString("id-ID")}</td>
+      <td class="r" style="color:var(--amber);font-weight:700;font-family:'Instrument Mono',monospace;">Rp&nbsp;${costN.toLocaleString("id-ID")}</td>
+    </tr>`;
+  }).join("");
+}
+
+function saveBBMPrices(silent=false){
+  const newS        = parseInt(el("bbm_subsidi").value)||BBM_DEFAULT.subsidi;
+  const newN        = parseInt(el("bbm_nonsubsidi").value)||BBM_DEFAULT.nonsubsidi;
+  const newHinoLB   = parseFloat(el("bbm_kml_hino_lb").value)||BBM_DEFAULT.kmlHinoLB;
+  const newIvecoHD54= parseFloat(el("bbm_kml_iveco_hd54").value)||BBM_DEFAULT.kmlIvecoHD54;
+  const newIvecoHD56= parseFloat(el("bbm_kml_iveco_hd56").value)||BBM_DEFAULT.kmlIvecoHD56;
+  const newIvecoTWAY= parseFloat(el("bbm_kml_iveco_tway").value)||BBM_DEFAULT.kmlIvecoTWAY;
+  const newScaniaLB = parseFloat(el("bbm_kml_scania_lb").value)||BBM_DEFAULT.kmlScaniaLB;
+  const newSL       = parseFloat(el("bbm_kml_sl").value)||BBM_DEFAULT.kmlSL;
+
+  if(newS < 1000 || newN < 1000){ if(!silent) showToast("Harga BBM tidak valid!", "warning"); return; }
+  if([newHinoLB,newIvecoHD54,newIvecoHD56,newIvecoTWAY,newScaniaLB,newSL].some(k=>k<0.5)){
+    if(!silent) showToast("Rasio km/L tidak valid! Minimal 0,5", "warning"); return;
+  }
+
+  const old = {...BBM_PRICES};
+  const avgLB = parseFloat(((newHinoLB+newIvecoHD54+newIvecoHD56+newIvecoTWAY+newScaniaLB)/5).toFixed(2));
+
+  BBM_PRICES = {
+    subsidi: newS, nonsubsidi: newN,
+    kmlLB: avgLB, kmlSL: newSL,
+    kmlHinoLB: newHinoLB,
+    kmlIvecoHD54: newIvecoHD54, kmlIvecoHD56: newIvecoHD56, kmlIvecoTWAY: newIvecoTWAY,
+    kmlScaniaLB: newScaniaLB,
+  };
+  localStorage.setItem("ckb_bbm_prices", JSON.stringify(BBM_PRICES));
+
+  const changes = [];
+  if(newS          !== old.subsidi)       changes.push(`⛽ Solar Subsidi: Rp\u00a0${old.subsidi.toLocaleString("id-ID")} → Rp\u00a0${newS.toLocaleString("id-ID")}`);
+  if(newN          !== old.nonsubsidi)    changes.push(`⛽ Solar Non-Subsidi: Rp\u00a0${old.nonsubsidi.toLocaleString("id-ID")} → Rp\u00a0${newN.toLocaleString("id-ID")}`);
+  if(newHinoLB     !== old.kmlHinoLB)    changes.push(`🟠 Hino FM350 (B 9068 SEI): ${old.kmlHinoLB} → ${newHinoLB} km/L`);
+  if(newIvecoHD54  !== old.kmlIvecoHD54) changes.push(`🔵 Iveco HD9 66.54T (B 9300 SEI): ${old.kmlIvecoHD54} → ${newIvecoHD54} km/L`);
+  if(newIvecoHD56  !== old.kmlIvecoHD56) changes.push(`🔵 Iveco HD9 66.56T (B 9809 SEI): ${old.kmlIvecoHD56} → ${newIvecoHD56} km/L`);
+  if(newIvecoTWAY  !== old.kmlIvecoTWAY) changes.push(`🔵 Iveco T-WAY (B 9786 SEI): ${old.kmlIvecoTWAY} → ${newIvecoTWAY} km/L`);
+  if(newScaniaLB   !== old.kmlScaniaLB)  changes.push(`🔴 Scania RM580 (B 9995 SYN): ${old.kmlScaniaLB} → ${newScaniaLB} km/L`);
+  if(newSL         !== old.kmlSL)        changes.push(`🚚 Hino 500 FM280JW (4 unit): ${old.kmlSL} → ${newSL} km/L`);
+
+  if(changes.length){
+    bbmHistory.unshift({ msg: changes.join(" | "), time: now() });
+    if(bbmHistory.length>50) bbmHistory = bbmHistory.slice(0,50);
+    localStorage.setItem("ckb_bbm_history", JSON.stringify(bbmHistory));
+    addHistory(changes.join("<br>"));
+  }
+
+  renderBBMHistory();
+  delete bbmPending.bbm;
+  checkPending();
+  if(!silent) showToast("✅ Pengaturan BBM berhasil disimpan & disinkronkan!", "success");
+}
+
+function resetBBMPrices(){
+  el("bbm_subsidi").value        = BBM_DEFAULT.subsidi;
+  el("bbm_nonsubsidi").value     = BBM_DEFAULT.nonsubsidi;
+  el("bbm_kml_hino_lb").value    = BBM_DEFAULT.kmlHinoLB;
+  el("bbm_kml_iveco_hd54").value = BBM_DEFAULT.kmlIvecoHD54;
+  el("bbm_kml_iveco_hd56").value = BBM_DEFAULT.kmlIvecoHD56;
+  el("bbm_kml_iveco_tway").value = BBM_DEFAULT.kmlIvecoTWAY;
+  el("bbm_kml_scania_lb").value  = BBM_DEFAULT.kmlScaniaLB;
+  el("bbm_kml_sl").value         = BBM_DEFAULT.kmlSL;
+  onBBMChange();
+  showToast("Pengaturan direset ke nilai default.", "info");
+}
+
+function renderBBMHistory(){
+  const container = el("bbm_history");
+  if(!container) return;
+  if(!bbmHistory.length){
+    container.innerHTML = `<em style="color:var(--muted);font-size:.8rem;">Belum ada riwayat perubahan BBM.</em>`;
+    return;
+  }
+  container.innerHTML = bbmHistory.slice(0,8).map((h,i)=>
+    `<div style="display:flex;align-items:flex-start;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--border2);">
+      <div style="width:7px;height:7px;border-radius:50%;background:${i===0?'var(--amber)':'var(--muted)'};flex-shrink:0;margin-top:5px;"></div>
+      <div style="flex:1;line-height:1.5;">${h.msg}</div>
+      <div style="font-size:.68rem;color:var(--muted);font-family:'Instrument Mono',monospace;white-space:nowrap;padding-top:2px;">${h.time}</div>
+    </div>`
+  ).join("");
+}
+
+
+// ── BBM COMPOSITION RULE MASTER ──
+const COMP_PAIRS = [
+  ["trontonBio","trontonDex"],
+  ["trintonBio","trintonDex"],
+  ["lowbedKosongBio","lowbedKosongDex"],
+  ["lowbedIsiBio","lowbedIsiDex"]
+];
+function loadBBMCompositionRules(){
+  try{
+    const saved = localStorage.getItem("ckb_bbm_composition_rules");
+    if(saved) BBM_COMP_RULES = JSON.parse(saved);
+  }catch(e){}
+}
+function compInput(id, key, val){
+  return `<span class="comp-input-wrap"><input class="comp-input" type="number" min="0" max="100" value="${val}" id="${key}_${id}" onchange="onBBMCompChange('${id}','${key}',this.value)" onfocus="this.select()"><span class="comp-pct">%</span></span>`;
+}
+function isCompValid(row){
+  return COMP_PAIRS.every(([a,b]) => (Number(row[a]||0) + Number(row[b]||0)) === 100);
+}
+function renderBBMCompositionPage(){
+  const tbody = el("bbmcomp-body");
+  if(!tbody) return;
+  const q = (el("srch-bbmcomp")?.value || "").toLowerCase();
+  const rows = BBM_COMP_RULES.filter(r => !q || r.tujuan.toLowerCase().includes(q));
+  el("cnt-bbmcomp").textContent = BBM_COMP_RULES.length;
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="ei">⚗️</div><p>Tidak ada rule komposisi BBM yang ditemukan.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    const valid = isCompValid(r);
+    const statusClass = valid ? "" : " invalid";
+    const statusText = valid ? "Valid" : "Cek %";
+    return `<tr>
+      <td>${r.tujuan}</td>
+      <td>${compInput(r.id,"trontonBio",r.trontonBio)}</td>
+      <td>${compInput(r.id,"trontonDex",r.trontonDex)}</td>
+      <td>${compInput(r.id,"trintonBio",r.trintonBio)}</td>
+      <td>${compInput(r.id,"trintonDex",r.trintonDex)}</td>
+      <td>${compInput(r.id,"lowbedKosongBio",r.lowbedKosongBio)}</td>
+      <td>${compInput(r.id,"lowbedKosongDex",r.lowbedKosongDex)}</td>
+      <td>${compInput(r.id,"lowbedIsiBio",r.lowbedIsiBio)}</td>
+      <td>${compInput(r.id,"lowbedIsiDex",r.lowbedIsiDex)}</td>
+      <td><span class="comp-status${statusClass}">${statusText}</span></td>
+    </tr>`;
+  }).join("");
+}
+function onBBMCompChange(id, key, value){
+  const row = BBM_COMP_RULES.find(r => r.id === id);
+  if(!row) return;
+  let val = parseInt(value);
+  if(isNaN(val)) val = 0;
+  val = Math.max(0, Math.min(100, val));
+  row[key] = val;
+  // Auto-complement the paired fuel type so Biosolar + Dexlite stays 100%.
+  for(const [bio,dex] of COMP_PAIRS){
+    if(key === bio){ row[dex] = 100 - val; break; }
+    if(key === dex){ row[bio] = 100 - val; break; }
+  }
+  bbmCompPending = true;
+  renderBBMCompositionPage();
+  // Mark current field visually after re-render.
+  const input = el(key + "_" + id);
+  if(input) input.classList.add("comp-modified");
+  checkPending();
+}
+function saveBBMCompositionRules(){
+  const invalid = BBM_COMP_RULES.filter(r => !isCompValid(r));
+  if(invalid.length){
+    showToast("Ada komposisi yang totalnya tidak 100%.", "warning");
+    renderBBMCompositionPage();
+    return;
+  }
+  localStorage.setItem("ckb_bbm_composition_rules", JSON.stringify(BBM_COMP_RULES));
+  addHistory(`⚗️ Simpan Master Komposisi BBM (${BBM_COMP_RULES.length} tujuan)`);
+  bbmCompPending = false;
+  renderBBMCompositionPage();
+  checkPending();
+  showToast("✅ Master Komposisi BBM berhasil disimpan!", "success");
+}
+function resetBBMCompositionRules(){
+  BBM_COMP_RULES = JSON.parse(JSON.stringify(BBM_COMP_DEFAULT));
+  localStorage.setItem("ckb_bbm_composition_rules", JSON.stringify(BBM_COMP_RULES));
+  addHistory("↺ Reset Master Komposisi BBM ke default");
+  bbmCompPending = false;
+  renderBBMCompositionPage();
+  checkPending();
+  showToast("Komposisi BBM direset ke default.", "info");
+}
+
+// ── ADD TOL MODAL ──
+function openAddTolModal(){
+  el("modalAddTolTitle").textContent = "➕ Tambah Ruas Tol Baru";
+  el("m_tol_name").value=""; el("m_tol_lb").value=""; el("m_tol_sl").value=""; el("m_tol_routes").value="";
+  el("modalAddTol").classList.add("open");
+  setTimeout(()=>el("m_tol_name").focus(),100);
+}
+
+function saveTolFromModal(){
+  const name = el("m_tol_name").value.trim();
+  const lb = parseInt(el("m_tol_lb").value)||0;
+  const sl = parseInt(el("m_tol_sl").value)||0;
+  const routesRaw = el("m_tol_routes").value;
+  const routes = routesRaw ? routesRaw.split(",").map(r=>r.trim().toUpperCase()).filter(Boolean) : [];
+
+  if(!name){ el("m_tol_name").focus(); showToast("Nama ruas tol wajib diisi!", "warning"); return; }
+  if(lb<=0 || sl<=0){ showToast("Tarif harus lebih dari 0!", "warning"); return; }
+
+  const id = "tol_"+Date.now();
+  TOL_MASTER.push({id, name, lb, sl, routes});
+  addHistory(`➕ Tambah tol baru: <strong>${name}</strong> (LB: ${fmt(lb)}, SL: ${fmt(sl)})`);
+  saveToStorage();
+  renderTolTable();
+  closeModal("modalAddTol");
+  showToast(`✅ Ruas tol "${name}" berhasil ditambahkan!`, "success");
+}
+
+// ── ADD CROSSING MODAL ──
+function openAddCrossModal(){
+  el("m_cross_name").value=""; el("m_cross_route").value="";
+  el("m_cross_lb").value=""; el("m_cross_sl").value=""; el("m_cross_routes").value="";
+  el("modalAddCross").classList.add("open");
+  setTimeout(()=>el("m_cross_name").focus(),100);
+}
+
+function saveCrossFromModal(){
+  const name = el("m_cross_name").value.trim();
+  const route = el("m_cross_route").value.trim();
+  const lb = parseInt(el("m_cross_lb").value)||0;
+  const sl = parseInt(el("m_cross_sl").value)||0;
+  const usedRaw = el("m_cross_routes").value;
+  const usedIn = usedRaw ? usedRaw.split(",").map(r=>r.trim().toUpperCase()).filter(Boolean) : [];
+
+  if(!name){ showToast("Nama penyeberangan wajib diisi!", "warning"); return; }
+  if(lb<=0 || sl<=0){ showToast("Tarif harus lebih dari 0!", "warning"); return; }
+
+  const id = "cross_"+Date.now();
+  CROSSING_MASTER.push({id, name, route, lb, sl, usedIn});
+  addHistory(`➕ Tambah penyeberangan: <strong>${name}</strong> (LB: ${fmt(lb)}, SL: ${fmt(sl)})`);
+  saveToStorage();
+  renderCrossingTable();
+  closeModal("modalAddCross");
+  showToast(`✅ Penyeberangan "${name}" berhasil ditambahkan!`, "success");
+}
+
+// ── HISTORY ──
+function addHistory(msg){
+  history.unshift({msg, time:now()});
+  if(history.length>100) history = history.slice(0,100);
+  localStorage.setItem("ckb_tarif_history", JSON.stringify(history));
+  el("cnt-history").textContent = history.length;
+}
+
+function renderHistory(){
+  el("cnt-history").textContent = history.length;
+  const container = el("history-container");
+  if(!history.length){
+    container.innerHTML = `<div class="empty"><div class="ei">📋</div><p>Belum ada riwayat perubahan.</p></div>`;
+    return;
+  }
+  container.innerHTML = history.map((h,i)=>`
+    <div class="history-item">
+      <div class="history-dot ${i>0?'old':''}"></div>
+      <div class="history-text">${h.msg}</div>
+      <div class="history-time">${h.time}</div>
+    </div>
+  `).join("");
+}
+
+function clearHistory(){
+  history = [];
+  localStorage.removeItem("ckb_tarif_history");
+  renderHistory();
+  showToast("Riwayat perubahan dihapus.", "info");
+}
+
+// ── EXPORT ──
+function exportJSON(){
+  const data = {
+    exportTime: now(),
+    tolMaster: TOL_MASTER,
+    crossingMaster: CROSSING_MASTER,
+    version: "v9"
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `ckb-tarif-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── MODAL ──
+function closeModal(id){ el(id).classList.remove("open"); }
+document.querySelectorAll(".modal-bg").forEach(m=>{
+  m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); });
+});
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg, type="success"){
+  let toast = el("_toast");
+  if(!toast){
+    toast = document.createElement("div");
+    toast.id = "_toast";
+    Object.assign(toast.style, {
+      position:"fixed",bottom:"4.5rem",right:"1.5rem",zIndex:999,
+      padding:".65rem 1.1rem",borderRadius:"10px",fontFamily:"Sora,sans-serif",
+      fontSize:".85rem",fontWeight:"600",boxShadow:"0 8px 28px rgba(0,0,0,.15)",
+      transition:"all .25s",animation:"fadeUp .22s ease"
+    });
+    document.body.appendChild(toast);
+  }
+  const colors = {success:["#dcfce7","#15803d","#bbf7d0"], warning:["#fef3c7","#d97706","#fde68a"], info:["#eff6ff","#2563eb","#bfdbfe"]};
+  const [bg,clr,border] = colors[type]||colors.success;
+  Object.assign(toast.style, {background:bg,color:clr,border:`1.5px solid ${border}`,opacity:"1",transform:"translateY(0)"});
+  toast.textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ toast.style.opacity="0"; toast.style.transform="translateY(8px)"; }, 3200);
+}
+
+// ══════════════════════════════════════════════════
+// FIXED COST LOGIC
+// ══════════════════════════════════════════════════
+
+const FC_DEFAULT = {
+  fcHinoLB:   988967,
+  fcIvecoHD54: 988967,
+  fcIvecoHD56: 988967,
+  fcIvecoTWAY: 988967,
+  fcScaniaLB:  988967,
+  fcSL:        982145,
+};
+let FC_PRICES = { ...FC_DEFAULT };
+let fcHistory = JSON.parse(localStorage.getItem("ckb_fc_history") || "[]");
+
+function loadFixedCosts() {
+  const saved = localStorage.getItem("ckb_fixed_costs");
+  if (saved) {
+    try { FC_PRICES = { ...FC_DEFAULT, ...JSON.parse(saved) }; } catch(e) {}
+  }
+}
+
+function renderFCPage() {
+  el("fc_hino_lb").value     = FC_PRICES.fcHinoLB;
+  el("fc_iveco_hd54").value  = FC_PRICES.fcIvecoHD54;
+  el("fc_iveco_hd56").value  = FC_PRICES.fcIvecoHD56;
+  el("fc_iveco_tway").value  = FC_PRICES.fcIvecoTWAY;
+  el("fc_scania_lb").value   = FC_PRICES.fcScaniaLB;
+  el("fc_sl").value          = FC_PRICES.fcSL;
+  updateFCPreviews();
+  renderFCHistory();
+  ["fc_hino_lb","fc_iveco_hd54","fc_iveco_hd56","fc_iveco_tway","fc_scania_lb","fc_sl"].forEach(id => {
+    el(id)?.classList.remove("fc-modified");
+  });
+  el("fc_pending_bar")?.classList.add("hidden");
+}
+
+function onFCChange() {
+  updateFCPreviews();
+  const dirty = isFCDirty();
+  el("fc_pending_bar")?.classList.toggle("hidden", !dirty);
+  // mark all inputs as modified
+  ["fc_hino_lb","fc_iveco_hd54","fc_iveco_hd56","fc_iveco_tway","fc_scania_lb","fc_sl"].forEach(id => {
+    el(id)?.classList.toggle("fc-modified", dirty);
+  });
+}
+
+function getFCValues() {
+  return {
+    fcHinoLB:    parseInt(el("fc_hino_lb")?.value)    || FC_DEFAULT.fcHinoLB,
+    fcIvecoHD54: parseInt(el("fc_iveco_hd54")?.value) || FC_DEFAULT.fcIvecoHD54,
+    fcIvecoHD56: parseInt(el("fc_iveco_hd56")?.value) || FC_DEFAULT.fcIvecoHD56,
+    fcIvecoTWAY: parseInt(el("fc_iveco_tway")?.value) || FC_DEFAULT.fcIvecoTWAY,
+    fcScaniaLB:  parseInt(el("fc_scania_lb")?.value)  || FC_DEFAULT.fcScaniaLB,
+    fcSL:        parseInt(el("fc_sl")?.value)         || FC_DEFAULT.fcSL,
+  };
+}
+
+function isFCDirty() {
+  const cur = getFCValues();
+  return Object.keys(cur).some(k => cur[k] !== FC_PRICES[k]);
+}
+
+function cancelFCChanges() {
+  renderFCPage();
+  showToast("Perubahan Fixed Cost dibatalkan.", "info");
+}
+
+function calcFCAvgLB(vals) {
+  return Math.round((vals.fcHinoLB + vals.fcIvecoHD54 + vals.fcIvecoHD56 + vals.fcIvecoTWAY + vals.fcScaniaLB) / 5);
+}
+
+function updateFCPreviews() {
+  const fmtRp = n => "Rp\u00a0" + Math.round(n).toLocaleString("id-ID");
+  const vals = getFCValues();
+  const avgLB = calcFCAvgLB(vals);
+  const avgLBel = el("fc_avg_lb");
+  const avgSLel = el("fc_avg_sl");
+  if (avgLBel) avgLBel.textContent = fmtRp(avgLB);
+  if (avgSLel) avgSLel.textContent = fmtRp(vals.fcSL);
+}
+
+function renderFCSim() {} // no longer used
+
+function saveFixedCosts() {
+  const vals = getFCValues();
+  if (Object.values(vals).some(v => v < 0)) {
+    showToast("Nilai Fixed Cost tidak boleh negatif!", "warning"); return;
+  }
+
+  const old = { ...FC_PRICES };
+  FC_PRICES = { ...vals };
+
+  const avgLB = calcFCAvgLB(vals);
+
+  // Write to localStorage — key ckb_fixed_costs
+  const syncData = {
+    fcHinoLB:    vals.fcHinoLB,
+    fcIvecoHD54: vals.fcIvecoHD54,
+    fcIvecoHD56: vals.fcIvecoHD56,
+    fcIvecoTWAY: vals.fcIvecoTWAY,
+    fcScaniaLB:  vals.fcScaniaLB,
+    fcSL:        vals.fcSL,
+    fcLB:        avgLB,   // rata-rata LB untuk dipakai uang jalan
+  };
+  localStorage.setItem("ckb_fixed_costs", JSON.stringify(syncData));
+
+  const fmtRp = n => "Rp\u00a0" + Math.round(n).toLocaleString("id-ID");
+  const changes = [];
+  if (vals.fcHinoLB    !== old.fcHinoLB)    changes.push(`🟠 Hino FM350 (B 9068): ${fmtRp(old.fcHinoLB)} → ${fmtRp(vals.fcHinoLB)}`);
+  if (vals.fcIvecoHD54 !== old.fcIvecoHD54) changes.push(`🔵 Iveco HD9 66.54T (B 9300): ${fmtRp(old.fcIvecoHD54)} → ${fmtRp(vals.fcIvecoHD54)}`);
+  if (vals.fcIvecoHD56 !== old.fcIvecoHD56) changes.push(`🔵 Iveco HD9 66.56T (B 9809): ${fmtRp(old.fcIvecoHD56)} → ${fmtRp(vals.fcIvecoHD56)}`);
+  if (vals.fcIvecoTWAY !== old.fcIvecoTWAY) changes.push(`🔵 Iveco T-WAY (B 9786): ${fmtRp(old.fcIvecoTWAY)} → ${fmtRp(vals.fcIvecoTWAY)}`);
+  if (vals.fcScaniaLB  !== old.fcScaniaLB)  changes.push(`🔴 Scania RM580 (B 9995): ${fmtRp(old.fcScaniaLB)} → ${fmtRp(vals.fcScaniaLB)}`);
+  if (vals.fcSL        !== old.fcSL)        changes.push(`🚚 Hino 500 FM280JW (4 unit): ${fmtRp(old.fcSL)} → ${fmtRp(vals.fcSL)}`);
+
+  if (changes.length) {
+    fcHistory.unshift({ msg: changes.join(" | "), time: now() });
+    if (fcHistory.length > 50) fcHistory = fcHistory.slice(0, 50);
+    localStorage.setItem("ckb_fc_history", JSON.stringify(fcHistory));
+    addHistory(changes.join("<br>"));
+  }
+
+  renderFCHistory();
+  ["fc_hino_lb","fc_iveco_hd54","fc_iveco_hd56","fc_iveco_tway","fc_scania_lb","fc_sl"].forEach(id => {
+    el(id)?.classList.remove("fc-modified");
+  });
+  el("fc_pending_bar")?.classList.add("hidden");
+  showToast("✅ Fixed Cost berhasil disimpan & disinkronkan ke Uang Jalan!", "success");
+}
+
+function resetFixedCosts() {
+  el("fc_hino_lb").value     = FC_DEFAULT.fcHinoLB;
+  el("fc_iveco_hd54").value  = FC_DEFAULT.fcIvecoHD54;
+  el("fc_iveco_hd56").value  = FC_DEFAULT.fcIvecoHD56;
+  el("fc_iveco_tway").value  = FC_DEFAULT.fcIvecoTWAY;
+  el("fc_scania_lb").value   = FC_DEFAULT.fcScaniaLB;
+  el("fc_sl").value          = FC_DEFAULT.fcSL;
+  onFCChange();
+  showToast("Fixed Cost direset ke nilai default.", "info");
+}
+
+function renderFCHistory() {
+  const container = el("fc_history_container");
+  if (!container) return;
+  if (!fcHistory.length) { container.innerHTML = ""; return; }
+  const h = fcHistory[0];
+  container.innerHTML = `<span style="font-size:.72rem;color:var(--muted);">Terakhir diubah: ${h.time}</span>`;
+}
+
+// ══════════════════════════════════════════════════
+// TARIF DRIVER & HELPER
+// ══════════════════════════════════════════════════
+
+const CREW_DEFAULT = { driver: 150000, helper: 75000 };
+let CREW_RATES = { ...CREW_DEFAULT };
+let crewHistory = JSON.parse(localStorage.getItem("ckb_crew_history") || "[]");
+
+function loadCrewRates() {
+  const saved = localStorage.getItem("ckb_crew_rates");
+  if (saved) {
+    try {
+      const p = JSON.parse(saved);
+      CREW_RATES = {
+        driver: p.driver || CREW_DEFAULT.driver,
+        helper: p.helper || CREW_DEFAULT.helper,
+      };
+    } catch(e) {}
+  }
+}
+
+function renderCrewPage() {
+  el("crew_driver").value = CREW_RATES.driver;
+  el("crew_helper").value = CREW_RATES.helper;
+  renderCrewHistory();
+  ["crew_driver","crew_helper"].forEach(id => el(id)?.classList.remove("modified"));
+  el("crew_pending_bar")?.classList.add("hidden");
+}
+
+function getCrewValues() {
+  return {
+    driver: parseInt(el("crew_driver")?.value) || 0,
+    helper: parseInt(el("crew_helper")?.value) || 0,
+  };
+}
+
+function isCrewDirty() {
+  const cur = getCrewValues();
+  return cur.driver !== CREW_RATES.driver || cur.helper !== CREW_RATES.helper;
+}
+
+function onCrewChange() {
+  const dirty = isCrewDirty();
+  el("crew_pending_bar")?.classList.toggle("hidden", !dirty);
+  ["crew_driver","crew_helper"].forEach(id => el(id)?.classList.toggle("modified", dirty));
+}
+
+function cancelCrewChanges() {
+  renderCrewPage();
+  showToast("Perubahan Tarif Driver & Helper dibatalkan.", "info");
+}
+
+function saveCrewRates() {
+  const vals = getCrewValues();
+  if (vals.driver < 0 || vals.helper < 0) {
+    showToast("Nilai tarif tidak boleh negatif!", "warning"); return;
+  }
+
+  const old = { ...CREW_RATES };
+  CREW_RATES = { ...vals };
+
+  localStorage.setItem("ckb_crew_rates", JSON.stringify(CREW_RATES));
+
+  const fmtRp = n => "Rp\u00a0" + Math.round(n).toLocaleString("id-ID");
+  const changes = [];
+  if (vals.driver !== old.driver) changes.push(`🚚 Tarif Driver: ${fmtRp(old.driver)} → ${fmtRp(vals.driver)}`);
+  if (vals.helper !== old.helper) changes.push(`🧑‍🔧 Tarif Helper: ${fmtRp(old.helper)} → ${fmtRp(vals.helper)}`);
+
+  if (changes.length) {
+    crewHistory.unshift({ msg: changes.join(" | "), time: now() });
+    if (crewHistory.length > 50) crewHistory = crewHistory.slice(0, 50);
+    localStorage.setItem("ckb_crew_history", JSON.stringify(crewHistory));
+    addHistory(changes.join("<br>"));
+  }
+
+  renderCrewHistory();
+  ["crew_driver","crew_helper"].forEach(id => el(id)?.classList.remove("modified"));
+  el("crew_pending_bar")?.classList.add("hidden");
+  showToast("✅ Tarif Driver & Helper berhasil disimpan & disinkronkan ke Uang Jalan!", "success");
+}
+
+function resetCrewRates() {
+  el("crew_driver").value = CREW_DEFAULT.driver;
+  el("crew_helper").value = CREW_DEFAULT.helper;
+  onCrewChange();
+  showToast("Tarif Driver & Helper direset ke nilai default.", "info");
+}
+
+function renderCrewHistory() {
+  const container = el("crew_history_container");
+  if (!container) return;
+  if (!crewHistory.length) { container.innerHTML = ""; return; }
+  const h = crewHistory[0];
+  container.innerHTML = `<span style="font-size:.72rem;color:var(--muted);">Terakhir diubah: ${h.time}</span>`;
+}
+
+// ══════════════════════════════════════════════════
+// MASTER JARAK & LEADTIME
+// ══════════════════════════════════════════════════
+
+// Default routes (mirror dari Kelola Jalur)
+const JARAK_DEFAULT = [
+  {id:"rt_001",no:1,  origin:"CKB Cakung",dest:"TG PRIOK, MARUNDA CENTRE AREA", km:18,    hSL:1, hLB:1},
+  {id:"rt_002",no:2,  origin:"CKB Cakung",dest:"BSD",                            km:61.5,  hSL:1, hLB:1},
+  {id:"rt_003",no:3,  origin:"CKB Cakung",dest:"KUNINGAN, JAKSEL",               km:40,    hSL:1, hLB:1},
+  {id:"rt_004",no:4,  origin:"CKB Cakung",dest:"BEKASI",                         km:34,    hSL:1, hLB:1},
+  {id:"rt_005",no:5,  origin:"CKB Cakung",dest:"BOGOR",                          km:66.6,  hSL:1, hLB:1},
+  {id:"rt_006",no:6,  origin:"CKB Cakung",dest:"SUKABUMI",                       km:123,   hSL:1, hLB:1},
+  {id:"rt_007",no:7,  origin:"CKB Cakung",dest:"CIBINONG",                       km:63,    hSL:1, hLB:1},
+  {id:"rt_008",no:8,  origin:"CKB Cakung",dest:"CIBITUNG",                       km:39.1,  hSL:1, hLB:1},
+  {id:"rt_009",no:9,  origin:"CKB Cakung",dest:"CIKARANG",                       km:46.9,  hSL:1, hLB:1},
+  {id:"rt_010",no:10, origin:"CKB Cakung",dest:"KERAWANG",                       km:75,    hSL:1, hLB:1},
+  {id:"rt_011",no:11, origin:"CKB Cakung",dest:"BANDUNG",                        km:146,   hSL:2, hLB:2},
+  {id:"rt_012",no:12, origin:"CKB Cakung",dest:"TASIKMALAYA",                    km:286,   hSL:3, hLB:4},
+  {id:"rt_013",no:13, origin:"CKB Cakung",dest:"CILACAP",                        km:374,   hSL:3, hLB:4},
+  {id:"rt_014",no:14, origin:"CKB Cakung",dest:"CIREBON",                        km:214,   hSL:2, hLB:2},
+  {id:"rt_015",no:15, origin:"CKB Cakung",dest:"TEGAL",                          km:290,   hSL:2, hLB:3},
+  {id:"rt_016",no:16, origin:"CKB Cakung",dest:"CILEGON",                        km:129,   hSL:1, hLB:1},
+  {id:"rt_017",no:17, origin:"CKB Cakung",dest:"SERANG",                         km:108,   hSL:1, hLB:1},
+  {id:"rt_018",no:18, origin:"CKB Cakung",dest:"BALARAJA",                       km:81,    hSL:1, hLB:1},
+  {id:"rt_019",no:19, origin:"CKB Cakung",dest:"SEMARANG",                       km:429,   hSL:3, hLB:3},
+  {id:"rt_020",no:20, origin:"CKB Cakung",dest:"PURWOKERTO",                     km:351,   hSL:4, hLB:4},
+  {id:"rt_021",no:21, origin:"CKB Cakung",dest:"SOLO",                           km:533,   hSL:4, hLB:4},
+  {id:"rt_022",no:22, origin:"CKB Cakung",dest:"JOGJA",                          km:559,   hSL:4, hLB:4},
+  {id:"rt_023",no:23, origin:"CKB Cakung",dest:"KEDIRI",                         km:707,   hSL:4, hLB:4},
+  {id:"rt_024",no:24, origin:"CKB Cakung",dest:"TUBAN",                          km:653,   hSL:4, hLB:4},
+  {id:"rt_025",no:25, origin:"CKB Cakung",dest:"GRESIK",                         km:736,   hSL:4, hLB:4},
+  {id:"rt_026",no:26, origin:"CKB Cakung",dest:"LAMONGAN",                       km:790,   hSL:4, hLB:4},
+  {id:"rt_027",no:27, origin:"CKB Cakung",dest:"SURABAYA",                       km:810,   hSL:4, hLB:4},
+  {id:"rt_028",no:28, origin:"CKB Cakung",dest:"MALANG",                         km:842,   hSL:5, hLB:5},
+  {id:"rt_029",no:29, origin:"CKB Cakung",dest:"BANYUWANGI",                     km:1053,  hSL:5, hLB:5},
+  {id:"rt_030",no:30, origin:"CKB Cakung",dest:"BALI",                           km:1200,  hSL:10,hLB:10},
+  {id:"rt_031",no:31, origin:"CKB Cakung",dest:"MATARAM",                        km:1299,  hSL:11,hLB:11},
+  {id:"rt_032",no:32, origin:"CKB Cakung",dest:"BATU HIJAU",                     km:1372.5,hSL:11,hLB:11},
+  {id:"rt_033",no:33, origin:"CKB Cakung",dest:"GARUT",                          km:280,   hSL:2, hLB:2},
+  {id:"rt_034",no:34, origin:"CKB Cakung",dest:"SUMBAWA",                        km:1498,  hSL:11,hLB:11},
+  {id:"rt_035",no:35, origin:"CKB Cakung",dest:"TPA IJOBAIT LOMBOK",             km:990,   hSL:11,hLB:11},
+  {id:"rt_036",no:36, origin:"CKB Cakung",dest:"BOJONEGORO",                     km:680,   hSL:4, hLB:4},
+  {id:"rt_037",no:37, origin:"CKB Cakung",dest:"SENTOLO, GARUT",                 km:330,   hSL:3, hLB:3},
+  {id:"rt_038",no:38, origin:"CKB Cakung",dest:"CIANJUR",                        km:130,   hSL:2, hLB:2},
+  {id:"rt_039",no:39, origin:"CKB Cakung",dest:"BANJARNEGARA, WADUK MRICAN",     km:410,   hSL:3, hLB:3},
+  {id:"rt_040",no:40, origin:"CKB Cakung",dest:"PATIMBAN, SUBANG",               km:145,   hSL:2, hLB:2},
+  {id:"rt_041",no:41, origin:"CKB Cakung",dest:"PROBOLINGGO",                    km:920,   hSL:4, hLB:4},
+  {id:"rt_042",no:42, origin:"CKB Cakung",dest:"PANGGUNG REJO, BLITAR",          km:785,   hSL:4, hLB:4},
+];
+
+let JARAK_DATA = [];
+let jarakPending = {};
+
+function loadJarakData(){
+  // Coba sync dari ckb_route_paths (Kelola Jalur)
+  const saved = localStorage.getItem("ckb_route_paths");
+  if(saved){
+    try{
+      const routes = JSON.parse(saved);
+      // Merge: ambil km, hSL, hLB dari route yang sudah disimpan Kelola Jalur
+      // Plus cek apakah ada override dari ckb_jarak_master
+      const jarakOverride = JSON.parse(localStorage.getItem("ckb_jarak_master")||"{}");
+      JARAK_DATA = routes.map(r => {
+        const ov = jarakOverride[r.id] || {};
+        return {
+          id: r.id,
+          no: r.no || 0,
+          origin: r.origin,
+          dest: r.dest,
+          km: ov.km !== undefined ? ov.km : r.km,
+          hSL: ov.hSL !== undefined ? ov.hSL : (r.hSL||1),
+          hLB: ov.hLB !== undefined ? ov.hLB : (r.hLB||1),
+        };
+      });
+      return;
+    } catch(e){}
+  }
+  // Fallback ke default
+  const jarakOverride = JSON.parse(localStorage.getItem("ckb_jarak_master")||"{}");
+  JARAK_DATA = JARAK_DEFAULT.map(r => {
+    const ov = jarakOverride[r.id] || {};
+    return {
+      ...r,
+      km:  ov.km  !== undefined ? ov.km  : r.km,
+      hSL: ov.hSL !== undefined ? ov.hSL : r.hSL,
+      hLB: ov.hLB !== undefined ? ov.hLB : r.hLB,
+    };
+  });
+}
+
+function populateJarakOriginFilter(){
+  const sel = el("jarak-filter-origin");
+  if(!sel) return;
+  const origins = [...new Set(JARAK_DATA.map(r=>r.origin))];
+  sel.innerHTML = '<option value="">Semua Origin</option>' +
+    origins.map(o=>`<option value="${o}">${o}</option>`).join("");
+}
+
+function renderJarakTable(){
+  const q = (el("srch-jarak")?.value||"").toLowerCase();
+  const originF = el("jarak-filter-origin")?.value||"";
+
+  const filtered = JARAK_DATA.filter(r=>
+    (!originF || r.origin===originF) &&
+    (!q || r.dest.toLowerCase().includes(q) || r.origin.toLowerCase().includes(q))
+  );
+
+  el("cnt-jarak").textContent = JARAK_DATA.length;
+
+  // Stats
+  const statsEl = el("jarak-stats");
+  if(statsEl){
+    statsEl.innerHTML = `
+      <div class="stat-card"><div class="stat-label">Total Jalur</div><div class="stat-val amber">${JARAK_DATA.length}</div><div class="stat-note">rute terdaftar</div></div>
+      <div class="stat-card"><div class="stat-label">Pending Ubah</div><div class="stat-val" style="color:var(--warning);">${Object.keys(jarakPending).length}</div><div class="stat-note">belum disimpan</div></div>
+    `;
+  }
+
+  const tbody = el("jarak-tbody");
+  if(!tbody) return;
+
+  if(!filtered.length){
+    tbody.innerHTML = `<tr><td colspan="9" class="empty"><div class="ei">🗺</div><p>Tidak ada jalur ditemukan.</p></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  filtered.forEach((r, i) => {
+    const kmpp = Math.round(r.km * 2 * 10) / 10;
+    const ltTotalSL = r.hSL * 2;
+    const ltTotalLB = r.hLB * 2;
+    const isChanged = jarakPending[r.id];
+    const rowClass = isChanged ? "changed-row" : "";
+    const modCls = isChanged ? " jmodified" : "";
+
+    const tr = document.createElement("tr");
+    tr.className = rowClass;
+    tr.innerHTML = `
+      <td class="mono" style="color:var(--muted);font-size:.75rem;">${String(i+1).padStart(2,"0")}</td>
+      <td style="font-size:.78rem;color:var(--muted);white-space:nowrap;">📍 ${r.origin}</td>
+      <td><strong style="font-size:.88rem;">${r.dest}</strong></td>
+      <td class="r">
+        <div class="editable-cell">
+          <input class="jarak-input${modCls}" type="number" id="jkm_${r.id}"
+            value="${r.km}" min="0" step="0.1"
+            onchange="onJarakChange('${r.id}','km',this.value)"
+            onfocus="this.select()">
+          <span style="font-size:.7rem;color:var(--muted);margin-left:2px;">km</span>
+        </div>
+      </td>
+      <!-- LT ke Destination — SL & LB side by side -->
+      <td class="r lt-cell-sl" style="border-left:2px solid var(--amber-light);">
+        <div class="editable-cell">
+          <input class="jarak-input${modCls}" type="number" id="jhsl_${r.id}"
+            value="${r.hSL}" min="0.5" step="0.5"
+            onchange="onJarakChange('${r.id}','hSL',this.value)"
+            onfocus="this.select()">
+          <span style="font-size:.7rem;color:#7c3aed;margin-left:2px;">hr</span>
+        </div>
+      </td>
+      <td class="r lt-cell-lb" style="border-right:2px solid var(--amber-light);">
+        <div class="editable-cell">
+          <input class="jarak-input${modCls}" type="number" id="jhlb_${r.id}"
+            value="${r.hLB}" min="0.5" step="0.5"
+            onchange="onJarakChange('${r.id}','hLB',this.value)"
+            onfocus="this.select()">
+          <span style="font-size:.7rem;color:#854d0e;margin-left:2px;">hr</span>
+        </div>
+      </td>
+      <!-- KM Total PP -->
+      <td class="r" id="jkmpp_${r.id}" style="color:var(--amber);font-weight:700;font-family:'Instrument Mono',monospace;">${kmpp.toLocaleString("id-ID")} km</td>
+      <!-- LT Total PP — SL & LB side by side -->
+      <td class="r" id="jlttsl_${r.id}" style="border-left:2px solid #ddd6fe;"><span class="lt-total-sl">${fmtHr(ltTotalSL)} hr</span></td>
+      <td class="r" id="jltflb_${r.id}" style="border-right:2px solid #ddd6fe;"><span class="lt-total-lb">${fmtHr(ltTotalLB)} hr</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Format angka hari: bulat tampil apa adanya, desimal pakai koma (mis. 1.5 -> "1,5")
+function fmtHr(n){
+  return (Math.round(n*10)/10).toString().replace(".",",");
+}
+
+function onJarakChange(id, field, val){
+  const r = JARAK_DATA.find(x=>x.id===id);
+  if(!r) return;
+
+  if(!r._orig) r._orig = {km:r.km, hSL:r.hSL, hLB:r.hLB};
+
+  const num = field==="km" ? (parseFloat(val)||0) : (Math.round((parseFloat(val)||0.5)*2)/2);
+  r[field] = num;
+
+  // Update calculated cells live
+  const kmpp = Math.round(r.km*2*10)/10;
+  const ltTotSL = r.hSL*2;
+  const ltTotLB = r.hLB*2;
+
+  const kmppEl = el("jkmpp_"+id);
+  if(kmppEl) kmppEl.textContent = kmpp.toLocaleString("id-ID") + " km";
+  const tslEl = el("jlttsl_"+id);
+  if(tslEl) tslEl.innerHTML = `<span class="lt-total-sl">${fmtHr(ltTotSL)} hr</span>`;
+  const tlbEl = el("jltflb_"+id);
+  if(tlbEl) tlbEl.innerHTML = `<span class="lt-total-lb">${fmtHr(ltTotLB)} hr</span>`;
+
+  const changed = r.km!==r._orig.km || r.hSL!==r._orig.hSL || r.hLB!==r._orig.hLB;
+  if(changed){
+    jarakPending[id] = true;
+    ["jkm_","jhsl_","jhlb_"].forEach(pfx=>{
+      el(pfx+id)?.classList.add("jmodified");
+    });
+    el("jkm_"+id)?.closest("tr")?.classList.add("changed-row");
+  } else {
+    delete jarakPending[id];
+    ["jkm_","jhsl_","jhlb_"].forEach(pfx=>{
+      el(pfx+id)?.classList.remove("jmodified");
+    });
+    el("jkm_"+id)?.closest("tr")?.classList.remove("changed-row");
+  }
+
+  // Update stats
+  renderJarakStats();
+  checkPending();
+}
+
+function renderJarakStats(){
+  const statsEl = el("jarak-stats");
+  if(!statsEl) return;
+  const cards = statsEl.querySelectorAll(".stat-card");
+  if(cards[1]) cards[1].querySelector(".stat-val").textContent = Object.keys(jarakPending).length;
+}
+
+function saveJarakChanges(silent=false){
+  if(!Object.keys(jarakPending).length){
+    if(!silent) showToast("Tidak ada perubahan jarak/LT untuk disimpan.", "info");
+    return;
+  }
+
+  // Simpan override ke ckb_jarak_master
+  const existing = JSON.parse(localStorage.getItem("ckb_jarak_master")||"{}");
+  const histEntries = [];
+
+  Object.keys(jarakPending).forEach(id=>{
+    const r = JARAK_DATA.find(x=>x.id===id);
+    if(!r) return;
+    const orig = r._orig || {km:r.km, hSL:r.hSL, hLB:r.hLB};
+    const changes = [];
+    if(r.km   !== orig.km)   changes.push(`KM: ${orig.km} → ${r.km}`);
+    if(r.hSL  !== orig.hSL)  changes.push(`LT SL: ${orig.hSL} → ${r.hSL} hari`);
+    if(r.hLB  !== orig.hLB)  changes.push(`LT LB: ${orig.hLB} → ${r.hLB} hari`);
+    if(changes.length){
+      histEntries.push(`🗺 <strong>${r.dest}</strong>: ${changes.join(", ")}`);
+    }
+    existing[id] = {km:r.km, hSL:r.hSL, hLB:r.hLB};
+    delete r._orig;
+  });
+
+  localStorage.setItem("ckb_jarak_master", JSON.stringify(existing));
+
+  // Sync balik ke ckb_route_paths supaya Kelola Jalur terupdate
+  const routesSaved = localStorage.getItem("ckb_route_paths");
+  if(routesSaved){
+    try{
+      let routes = JSON.parse(routesSaved);
+      routes = routes.map(rt=>{
+        const ov = existing[rt.id];
+        if(!ov) return rt;
+        return {...rt, km:ov.km, kmpp:ov.km*2, hSL:ov.hSL, hLB:ov.hLB};
+      });
+      localStorage.setItem("ckb_route_paths", JSON.stringify(routes));
+    } catch(e){}
+  }
+
+  // ── KUNCI: Update ckb_route_sync supaya Dashboard langsung baca perubahan LT & KM ──
+  // Dashboard hanya membaca ckb_route_sync (bukan ckb_route_paths / ckb_jarak_master)
+  try{
+    const syncRaw = localStorage.getItem("ckb_route_sync");
+    const syncMap = syncRaw ? JSON.parse(syncRaw) : {};
+    // Update hanya entry yang berubah, pertahankan field lain (tolSegs, crossSegs, ujLB, dll.)
+    JARAK_DATA.forEach(r=>{
+      const ov = existing[r.id];
+      if(!ov) return; // hanya entry yang pernah diubah via jarak master
+      const key = (r.origin + "|" + r.dest).toUpperCase();
+      if(syncMap[key]){
+        syncMap[key].km   = ov.km;
+        syncMap[key].kmpp = ov.km * 2;
+        syncMap[key].hSL  = ov.hSL;
+        syncMap[key].hLB  = ov.hLB;
+      } else {
+        // Entry belum ada di syncMap (belum pernah dibuka Kelola Jalur) — buat skeleton-nya
+        syncMap[key] = {
+          origin: r.origin, dest: r.dest,
+          km: ov.km, kmpp: ov.km*2,
+          hSL: ov.hSL, hLB: ov.hLB,
+          ujLB: 0, ujSL: 0,
+          tol: "", crossing: "",
+          tolSegs: {}, crossSegs: {},
+        };
+      }
+    });
+    localStorage.setItem("ckb_route_sync", JSON.stringify(syncMap));
+  } catch(e){ console.warn("Gagal sync ke ckb_route_sync:", e); }
+
+  if(histEntries.length) addHistory(histEntries.join("<br>"));
+
+  jarakPending = {};
+  renderJarakTable();
+  checkPending();
+  if(!silent) showToast("✅ Jarak & Leadtime berhasil disimpan & disinkronkan!", "success");
+}
+
+// ── INIT ──
+loadSavedData();
+loadBBMPrices();
+loadBBMCompositionRules();
+loadFixedCosts();
+loadCrewRates();
+loadJarakData();
+updateDate();
+renderTolTable();
+populateJarakOriginFilter();
+checkPending();
+el("cnt-history").textContent = history.length;
+el("cnt-jarak").textContent = JARAK_DATA.length;
+</script>
+<style>
+
+/* =========================================================
+   CORPORATE UI OVERRIDE - Master Tarif
+   Clara revision: aligned with index + dashboard corporate look
+   ========================================================= */
+:root{
+  --bg:#f5f7f6;
+  --bg2:#ffffff;
+  --sidebar:#ffffff;
+  --hdr:#ffffff;
+  --amber:#22543D;
+  --amber2:#2F6B4F;
+  --amber-pale:#F3F7F4;
+  --amber-light:#C7D6CC;
+  --coral:#22543D;
+  --teal:#2F6B4F;
+  --teal-pale:#EEF5F0;
+  --blue:#24527A;
+  --text:#14251B;
+  --text2:#33483B;
+  --muted:#66766C;
+  --border:#C7D6CC;
+  --border2:#E1E8E3;
+  --card:#ffffff;
+  --success:#2F6B4F;
+  --danger:#B42318;
+  --warning:#8A5B12;
+  --shadow:none;
+  --radius:8px;
+  --radius-sm:6px;
+}
+html{font-size:15.5px !important;}
+body{
+  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+  background:var(--bg) !important;
+  color:var(--text);
+  letter-spacing:-.01em;
+  font-size:15px !important;
+}
+body::before{display:none !important;}
+*,button,input,select,textarea{font-family:"Inter","Segoe UI",Arial,sans-serif !important;}
+
+/* Header */
+header{
+  height:60px !important;
+  padding:0 1.25rem !important;
+  background:#fff !important;
+  border-bottom:1px solid #dbe3de !important;
+  box-shadow:none !important;
+}
+.logo-mark{
+  width:34px !important;height:34px !important;
+  border-radius:6px !important;
+  background:var(--amber) !important;
+  background-image:none !important;
+  box-shadow:none !important;
+  filter:grayscale(1);
+}
+.logo-t1{font-size:1.04rem !important;font-weight:800;color:var(--text);letter-spacing:-.02em;}
+.logo-t2{font-size:.64rem !important;color:var(--muted);letter-spacing:1.5px;font-weight:700;}
+.hdate{
+  font-size:.78rem !important;
+  background:#f8faf9 !important;
+  border:1px solid var(--border2) !important;
+  color:var(--muted) !important;
+  border-radius:6px !important;
+  padding:5px 10px !important;
+}
+
+/* Navigation Tabs */
+.nav-tabs{
+  top:60px !important;
+  background:#fff !important;
+  border-bottom:1px solid var(--border2) !important;
+  box-shadow:none !important;
+  padding:0 1.1rem !important;
+  overflow-x:auto;
+}
+.nav-tab{
+  font-size:.9rem !important;
+  font-weight:700 !important;
+  padding:.78rem 1rem !important;
+  color:var(--muted) !important;
+  border-bottom:2px solid transparent !important;
+  filter:grayscale(.25);
+}
+.nav-tab:hover{background:var(--amber-pale) !important;color:var(--text2) !important;}
+.nav-tab.active{
+  background:var(--amber-pale) !important;
+  color:var(--amber) !important;
+  border-bottom-color:var(--amber) !important;
+}
+.nav-tab .tab-cnt{
+  border-radius:4px !important;
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  color:var(--amber) !important;
+  font-size:.7rem !important;
+}
+.nav-tab.active .tab-cnt{background:var(--amber) !important;color:#fff !important;}
+
+/* Main and section */
+.main{padding:1.15rem 1.25rem !important;background:var(--bg);}
+.sec-ttl{font-size:1.06rem !important;font-weight:800;color:var(--text);filter:grayscale(1);}
+.sec-sub{font-size:.82rem !important;color:var(--muted);}
+.fbar input,.fbar select{
+  height:36px;
+  font-size:.9rem !important;
+  border:1px solid var(--border) !important;
+  border-radius:6px !important;
+  background:#fff !important;
+  box-shadow:none !important;
+}
+
+/* Buttons */
+.btn,.aBtn,.btn-sm,.map-search-btn{
+  border-radius:6px !important;
+  box-shadow:none !important;
+  transform:none !important;
+  transition:background .12s ease,border-color .12s ease,color .12s ease;
+}
+.btn{font-size:.9rem !important;}
+.btn-sm{font-size:.8rem !important;}
+.btn-amber,.btn-teal{
+  background:var(--amber) !important;
+  background-image:none !important;
+  color:#fff !important;
+  border-color:var(--amber) !important;
+}
+.btn-amber:hover,.btn-teal:hover{background:#183528 !important;border-color:#183528 !important;transform:none !important;box-shadow:none !important;}
+.btn-outline,.btn-ghost{
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  color:var(--text2) !important;
+}
+.btn-outline:hover,.btn-ghost:hover{
+  background:var(--amber-pale) !important;
+  border-color:var(--amber) !important;
+  color:var(--amber) !important;
+}
+.btn-danger{background:var(--danger) !important;border-color:var(--danger) !important;}
+
+/* Cards and stats */
+.stat-card,.twrap,.tarif-group,.bbm-veh-card,.bbm-sl-card,.bbm-actionbar{
+  border:1px solid var(--border2) !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+  background:#fff !important;
+}
+.stat-label{font-size:.72rem !important;color:var(--muted);}
+.stat-val{font-size:1.45rem !important;color:var(--text);}
+.stat-val.amber,.stat-val.teal{color:var(--amber) !important;}
+.stat-note{font-size:.76rem !important;}
+
+/* Tables */
+.tbl th{
+  background:#f8faf9 !important;
+  color:var(--muted) !important;
+  border-bottom:1px solid var(--border2) !important;
+  font-size:.75rem !important;
+  padding:.68rem .8rem !important;
+}
+.tbl td{
+  font-size:.94rem !important;
+  padding:.68rem .8rem !important;
+  border-bottom:1px solid #edf2ef !important;
+}
+.tbl tbody tr:hover td{background:#f8faf9 !important;}
+.tbl .changed-row td{background:#fff9e8 !important;}
+.price-input,.jarak-input,.fc-input,.bbm-veh-input{
+  font-size:.96rem !important;
+  border:1px solid var(--border) !important;
+  border-radius:6px !important;
+  background:#fff !important;
+  box-shadow:none !important;
+}
+.price-input:focus,.jarak-input:focus,.fc-input:focus,.bbm-veh-input:focus,
+input[type=text]:focus,input[type=number]:focus{
+  border-color:var(--amber) !important;
+  box-shadow:0 0 0 2px rgba(34,84,61,.10) !important;
+}
+input.modified,.price-input.modified,.jarak-input.jmodified,.fc-input.fc-modified{
+  background:#fffbeb !important;
+  border-color:var(--warning) !important;
+}
+
+/* Badges and actions */
+.badge{border-radius:4px !important;font-size:.7rem !important;padding:3px 7px !important;}
+.badge-amber,.badge-teal,.badge-success,.badge-warning,.badge-gray{
+  background:var(--amber-pale) !important;
+  color:var(--amber) !important;
+  border:1px solid var(--border) !important;
+}
+.aBtn{
+  width:32px !important;height:32px !important;
+  background:#fff !important;
+  border:1px solid var(--border2) !important;
+  color:var(--text2) !important;
+  font-size:.92rem !important;
+}
+.aBtn:hover{background:var(--amber-pale) !important;color:var(--amber) !important;border-color:var(--amber) !important;}
+
+/* BBM page, remove strong gradients */
+.bbm-price-card{
+  border-radius:8px !important;
+  box-shadow:none !important;
+  border:1px solid var(--border2) !important;
+  background:#fff !important;
+  color:var(--text) !important;
+  transform:none !important;
+}
+.bbm-price-card:hover{transform:none !important;box-shadow:none !important;}
+.bbm-price-card::after{display:none !important;}
+.bbm-price-card.subsidi,.bbm-price-card.nonsubsidi{
+  background:#fff !important;
+  color:var(--text) !important;
+}
+.bbm-price-icon{
+  background:var(--amber-pale) !important;
+  color:var(--amber) !important;
+  border:1px solid var(--border) !important;
+  box-shadow:none !important;
+  filter:grayscale(1);
+}
+.bbm-price-tag{
+  background:var(--amber-pale) !important;
+  color:var(--amber) !important;
+  border:1px solid var(--border) !important;
+  border-radius:4px !important;
+}
+.bbm-price-name{font-size:1.12rem !important;color:var(--text) !important;}
+.bbm-price-sub{font-size:.8rem !important;color:var(--muted) !important;}
+.bbm-price-input-wrap{
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  border-radius:6px !important;
+  box-shadow:none !important;
+}
+.bbm-price-rp{color:var(--muted) !important;}
+.bbm-price-input{color:var(--text) !important;font-size:1.3rem !important;}
+.bbm-price-preview{color:var(--muted) !important;font-size:.84rem !important;}
+.bbm-group-title{font-size:.78rem !important;color:var(--muted) !important;}
+.bbm-group-count{border-radius:4px !important;background:var(--amber-pale) !important;color:var(--amber) !important;border:1px solid var(--border) !important;}
+.bbm-veh-card{border-top:1px solid var(--border2) !important;}
+.bbm-veh-card:hover{transform:none !important;box-shadow:none !important;}
+.bbm-veh-icon,.bbm-sim-icon{background:var(--amber-pale) !important;color:var(--amber) !important;border:1px solid var(--border) !important;box-shadow:none !important;filter:grayscale(1);}
+.bbm-veh-name{font-size:.88rem !important;}
+.bbm-veh-plate{font-size:.7rem !important;}
+.bbm-veh-label{font-size:.76rem !important;}
+.bbm-veh-stats{font-size:.72rem !important;}
+.bbm-sl-plate-chip{border-radius:4px !important;background:var(--amber-pale) !important;border:1px solid var(--border) !important;color:var(--amber) !important;filter:grayscale(1);}
+
+/* Fixed cost / crew / route sections */
+.fc-row{padding:.78rem 1.1rem !important;border-bottom:1px solid #edf2ef !important;}
+.fc-row:hover{background:#f8faf9 !important;}
+.fc-name{font-size:.94rem !important;}
+.fc-plate{font-size:.78rem !important;}
+.fc-dot{filter:grayscale(1);}
+.fc-input{background:#fff !important;}
+.jarak-input{width:78px !important;}
+.lt-total-sl,.lt-total-lb{color:var(--amber) !important;font-size:.94rem !important;}
+.lt-cell-sl,.lt-cell-lb{background:#fff !important;}
+
+/* Modals, save bar, alert */
+.modal,.save-bar{
+  border:1px solid var(--border2) !important;
+  border-radius:8px !important;
+  box-shadow:0 12px 28px rgba(20,37,27,.12) !important;
+}
+.modal-bg{background:rgba(20,37,27,.38) !important;backdrop-filter:blur(3px) !important;}
+.m-head{
+  background:#fff !important;
+  border-bottom:1px solid var(--border2) !important;
+}
+.m-title{font-size:1.16rem !important;color:var(--text) !important;filter:grayscale(1);}
+.m-body{padding:1.25rem !important;}
+.m-foot{background:#f8faf9 !important;border-top:1px solid var(--border2) !important;}
+.m-close{border-radius:6px !important;background:#fff !important;border:1px solid var(--border) !important;color:var(--muted) !important;}
+.m-close:hover{background:#fef2f2 !important;color:var(--danger) !important;border-color:#f3b4ae !important;}
+.flabel{font-size:.88rem !important;color:var(--text2) !important;font-weight:700 !important;}
+input[type=text],input[type=number],select{
+  background:#fff !important;
+  border:1px solid var(--border) !important;
+  border-radius:6px !important;
+  font-size:.94rem !important;
+  box-shadow:none !important;
+}
+.alert{border-radius:6px !important;font-size:.88rem !important;}
+.empty .ei,.history-dot{filter:grayscale(1);}
+.history-text{font-size:.9rem !important;}
+.history-time{font-size:.76rem !important;}
+
+/* Toast */
+#_toast{border-radius:8px !important;box-shadow:0 12px 28px rgba(20,37,27,.12) !important;font-family:"Inter","Segoe UI",Arial,sans-serif !important;}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:#cbd6d0;border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:#9fb0a6;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</body>
+</html>
