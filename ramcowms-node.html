@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramco WMS Map - BPI Ops, by zanov</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f7f5;--panel:rgba(255,255,255,.88);--white:#fff;--ink:#173226;--muted:#708077;
+  --line:#d9e4dd;--line2:#c9d8cf;--green:#2f8f5b;--green2:#56c788;--blue:#4d8fe8;
+  --violet:#8b6fe8;--shadow:0 18px 48px rgba(28,65,45,.10);--shadow2:0 10px 25px rgba(28,65,45,.14);
+}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
+body{overflow:hidden;background:radial-gradient(circle at 10% 0%,rgba(86,199,136,.17),transparent 29%),radial-gradient(circle at 92% 8%,rgba(77,143,232,.10),transparent 27%),linear-gradient(180deg,#f9fbfa,#eef4f0)}
+button,input,textarea,select{font:inherit}.app{height:100vh;display:grid;grid-template-rows:68px 1fr}.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);backdrop-filter:blur(18px);z-index:20}.brand{display:flex;align-items:center;gap:12px}.brandmark{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:grid;place-items:center;color:white;font-weight:900;box-shadow:0 9px 25px rgba(47,143,91,.28)}.brand h1{font-size:17px;margin:0;line-height:1.2}.brand small{display:block;margin-top:3px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.btn{height:38px;border:1px solid var(--line2);background:white;color:var(--ink);border-radius:12px;padding:0 12px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(28,65,45,.05);transition:.18s}.btn:hover,.btn.active{transform:translateY(-1px);border-color:var(--green);background:#f0faf4}.btn.primary{background:var(--green);border-color:var(--green);color:white}.btn.danger{color:#b42318}.layout{min-height:0;display:grid;grid-template-columns:250px 1fr 360px}.sidebar,.inspector{min-height:0;overflow:auto;background:var(--panel);backdrop-filter:blur(18px)}.sidebar{border-right:1px solid var(--line);padding:14px}.inspector{border-left:1px solid var(--line);padding:14px}.section{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 8px 25px rgba(28,65,45,.05)}.section-label{font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:900;color:var(--muted);margin-bottom:10px}.field{width:100%;border:1px solid var(--line2);background:#fbfdfc;color:var(--ink);border-radius:11px;padding:10px;outline:none}.field:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(47,143,91,.09)}textarea.field{min-height:78px;resize:vertical}.library{display:grid;gap:8px}.library-item{height:45px;display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--line);border-radius:14px;background:#fbfdfc;padding:0 11px;color:var(--ink);font-size:12px;font-weight:800;cursor:pointer;text-align:left;transition:.18s}.library-item:hover{border-color:var(--green);transform:translateX(3px);background:#f1faf5}.library-dot{width:19px;height:19px;border-radius:50%;box-shadow:0 5px 12px rgba(0,0,0,.13)}.scenario{margin-bottom:8px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{padding:10px;border-radius:14px;background:#f7faf8;border:1px solid var(--line)}.metric b{display:block;font-size:21px}.metric span{font-size:9px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.1em}.validation{font-size:11px;line-height:1.55}.ok{color:#168149}.warn{color:#a15c00}.error{color:#b42318}.canvas{position:relative;overflow:hidden;background-color:#f8fbf9;background-image:radial-gradient(#bbcec2 1px,transparent 1px);background-size:27px 27px}.canvas::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 43%,rgba(236,244,239,.71) 100%)}svg{position:relative;z-index:1;width:100%;height:100%;user-select:none}.edge{fill:none;stroke:#9cafaa;stroke-width:2;cursor:pointer;transition:.15s}.edge:hover,.edge.selected{stroke:var(--green);stroke-width:4;filter:drop-shadow(0 3px 5px rgba(47,143,91,.24))}.edge-label{font-size:10px;font-weight:800;fill:#53685b;text-anchor:middle;paint-order:stroke;stroke:#f8fbf9;stroke-width:5px}.node{cursor:grab}.node:active{cursor:grabbing}.node circle.main{stroke:white;stroke-width:5;filter:drop-shadow(0 13px 14px rgba(28,65,45,.20));transition:.18s}.node:hover circle.main{stroke-width:6;filter:drop-shadow(0 15px 16px rgba(28,65,45,.24))}.node.selected circle.main{stroke:#173226;stroke-width:5;filter:drop-shadow(0 0 16px rgba(47,143,91,.36))}.node.archived{opacity:.30}.node .node-name{font-size:12px;font-weight:900;fill:var(--ink);text-anchor:middle;paint-order:stroke;stroke:#f8fbf9;stroke-width:5px;stroke-linejoin:round}.node .node-type{font-size:8px;font-weight:900;text-anchor:middle;fill:white;letter-spacing:.06em;text-transform:uppercase}.connect-ring{fill:white;stroke:var(--green);stroke-width:3}.hint{position:absolute;z-index:5;left:16px;bottom:14px;background:rgba(255,255,255,.92);border:1px solid var(--line2);border-radius:12px;padding:9px 12px;color:var(--muted);font-size:11px;font-weight:700;box-shadow:var(--shadow2)}.empty{text-align:center;color:var(--muted);padding:55px 13px;font-size:12px}.badge{display:inline-flex;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:900;background:#edf8f1;border:1px solid #cde7d6;color:var(--green)}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#f7faf8;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:800;color:#4d6054}.inspector h2{font-size:22px;margin:10px 0 7px}.desc{font-size:12px;color:var(--muted);line-height:1.65}.form-group{margin-bottom:11px}.label{display:block;font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.modal-bg{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(23,50,38,.28);backdrop-filter:blur(7px)}.modal-bg.open{display:flex}.modal{width:min(580px,94vw);max-height:90vh;overflow:auto;background:white;border:1px solid var(--line);border-radius:21px;box-shadow:var(--shadow)}.modal-head,.modal-foot{padding:15px 18px;display:flex;align-items:center;justify-content:space-between}.modal-head{border-bottom:1px solid var(--line)}.modal-foot{border-top:1px solid var(--line);justify-content:flex-end;gap:8px}.modal-body{padding:18px}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.toast{position:fixed;right:18px;bottom:18px;z-index:70;display:none;background:#173226;color:white;border-radius:13px;padding:11px 14px;font-size:12px;font-weight:800;box-shadow:var(--shadow)}@media(max-width:1050px){body{overflow:auto}.app{height:auto}.layout{display:block}.canvas{height:720px}.sidebar,.inspector{border:0}.topbar{height:auto;min-height:68px;padding:12px;gap:10px;align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brandmark">W</div><div><h1>Ramco WMS Map - BPI Ops</h1><small>by zanov · Visual Node Editor</small></div></div>
+  <div class="toolbar">
+    <button class="btn primary" onclick="openNodeModal()">+ Add Node</button>
+    <button id="connectBtn" class="btn" onclick="toggleConnect()">Connect</button>
+    <button class="btn" onclick="autoLayout()">Auto Layout</button>
+    <button class="btn" onclick="validateMap()">Validate</button>
+    <button class="btn" onclick="exportJSON()">Export</button>
+    <button class="btn" onclick="fileInput.click()">Import</button>
+    <input id="fileInput" type="file" accept="application/json" hidden onchange="importJSON(event)">
+  </div>
+</header>
+<div class="layout">
+<aside class="sidebar">
+  <div class="section"><div class="section-label">Search Node Map</div><input id="search" class="field" placeholder="Search name, variable, trigger..." oninput="render()"></div>
+  <div class="section"><div class="section-label">Component Library</div><div class="library">
+    <button class="library-item" onclick="quickAdd('transaction')"><span class="library-dot" style="background:var(--blue)"></span>Transaction</button>
+    <button class="library-item" onclick="quickAdd('rule')"><span class="library-dot" style="background:var(--violet)"></span>Rules & Strategy</button>
+    <button class="library-item" onclick="quickAdd('master')"><span class="library-dot" style="background:var(--green2)"></span>Data Master</button>
+  </div></div>
+  <div class="section"><div class="section-label">Scenario</div><select id="scenario" class="field scenario" onchange="changeScenario()"></select><button class="btn" style="width:100%" onclick="addScenario()">+ New Scenario</button></div>
+  <div class="section"><div class="section-label">Map Metrics</div><div class="metrics"><div class="metric"><b id="mNodes">0</b><span>Nodes</span></div><div class="metric"><b id="mEdges">0</b><span>Relations</span></div><div class="metric"><b id="mActive">0</b><span>Active</span></div><div class="metric"><b id="mRule">0</b><span>Rules</span></div></div></div>
+  <div class="section"><div class="section-label">Validation Result</div><div id="validation" class="validation"><span class="ok">Ready to validate.</span></div></div>
+  <button class="btn" style="width:100%" onclick="resetDemo()">Reset Demo Data</button>
+</aside>
+<main class="canvas"><svg id="svg" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid meet"><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8ca498"/></marker></defs><g id="edges"></g><g id="nodes"></g></svg><div class="hint" id="hint">Drag big dots · Click a dot to inspect · Connect mode: source then target</div></main>
+<section class="inspector"><div id="propertyPanel" class="empty">Select a node or relationship to inspect and edit its properties.</div></section>
+</div></div>
+<div class="modal-bg" id="nodeModal"><div class="modal"><div class="modal-head"><b id="modalTitle">Add Node</b><button class="btn" onclick="closeNodeModal()">Close</button></div><div class="modal-body">
+<input id="nId" type="hidden"><div class="form-group"><label class="label">Node Name</label><input id="nName" class="field"></div>
+<div class="two"><div class="form-group"><label class="label">Main Component</label><select id="nType" class="field"><option value="transaction">Transaction</option><option value="rule">Rules & Strategy</option><option value="master">Data Master</option></select></div><div class="form-group"><label class="label">Module</label><input id="nModule" class="field" placeholder="Inbound / Outbound / Setup"></div></div>
+<div class="form-group"><label class="label">Description</label><textarea id="nDesc" class="field"></textarea></div><div class="form-group"><label class="label">Ramco Menu Path</label><input id="nMenu" class="field"></div>
+<div class="form-group"><label class="label">Variables (comma separated)</label><input id="nVars" class="field"></div><div class="form-group"><label class="label">Triggers (comma separated)</label><input id="nTriggers" class="field"></div><div class="form-group"><label class="label">Operational Impact</label><textarea id="nImpact" class="field"></textarea></div>
+</div><div class="modal-foot"><button class="btn" onclick="closeNodeModal()">Cancel</button><button class="btn primary" onclick="saveNode()">Save Node</button></div></div></div>
+<div id="toast" class="toast"></div>
+<script>
+const COLORS={transaction:'#4d8fe8',rule:'#8b6fe8',master:'#56c788'};
+const LABELS={transaction:'Transaction',rule:'Rules & Strategy',master:'Data Master'};
+const DEMO={scenarios:[{id:'sc_core',name:'Ramco WMS Core'}],activeScenario:'sc_core',nodes:[
+{id:'n_zone',name:'Zone Layout',type:'master',module:'Warehouse Setup',description:'Defines storage, putaway, and picking zones.',menu:'WMS Setup > Zones',variables:['Zone ID','Zone Type','Mix Storage'],triggers:['Warehouse setup'],impact:'Controls eligible storage and picking area.',status:'active',x:150,y:125,scenario:'sc_core'},
+{id:'n_bin',name:'BIN Type',type:'master',module:'Warehouse Setup',description:'Defines BIN capacity and allowed storage units.',menu:'WMS Setup > BIN Types',variables:['LWH','Weight','Allowed SU'],triggers:['BIN creation'],impact:'Incorrect mapping may prevent putaway.',status:'active',x:380,y:105,scenario:'sc_core'},
+{id:'n_profile',name:'Zone Profile',type:'rule',module:'Warehouse Setup',description:'Maps zones and allowed package types.',menu:'WMS Setup > Profiles',variables:['Zone','SU1','SU2'],triggers:['Search strategy'],impact:'Controls eligible destination zones.',status:'active',x:610,y:135,scenario:'sc_core'},
+{id:'n_order',name:'Inbound Order',type:'transaction',module:'Inbound',description:'Creates inbound reference based on arrival document.',menu:'Inbound > Internal Order',variables:['Customer','Item','Quantity','Receipt Date'],triggers:['Inbound document'],impact:'Creates source data for ASN.',status:'active',x:155,y:385,scenario:'sc_core'},
+{id:'n_asn',name:'ASN Creation',type:'transaction',module:'Inbound',description:'Creates ASN as receiving reference.',menu:'Inbound > ASN',variables:['Vendor ASN No','Inbound Ref'],triggers:['Inbound Order confirmed'],impact:'Provides source for GR process.',status:'active',x:410,y:385,scenario:'sc_core'},
+{id:'n_gr',name:'GR Execution',type:'transaction',module:'Inbound',description:'Records receipt quantity, batch, manufacturing date, and expiry.',menu:'Good Receipt > Execution',variables:['Batch','MFG Date','Expiry','Quantity'],triggers:['GR Plan'],impact:'Creates received stock.',status:'active',x:665,y:385,scenario:'sc_core'},
+{id:'n_putrule',name:'Putaway Rule',type:'rule',module:'Inbound Strategy',description:'Determines destination based on condition and rule sequence.',menu:'Putaway > Rules',variables:['Condition Group','Destination Zone','Priority'],triggers:['Good Receipt'],impact:'Controls system putaway suggestion.',status:'active',x:910,y:205,scenario:'sc_core'},
+{id:'n_put',name:'Putaway Plan',type:'transaction',module:'Inbound',description:'Creates suggested or manual putaway destination.',menu:'Putaway > Plan',variables:['Actual BIN','Zone','UID'],triggers:['Good Receipt and Put Away'],impact:'Determines final storage location.',status:'active',x:1035,y:430,scenario:'sc_core'}],edges:[
+{id:'e1',from:'n_zone',to:'n_profile',type:'Required Before',condition:'Zone must exist',impact:'Profile can use zone',scenario:'sc_core'},
+{id:'e2',from:'n_bin',to:'n_profile',type:'Uses Master',condition:'Allowed SU mapped',impact:'Package eligibility',scenario:'sc_core'},
+{id:'e3',from:'n_order',to:'n_asn',type:'Triggers',condition:'Inbound order confirmed',impact:'ASN becomes available',scenario:'sc_core'},
+{id:'e4',from:'n_asn',to:'n_gr',type:'Triggers',condition:'ASN confirmed',impact:'GR can be executed',scenario:'sc_core'},
+{id:'e5',from:'n_profile',to:'n_putrule',type:'Affects',condition:'Zone profile available',impact:'Destination eligibility',scenario:'sc_core'},
+{id:'e6',from:'n_putrule',to:'n_put',type:'Produces',condition:'Rule condition matched',impact:'Putaway plan destination',scenario:'sc_core'},
+{id:'e7',from:'n_gr',to:'n_put',type:'Triggers',condition:'Good Receipt and Put Away selected',impact:'Putaway plan created',scenario:'sc_core'}]};
+let db=loadDB(),selected=null,connectMode=false,connectSource=null,drag=null,suppressNodeClick=false,dragFrame=null;
+function loadDB(){try{return JSON.parse(localStorage.getItem('ramco_wms_node_map'))||structuredClone(DEMO)}catch(e){return structuredClone(DEMO)}}
+function saveDB(){localStorage.setItem('ramco_wms_node_map',JSON.stringify(db));renderScenarioSelect();render()}
+function currentScenario(){return db.activeScenario}
+function scenarioNodes(){const q=(search.value||'').toLowerCase();return db.nodes.filter(n=>n.scenario===currentScenario()&&(!q||[n.name,n.module,n.description,n.menu,...(n.variables||[]),...(n.triggers||[])].join(' ').toLowerCase().includes(q)))}
+function renderScenarioSelect(){scenario.innerHTML=db.scenarios.map(s=>`<option value="${s.id}" ${s.id===db.activeScenario?'selected':''}>${esc(s.name)}</option>`).join('')}
+function render(){const ns=scenarioNodes(),ids=new Set(ns.map(n=>n.id)),es=db.edges.filter(e=>e.scenario===currentScenario()&&ids.has(e.from)&&ids.has(e.to));mNodes.textContent=db.nodes.filter(n=>n.scenario===currentScenario()).length;mEdges.textContent=db.edges.filter(e=>e.scenario===currentScenario()).length;mActive.textContent=ns.filter(n=>n.status!=='archived').length;mRule.textContent=ns.filter(n=>n.type==='rule').length;
+edges.innerHTML=es.map(e=>{const a=db.nodes.find(n=>n.id===e.from),b=db.nodes.find(n=>n.id===e.to),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;return `<g onclick="selectEdge(event,'${e.id}')"><path class="edge ${selected?.kind==='edge'&&selected.id===e.id?'selected':''}" d="M${a.x} ${a.y} C${mx} ${a.y},${mx} ${b.y},${b.x} ${b.y}" marker-end="url(#arrow)"/><text class="edge-label" x="${mx}" y="${my-7}">${esc(e.type)}</text></g>`}).join('');
+nodes.innerHTML=ns.map(n=>`<g class="node ${selected?.kind==='node'&&selected.id===n.id?'selected':''} ${n.status==='archived'?'archived':''}" transform="translate(${n.x},${n.y})" onmousedown="startDrag(event,'${n.id}')" onclick="nodeClick(event,'${n.id}')"><circle class="main" r="31" fill="${COLORS[n.type]}"/><text class="node-type" y="3">${n.type==='rule'?'RULE':n.type==='master'?'MASTER':'TRX'}</text><text class="node-name" y="51">${esc(short(n.name,21))}</text>${connectMode?'<circle class="connect-ring" cx="28" cy="-25" r="7"/>':''}</g>`).join('');renderInspector()}
+function renderInspector(){if(!selected){propertyPanel.innerHTML='<div class="empty">Select a node or relationship to inspect and edit its properties.</div>';return}if(selected.kind==='node'){const n=db.nodes.find(x=>x.id===selected.id);if(!n){selected=null;return renderInspector()}const incoming=db.edges.filter(e=>e.to===n.id).length,outgoing=db.edges.filter(e=>e.from===n.id).length;propertyPanel.innerHTML=`<div class="section"><span class="badge" style="color:${COLORS[n.type]};border-color:${COLORS[n.type]}55;background:${COLORS[n.type]}16">${LABELS[n.type]}</span><h2>${esc(n.name)}</h2><div class="desc">${esc(n.description||'No description available.')}</div><div class="chips" style="margin-top:10px"><span class="chip">${esc(n.module||'No Module')}</span><span class="chip">${incoming} incoming</span><span class="chip">${outgoing} outgoing</span><span class="chip">${esc(n.status)}</span></div></div><div class="section"><div class="section-label">Ramco Menu</div><div class="desc">${esc(n.menu||'-')}</div></div><div class="section"><div class="section-label">Variables</div><div class="chips">${(n.variables||[]).map(v=>`<span class="chip">${esc(v)}</span>`).join('')||'-'}</div></div><div class="section"><div class="section-label">Triggers</div><div class="chips">${(n.triggers||[]).map(v=>`<span class="chip">${esc(v)}</span>`).join('')||'-'}</div></div><div class="section"><div class="section-label">Operational Impact</div><div class="desc">${esc(n.impact||'-')}</div></div><div class="actions"><button class="btn primary" onclick="openNodeModal('${n.id}')">Edit</button><button class="btn" onclick="duplicateNode('${n.id}')">Duplicate</button><button class="btn" onclick="archiveNode('${n.id}')">${n.status==='archived'?'Activate':'Archive'}</button><button class="btn danger" onclick="deleteNode('${n.id}')">Delete</button></div>`}else{const e=db.edges.find(x=>x.id===selected.id),a=db.nodes.find(n=>n.id===e?.from),b=db.nodes.find(n=>n.id===e?.to);if(!e)return;propertyPanel.innerHTML=`<div class="section"><span class="badge">Relationship</span><h2>${esc(a?.name)} → ${esc(b?.name)}</h2></div><div class="form-group"><label class="label">Relationship Type</label><select id="relType" class="field">${['Required Before','Triggers','Produces','Uses Master','Validates','Updates','Affects','Optional Step','Exception Flow','Data Reference'].map(v=>`<option ${v===e.type?'selected':''}>${v}</option>`).join('')}</select></div><div class="form-group"><label class="label">Condition</label><textarea id="relCondition" class="field">${esc(e.condition||'')}</textarea></div><div class="form-group"><label class="label">Impact</label><textarea id="relImpact" class="field">${esc(e.impact||'')}</textarea></div><div class="actions"><button class="btn primary" onclick="saveRelationship('${e.id}')">Save</button><button class="btn danger" onclick="deleteEdge('${e.id}')">Delete Relation</button></div>`}}
+function nodeClick(ev,id){
+  ev.stopPropagation();
+  if(suppressNodeClick){ suppressNodeClick=false; return; }
+  if(connectMode){
+    if(!connectSource){ connectSource=id; toast('Source selected. Select target node.'); }
+    else if(connectSource!==id){ createEdge(connectSource,id); connectSource=null; }
+    else toast('Please select another target.');
+    return;
+  }
+  selected={kind:'node',id}; render();
+}
+function selectEdge(ev,id){ev.stopPropagation();selected={kind:'edge',id};render()}
+function pointerToSvg(ev){
+  const r=svg.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)/r.width*1200,y:(ev.clientY-r.top)/r.height*760};
+}
+function startDrag(ev,id){
+  if(connectMode || ev.button!==0) return;
+  ev.preventDefault(); ev.stopPropagation();
+  const n=db.nodes.find(x=>x.id===id),pt=pointerToSvg(ev);
+  drag={id,offsetX:pt.x-n.x,offsetY:pt.y-n.y,startX:ev.clientX,startY:ev.clientY,moved:false,lastEvent:null};
+  selected={kind:'node',id}; render();
+  window.addEventListener('mousemove',dragMove);
+  window.addEventListener('mouseup',dragEnd,{once:true});
+}
+function dragMove(ev){
+  if(!drag) return;
+  drag.lastEvent=ev;
+  if(Math.hypot(ev.clientX-drag.startX,ev.clientY-drag.startY)>4) drag.moved=true;
+  if(dragFrame) return;
+  dragFrame=requestAnimationFrame(()=>{
+    dragFrame=null;
+    if(!drag || !drag.lastEvent) return;
+    const pt=pointerToSvg(drag.lastEvent),n=db.nodes.find(x=>x.id===drag.id);
+    n.x=Math.max(50,Math.min(1150,pt.x-drag.offsetX));
+    n.y=Math.max(45,Math.min(710,pt.y-drag.offsetY));
+    render();
+  });
+}
+function dragEnd(){
+  if(!drag) return;
+  const wasMoved=drag.moved;
+  localStorage.setItem('ramco_wms_node_map',JSON.stringify(db));
+  drag=null;
+  if(dragFrame){cancelAnimationFrame(dragFrame);dragFrame=null;}
+  window.removeEventListener('mousemove',dragMove);
+  if(wasMoved){ suppressNodeClick=true; setTimeout(()=>suppressNodeClick=false,80); }
+}
+function toggleConnect(){connectMode=!connectMode;connectSource=null;connectBtn.classList.toggle('active',connectMode);hint.textContent=connectMode?'Connect mode: click source big dot, then target big dot':'Drag big dots · Click a dot to inspect · Connect mode: source then target';render()}
+function createEdge(from,to){if(db.edges.some(e=>e.from===from&&e.to===to&&e.scenario===currentScenario()))return toast('Relationship already exists.');db.edges.push({id:'e_'+Date.now(),from,to,type:'Triggers',condition:'',impact:'',scenario:currentScenario()});connectMode=false;connectBtn.classList.remove('active');saveDB();toast('Relationship created.')}
+function openNodeModal(id,type){const n=id?db.nodes.find(x=>x.id===id):null;modalTitle.textContent=n?'Edit Node':'Add Node';nId.value=n?.id||'';nName.value=n?.name||'';nType.value=n?.type||type||'transaction';nModule.value=n?.module||'';nDesc.value=n?.description||'';nMenu.value=n?.menu||'';nVars.value=(n?.variables||[]).join(', ');nTriggers.value=(n?.triggers||[]).join(', ');nImpact.value=n?.impact||'';nodeModal.classList.add('open');setTimeout(()=>nName.focus(),50)}
+function closeNodeModal(){nodeModal.classList.remove('open')}
+function saveNode(){const id=nId.value,name=nName.value.trim();if(!name)return toast('Node name is required.');const data={name,type:nType.value,module:nModule.value.trim(),description:nDesc.value.trim(),menu:nMenu.value.trim(),variables:split(nVars.value),triggers:split(nTriggers.value),impact:nImpact.value.trim()};if(id)Object.assign(db.nodes.find(n=>n.id===id),data);else db.nodes.push({id:'n_'+Date.now(),...data,status:'active',x:260+Math.random()*650,y:130+Math.random()*470,scenario:currentScenario()});closeNodeModal();saveDB();toast('Node saved.')}
+function quickAdd(type){openNodeModal(null,type)}
+function duplicateNode(id){const n=db.nodes.find(x=>x.id===id);db.nodes.push({...structuredClone(n),id:'n_'+Date.now(),name:n.name+' Copy',x:n.x+45,y:n.y+45});saveDB()}
+function archiveNode(id){const n=db.nodes.find(x=>x.id===id);n.status=n.status==='archived'?'active':'archived';saveDB()}
+function deleteNode(id){if(!confirm('Delete this node and all connected relationships?'))return;db.nodes=db.nodes.filter(n=>n.id!==id);db.edges=db.edges.filter(e=>e.from!==id&&e.to!==id);selected=null;saveDB()}
+function saveRelationship(id){const e=db.edges.find(x=>x.id===id);e.type=relType.value;e.condition=relCondition.value.trim();e.impact=relImpact.value.trim();saveDB();toast('Relationship saved.')}
+function deleteEdge(id){db.edges=db.edges.filter(e=>e.id!==id);selected=null;saveDB()}
+function autoLayout(){const ns=db.nodes.filter(n=>n.scenario===currentScenario()),groups={master:[],rule:[],transaction:[]};ns.forEach(n=>groups[n.type].push(n));[['master',135],['rule',350],['transaction',575]].forEach(([t,y])=>groups[t].forEach((n,i)=>{n.x=130+i*(940/Math.max(1,groups[t].length-1));n.y=y}));saveDB();toast('Layered node layout applied.')}
+function validateMap(){const ns=db.nodes.filter(n=>n.scenario===currentScenario()&&n.status==='active'),es=db.edges.filter(e=>e.scenario===currentScenario()),messages=[];ns.forEach(n=>{const inc=es.some(e=>e.to===n.id),out=es.some(e=>e.from===n.id);if(n.type==='transaction'&&!inc)messages.push(['warn',`${n.name}: no incoming relation.`]);if(['transaction','rule'].includes(n.type)&&!out)messages.push(['warn',`${n.name}: no outgoing relation.`]);if(!n.description)messages.push(['error',`${n.name}: description is empty.`]);if(!n.variables?.length)messages.push(['warn',`${n.name}: variables are not documented.`])});es.forEach(e=>{if(!e.condition)messages.push(['warn',`${e.type}: relationship condition is empty.`])});validation.innerHTML=messages.length?messages.map(m=>`<div class="${m[0]}">• ${esc(m[1])}</div>`).join(''):'<span class="ok">✓ Map is structurally valid.</span>';toast(`${messages.length} validation item(s).`)}
+function changeScenario(){db.activeScenario=scenario.value;selected=null;saveDB()}
+function addScenario(){const name=prompt('Scenario name:');if(!name)return;const id='sc_'+Date.now();db.scenarios.push({id,name});db.activeScenario=id;saveDB()}
+function exportJSON(){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ramco-wms-node-map.json';a.click();URL.revokeObjectURL(a.href)}
+function importJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.nodes||!x.edges||!x.scenarios)throw 0;db=x;saveDB();toast('Node map imported.')}catch(e){alert('Invalid Ramco WMS Node Map JSON.')}};r.readAsText(f);ev.target.value=''}
+function resetDemo(){if(!confirm('Reset to demo node map?'))return;db=structuredClone(DEMO);selected=null;saveDB()}
+function split(v){return v.split(',').map(x=>x.trim()).filter(Boolean)}function short(v,n){return v.length>n?v.slice(0,n-1)+'…':v}function esc(v){return String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}function toast(text){toastEl.textContent=text;toastEl.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>toastEl.style.display='none',2200)}
+const toastEl=document.getElementById('toast');svg.addEventListener('click',()=>{if(!connectMode){selected=null;render()}});renderScenarioSelect();render();
+</script>
+</body>
+</html>
