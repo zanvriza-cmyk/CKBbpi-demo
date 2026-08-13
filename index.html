@@ -208,6 +208,64 @@
       background: #B7791F;
     }
 
+
+
+    /* Rendering performance -------------------------------------------------
+       Dark mode uses opaque surfaces instead of repeatedly blurring the page
+       behind every card. This keeps the same layout and interactions while
+       reducing paint work during scrolling. */
+    .tool-card {
+      content-visibility: auto;
+      contain-intrinsic-size: 160px;
+    }
+
+    .ticker-track,
+    .aurora,
+    .theme-toggle .knob {
+      will-change: transform;
+    }
+
+    body.dark-mode .noise {
+      display: none;
+    }
+
+    body.dark-mode .glass,
+    body.dark-mode header,
+    body.dark-mode .modal-backdrop {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+
+    body.dark-mode .glass {
+      background: rgba(16, 32, 24, .96) !important;
+    }
+
+    body.dark-mode header {
+      background: rgba(8, 18, 13, .97) !important;
+    }
+
+    body.dark-mode .tool-card,
+    body.dark-mode .quick-card {
+      contain: layout paint style;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, .22);
+    }
+
+    body.dark-mode .aurora {
+      opacity: .72;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .aurora,
+      .ticker-track,
+      .status-dot,
+      .shimmer,
+      .card-enter,
+      .tool-card {
+        animation: none !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -228,8 +286,8 @@
             <i class="fa-solid fa-anchor"></i>
           </div>
           <div>
-            <div class="font-black tracking-tight text-ckb-ink leading-tight">BPI OPS Tools Hub</div>
-            <div class="text-[10px] uppercase tracking-[.22em] font-black text-ckb-muted">CKB Logistics</div>
+            <div class="font-black tracking-tight text-ckb-ink leading-tight">Tools Hub</div>
+            <div class="text-[10px] uppercase tracking-[.22em] font-black text-ckb-muted">BPI Ops | CKB Logistics</div>
           </div>
         </div>
         <div class="hidden md:flex items-center gap-2 text-xs font-bold text-ckb-muted">
@@ -250,14 +308,14 @@
                 <i class="fa-solid fa-bolt"></i> Operational Excellence Workspace
               </div>
               <h1 class="text-4xl md:text-6xl font-black leading-[1.02] tracking-tight">
-                Portal Hub <span class="text-emerald-200">BPI OPS</span>
+               Tools Portal by <span class="text-emerald-200">BPI OPS</span>
               </h1>
               <p class="mt-4 text-sm md:text-base text-emerald-50/85 max-w-2xl leading-relaxed">
-                One landing page untuk akses tools, database, dashboard, dan document operations. Dibuat untuk bantu kerja harian jadi lebih cepat, rapi, dan gampang dicari.
+                One landing page untuk akses tools, database, dashboard, and many more. we made this so it can help you finish your job easier.
               </p>
               <div class="mt-7 flex flex-col sm:flex-row gap-3">
                 <button onclick="focusSearch()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-ckb-main font-black hover:bg-emerald-50 transition shadow-soft">
-                  <i class="fa-solid fa-magnifying-glass"></i> Cari Tools
+                  <i class="fa-solid fa-magnifying-glass"></i> Find Tools
                 </button>
                 <button onclick="scrollToTools()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 border border-white/25 text-white font-black hover:bg-white/15 transition">
                   <i class="fa-solid fa-layer-group"></i> Browse Library
@@ -642,26 +700,39 @@
     }
 
 
+    const THEME_STORAGE_KEY = 'bpi_theme';
+
+    function updateThemeIcon(icon, isDark) {
+      if (!icon) return;
+      icon.classList.toggle('fa-moon', !isDark);
+      icon.classList.toggle('fa-sun', isDark);
+    }
+
     function applyTheme(theme) {
       const isDark = theme === 'dark';
+
       document.body.classList.toggle('dark-mode', isDark);
-      document.getElementById('themeIcon')?.classList.toggle('fa-moon', !isDark);
-      document.getElementById('themeIcon')?.classList.toggle('fa-sun', isDark);
-      document.getElementById('themeIconMobile')?.classList.toggle('fa-moon', !isDark);
-      document.getElementById('themeIconMobile')?.classList.toggle('fa-sun', isDark);
-      localStorage.setItem('bpi_theme', theme);
+      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+      updateThemeIcon(document.getElementById('themeIcon'), isDark);
+      updateThemeIcon(document.getElementById('themeIconMobile'), isDark);
+
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
     }
 
     function toggleTheme() {
-      const isDark = document.body.classList.contains('dark-mode');
-      applyTheme(isDark ? 'light' : 'dark');
+      const nextTheme = document.body.classList.contains('dark-mode')
+        ? 'light'
+        : 'dark';
+
+      applyTheme(nextTheme);
     }
 
     function initTheme() {
-      const savedTheme = localStorage.getItem('bpi_theme');
-      if (savedTheme) { applyTheme(savedTheme); return; }
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyTheme(prefersDark ? 'dark' : 'light');
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+
+      applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
     }
 
     document.addEventListener('keydown', e => {
@@ -669,11 +740,15 @@
       if (e.key === 'Escape') closeCommandPalette();
     });
 
-    initTheme();
-    setInterval(updateClock, 1000);
-    updateClock();
-    setRandomQuote();
-    fetchLinks();
+    function initializePortal() {
+      initTheme();
+      updateClock();
+      setRandomQuote();
+      fetchLinks();
+      setInterval(updateClock, 1000);
+    }
+
+    initializePortal();
   </script>
 </body>
 </html>
