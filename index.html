@@ -210,61 +210,52 @@
 
 
 
-    /* Rendering performance -------------------------------------------------
-       Dark mode uses opaque surfaces instead of repeatedly blurring the page
-       behind every card. This keeps the same layout and interactions while
-       reducing paint work during scrolling. */
-    .tool-card {
-      content-visibility: auto;
-      contain-intrinsic-size: 160px;
+    /* Productivity widgets */
+    .productivity-panel {
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(215,227,219,.88);
+      box-shadow: 0 14px 34px rgba(16,32,24,.07);
     }
-
-    .ticker-track,
-    .aurora,
-    .theme-toggle .knob {
-      will-change: transform;
+    .recent-tool,
+    .favorite-tool { transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+    .recent-tool:hover,
+    .favorite-tool:hover { transform: translateY(-2px); border-color: #22543D; }
+    .favorite-button { transition: transform .18s ease, color .18s ease; }
+    .favorite-button:hover { transform: scale(1.12); }
+    .favorite-button.is-favorite { color: #B7791F; }
+    .check-item.completed .check-label { text-decoration: line-through; opacity: .58; }
+    .timer-ring {
+      --progress: 0deg;
+      width: 138px;
+      height: 138px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(#22543D var(--progress), #E5EDE8 0);
+      position: relative;
     }
-
-    body.dark-mode .noise {
-      display: none;
+    .timer-ring::before {
+      content: '';
+      position: absolute;
+      inset: 9px;
+      border-radius: inherit;
+      background: #fff;
+      border: 1px solid #D7E3DB;
     }
-
-    body.dark-mode .glass,
-    body.dark-mode header,
-    body.dark-mode .modal-backdrop {
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
+    .timer-ring > div { position: relative; z-index: 1; }
+    .timer-running { animation: timerPulse 2.2s ease-in-out infinite; }
+    @keyframes timerPulse { 50% { box-shadow: 0 0 0 10px rgba(34,84,61,.07); } }
+    .volume-slider { accent-color: #22543D; }
+    body.dark-mode .productivity-panel {
+      background: rgba(16,32,24,.96) !important;
+      border-color: rgba(199,214,204,.18) !important;
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
     }
-
-    body.dark-mode .glass {
-      background: rgba(16, 32, 24, .96) !important;
-    }
-
-    body.dark-mode header {
-      background: rgba(8, 18, 13, .97) !important;
-    }
-
-    body.dark-mode .tool-card,
-    body.dark-mode .quick-card {
-      contain: layout paint style;
-      box-shadow: 0 10px 26px rgba(0, 0, 0, .22);
-    }
-
-    body.dark-mode .aurora {
-      opacity: .72;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      .aurora,
-      .ticker-track,
-      .status-dot,
-      .shimmer,
-      .card-enter,
-      .tool-card {
-        animation: none !important;
-      }
-    }
+    body.dark-mode .timer-ring { background: conic-gradient(#4BA778 var(--progress), #263C30 0); }
+    body.dark-mode .timer-ring::before { background: #102018; border-color: rgba(199,214,204,.18); }
+    body.dark-mode .recent-tool,
+    body.dark-mode .favorite-tool,
+    body.dark-mode .check-item { background: rgba(8,18,13,.56) !important; }
 
   </style>
 </head>
@@ -286,8 +277,8 @@
             <i class="fa-solid fa-anchor"></i>
           </div>
           <div>
-            <div class="font-black tracking-tight text-ckb-ink leading-tight">Tools Hub</div>
-            <div class="text-[10px] uppercase tracking-[.22em] font-black text-ckb-muted">BPI Ops | CKB Logistics</div>
+            <div class="font-black tracking-tight text-ckb-ink leading-tight">BPI OPS Tools Hub</div>
+            <div class="text-[10px] uppercase tracking-[.22em] font-black text-ckb-muted">CKB Logistics</div>
           </div>
         </div>
         <div class="hidden md:flex items-center gap-2 text-xs font-bold text-ckb-muted">
@@ -305,13 +296,13 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div class="lg:col-span-7 card-enter">
               <div class="inline-flex items-center gap-2 rounded-full bg-white/12 border border-white/20 px-3 py-1 text-xs font-extrabold uppercase tracking-[.18em] text-emerald-100 mb-5">
-                <i class="fa-solid fa-bolt"></i> Operational Excellence Workspace
+                <i class="fa-solid fa-bolt"></i> Excellence Workspace
               </div>
               <h1 class="text-4xl md:text-6xl font-black leading-[1.02] tracking-tight">
-               Tools Portal by <span class="text-emerald-200">BPI OPS</span>
+                Tools Hub <span class="text-emerald-200">BPI Ops</span>
               </h1>
               <p class="mt-4 text-sm md:text-base text-emerald-50/85 max-w-2xl leading-relaxed">
-                One landing page untuk akses tools, database, dashboard, and many more. we made this so it can help you finish your job easier.
+                We made this to make your job become easier, pomodoro will help you to focus, woww what a tools!
               </p>
               <div class="mt-7 flex flex-col sm:flex-row gap-3">
                 <button onclick="focusSearch()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-ckb-main font-black hover:bg-emerald-50 transition shadow-soft">
@@ -399,6 +390,32 @@
             <div class="rounded-2xl border border-ckb-line bg-white p-5 shimmer h-32"></div>
             <div class="rounded-2xl border border-ckb-line bg-white p-5 shimmer h-32"></div>
           </div>
+
+
+          <!-- Personal Workspace -->
+          <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="productivity-panel rounded-3xl p-5">
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Personal History</div>
+                  <h2 class="font-black text-ckb-ink mt-1">Recently Opened</h2>
+                </div>
+                <button onclick="clearRecentTools()" class="text-xs font-black text-ckb-muted hover:text-ckb-main transition">Clear</button>
+              </div>
+              <div id="recentTools" class="space-y-2"></div>
+            </div>
+            <div class="productivity-panel rounded-3xl p-5">
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Pinned by You</div>
+                  <h2 class="font-black text-ckb-ink mt-1">Favorites</h2>
+                </div>
+                <i class="fa-solid fa-star text-amber-500"></i>
+              </div>
+              <div id="favoriteTools" class="space-y-2"></div>
+            </div>
+          </section>
+
           <div id="emptyState" class="hidden bg-white border border-dashed border-ckb-line rounded-3xl p-10 text-center">
             <div class="w-14 h-14 mx-auto rounded-2xl bg-ckb-pale flex items-center justify-center text-ckb-main text-xl"><i class="fa-solid fa-magnifying-glass"></i></div>
             <h3 class="mt-4 font-black text-ckb-ink">No matching tools found</h3>
@@ -408,6 +425,60 @@
 
         <!-- Right: Widgets -->
         <aside class="lg:col-span-4 space-y-5">
+
+          <!-- Daily Operations Checklist -->
+          <section class="productivity-panel rounded-3xl p-5 card-enter">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Daily Workspace</div>
+                <h2 class="font-black text-ckb-ink mt-1">Operations Checklist</h2>
+              </div>
+              <button onclick="addChecklistItem()" class="w-10 h-10 rounded-2xl bg-ckb-main text-white hover:bg-ckb-forest transition" title="Add task"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div id="checklistItems" class="space-y-2"></div>
+            <div class="mt-4">
+              <div class="flex justify-between text-xs font-black text-ckb-muted mb-1"><span>Daily Progress</span><span id="checklistProgressText">0 / 0</span></div>
+              <div class="h-2 rounded-full bg-white border border-ckb-line overflow-hidden"><div id="checklistProgressBar" class="h-full bg-ckb-main rounded-full transition-all" style="width:0%"></div></div>
+            </div>
+          </section>
+
+          <!-- Pomodoro Focus Timer -->
+          <section class="productivity-panel rounded-3xl p-5 card-enter">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Deep Work</div>
+                <h2 class="font-black text-ckb-ink mt-1">Pomodoro Focus</h2>
+              </div>
+              <select id="timerMode" onchange="changeTimerMode()" class="rounded-xl bg-white border border-ckb-line px-2 py-2 text-xs font-black text-ckb-main outline-none">
+                <option value="1500">Focus 25</option>
+                <option value="300">Break 5</option>
+                <option value="3000">Deep 50</option>
+              </select>
+            </div>
+            <div class="flex justify-center py-2">
+              <div id="timerRing" class="timer-ring">
+                <div class="text-center">
+                  <div id="timerDisplay" class="text-3xl font-black tabular-nums text-ckb-ink">25:00</div>
+                  <div id="timerState" class="text-[10px] uppercase tracking-[.14em] font-black text-ckb-muted mt-1">Ready</div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-4">
+              <button onclick="startTimer()" class="py-2.5 rounded-xl bg-ckb-main text-white text-xs font-black hover:bg-ckb-forest transition"><i class="fa-solid fa-play mr-1"></i>Start</button>
+              <button onclick="pauseTimer()" class="py-2.5 rounded-xl bg-white border border-ckb-line text-ckb-main text-xs font-black hover:bg-ckb-pale transition"><i class="fa-solid fa-pause mr-1"></i>Pause</button>
+              <button onclick="resetTimer()" class="py-2.5 rounded-xl bg-white border border-ckb-line text-ckb-main text-xs font-black hover:bg-ckb-pale transition"><i class="fa-solid fa-rotate-left mr-1"></i>Reset</button>
+            </div>
+            <div class="mt-4 rounded-2xl bg-ckb-pale border border-ckb-line p-3">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2"><i class="fa-solid fa-headphones text-ckb-main"></i><span class="text-xs font-black text-ckb-ink">Low-key Focus Audio</span></div>
+                <button id="audioToggle" onclick="toggleFocusAudio()" class="text-xs font-black text-ckb-main">Off</button>
+              </div>
+              <div class="flex items-center gap-2 mt-3"><i class="fa-solid fa-volume-low text-ckb-muted text-xs"></i><input id="focusVolume" class="volume-slider w-full" type="range" min="0" max="100" value="22" oninput="setFocusVolume(this.value)"></div>
+              <p class="text-[10px] text-ckb-muted mt-2 leading-relaxed">A lightweight ambient soundscape generated in the browser. No external song file or streaming service needed.</p>
+            </div>
+            <div class="text-center text-xs font-bold text-ckb-muted mt-3">Completed sessions: <span id="pomodoroCount" class="text-ckb-main font-black">0</span></div>
+          </section>
+
           <section class="glass rounded-3xl p-5 card-enter" style="animation-delay:.04s">
             <div class="flex items-center justify-between">
               <div>
@@ -555,6 +626,7 @@
         renderQuickLaunch();
         renderFeaturedTool();
         updateStats();
+        renderPersonalTools();
       } catch (error) {
         console.error('Error loading CSV:', error);
         document.getElementById('dbStatus').textContent = 'Failed';
@@ -603,13 +675,16 @@
       document.getElementById('emptyState').classList.toggle('hidden', filtered.length !== 0);
       if (!filtered.length) { container.innerHTML = ''; updateStats(); return; }
       container.innerHTML = filtered.map((t, idx) => `
-        <a href="${t.link}" target="_blank" class="tool-card group rounded-3xl bg-white border border-ckb-line p-5 transition-all duration-200" style="animation-delay:${Math.min(idx * 0.025, .35)}s">
+        <a href="${t.link}" target="_blank" onclick="recordToolOpen('${encodeURIComponent(t.title)}')" class="tool-card group rounded-3xl bg-white border border-ckb-line p-5 transition-all duration-200" style="animation-delay:${Math.min(idx * 0.025, .35)}s">
           <div class="flex gap-4">
             <div class="shrink-0 w-14 h-14 rounded-2xl bg-ckb-pale border border-ckb-line flex items-center justify-center text-2xl group-hover:bg-white transition">${t.emoji || '📄'}</div>
             <div class="min-w-0 flex-1">
               <div class="flex items-start justify-between gap-3">
                 <h3 class="font-black text-ckb-ink group-hover:text-ckb-main transition leading-snug">${escapeHTML(t.title)}</h3>
-                <i class="fa-solid fa-arrow-up-right-from-square text-ckb-muted group-hover:text-ckb-main text-xs mt-1"></i>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite('${encodeURIComponent(t.title)}')" class="favorite-button ${isFavorite(t.title) ? 'is-favorite' : 'text-ckb-muted'}" title="Favorite"><i class="fa-${isFavorite(t.title) ? 'solid' : 'regular'} fa-star"></i></button>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-ckb-muted group-hover:text-ckb-main text-xs mt-1"></i>
+                </div>
               </div>
               <p class="text-sm text-ckb-muted mt-2 leading-relaxed line-clamp-2">${escapeHTML(t.desc || 'No description available.')}</p>
               <span class="inline-flex mt-4 px-2.5 py-1 rounded-lg bg-ckb-pale border border-ckb-line text-[10px] font-black uppercase tracking-[.12em] text-ckb-main">${t.category}</span>
@@ -700,39 +775,261 @@
     }
 
 
-    const THEME_STORAGE_KEY = 'bpi_theme';
-
-    function updateThemeIcon(icon, isDark) {
-      if (!icon) return;
-      icon.classList.toggle('fa-moon', !isDark);
-      icon.classList.toggle('fa-sun', isDark);
-    }
-
     function applyTheme(theme) {
       const isDark = theme === 'dark';
-
       document.body.classList.toggle('dark-mode', isDark);
-      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
-
-      updateThemeIcon(document.getElementById('themeIcon'), isDark);
-      updateThemeIcon(document.getElementById('themeIconMobile'), isDark);
-
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
+      document.getElementById('themeIcon')?.classList.toggle('fa-moon', !isDark);
+      document.getElementById('themeIcon')?.classList.toggle('fa-sun', isDark);
+      document.getElementById('themeIconMobile')?.classList.toggle('fa-moon', !isDark);
+      document.getElementById('themeIconMobile')?.classList.toggle('fa-sun', isDark);
+      localStorage.setItem('bpi_theme', theme);
     }
 
     function toggleTheme() {
-      const nextTheme = document.body.classList.contains('dark-mode')
-        ? 'light'
-        : 'dark';
-
-      applyTheme(nextTheme);
+      const isDark = document.body.classList.contains('dark-mode');
+      applyTheme(isDark ? 'light' : 'dark');
     }
 
     function initTheme() {
-      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-      const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+      const savedTheme = localStorage.getItem('bpi_theme');
+      if (savedTheme) { applyTheme(savedTheme); return; }
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(prefersDark ? 'dark' : 'light');
+    }
 
-      applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+
+
+    // Personal workspace ------------------------------------------------------
+    const RECENT_TOOLS_KEY = 'bpi_recent_tools';
+    const FAVORITE_TOOLS_KEY = 'bpi_favorite_tools';
+    const CHECKLIST_KEY = 'bpi_daily_checklist';
+    const POMODORO_COUNT_KEY = 'bpi_pomodoro_count';
+
+    function readStorage(key, fallback = []) {
+      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+      catch { return fallback; }
+    }
+
+    function writeStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function findTool(title) {
+      return tools.find(tool => tool.title === title);
+    }
+
+    function recordToolOpen(encodedTitle) {
+      const title = decodeURIComponent(encodedTitle);
+      const recent = readStorage(RECENT_TOOLS_KEY).filter(item => item !== title);
+      recent.unshift(title);
+      writeStorage(RECENT_TOOLS_KEY, recent.slice(0, 6));
+      renderPersonalTools();
+    }
+
+    function clearRecentTools() {
+      writeStorage(RECENT_TOOLS_KEY, []);
+      renderPersonalTools();
+    }
+
+    function isFavorite(title) {
+      return readStorage(FAVORITE_TOOLS_KEY).includes(title);
+    }
+
+    function toggleFavorite(encodedTitle) {
+      const title = decodeURIComponent(encodedTitle);
+      const favorites = readStorage(FAVORITE_TOOLS_KEY);
+      const next = favorites.includes(title)
+        ? favorites.filter(item => item !== title)
+        : [...favorites, title];
+      writeStorage(FAVORITE_TOOLS_KEY, next);
+      renderTools();
+      renderPersonalTools();
+    }
+
+    function compactToolRow(tool, className, removable = false) {
+      return `
+        <div class="${className} flex items-center gap-3 rounded-2xl bg-white border border-ckb-line p-3">
+          <a href="${tool.link}" target="_blank" onclick="recordToolOpen('${encodeURIComponent(tool.title)}')" class="flex items-center gap-3 min-w-0 flex-1">
+            <div class="w-10 h-10 shrink-0 rounded-xl bg-ckb-pale border border-ckb-line flex items-center justify-center text-lg">${tool.emoji || '📄'}</div>
+            <div class="min-w-0"><div class="font-black text-xs text-ckb-ink truncate">${escapeHTML(tool.title)}</div><div class="text-[10px] text-ckb-muted truncate mt-1">${escapeHTML(tool.category)}</div></div>
+          </a>
+          ${removable ? `<button onclick="toggleFavorite('${encodeURIComponent(tool.title)}')" class="text-amber-500" title="Remove favorite"><i class="fa-solid fa-star"></i></button>` : ''}
+        </div>`;
+    }
+
+    function renderPersonalTools() {
+      const recent = readStorage(RECENT_TOOLS_KEY).map(findTool).filter(Boolean);
+      const favorites = readStorage(FAVORITE_TOOLS_KEY).map(findTool).filter(Boolean);
+      const recentContainer = document.getElementById('recentTools');
+      const favoriteContainer = document.getElementById('favoriteTools');
+      if (!recentContainer || !favoriteContainer) return;
+      recentContainer.innerHTML = recent.length
+        ? recent.map(tool => compactToolRow(tool, 'recent-tool')).join('')
+        : '<p class="text-xs text-ckb-muted leading-relaxed">Your recently opened tools will appear here.</p>';
+      favoriteContainer.innerHTML = favorites.length
+        ? favorites.map(tool => compactToolRow(tool, 'favorite-tool', true)).join('')
+        : '<p class="text-xs text-ckb-muted leading-relaxed">Click the star on a tool card to pin it here.</p>';
+    }
+
+    // Daily checklist ---------------------------------------------------------
+    function todayKey() { return new Date().toISOString().slice(0, 10); }
+
+    function loadChecklist() {
+      const saved = readStorage(CHECKLIST_KEY, {});
+      if (saved.date === todayKey()) return saved.items || [];
+      return [
+        { id: Date.now() + 1, text: 'Review open operational issues', done: false },
+        { id: Date.now() + 2, text: 'Follow up project testing', done: false },
+        { id: Date.now() + 3, text: 'Update process documentation', done: false }
+      ];
+    }
+
+    let checklist = loadChecklist();
+    function saveChecklist() { writeStorage(CHECKLIST_KEY, { date: todayKey(), items: checklist }); }
+
+    function renderChecklist() {
+      const container = document.getElementById('checklistItems');
+      if (!container) return;
+      container.innerHTML = checklist.map(item => `
+        <div class="check-item ${item.done ? 'completed' : ''} flex items-center gap-3 rounded-2xl bg-white border border-ckb-line p-3">
+          <button onclick="toggleChecklistItem(${item.id})" class="w-6 h-6 shrink-0 rounded-lg border ${item.done ? 'bg-ckb-main border-ckb-main text-white' : 'border-ckb-line text-transparent'}"><i class="fa-solid fa-check text-xs"></i></button>
+          <span class="check-label text-xs font-bold text-ckb-ink flex-1">${escapeHTML(item.text)}</span>
+          <button onclick="deleteChecklistItem(${item.id})" class="text-ckb-muted hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+        </div>`).join('') || '<p class="text-xs text-ckb-muted">No task yet. Add one to begin.</p>';
+      const completed = checklist.filter(item => item.done).length;
+      const pct = checklist.length ? Math.round(completed / checklist.length * 100) : 0;
+      document.getElementById('checklistProgressText').textContent = `${completed} / ${checklist.length}`;
+      document.getElementById('checklistProgressBar').style.width = `${pct}%`;
+      saveChecklist();
+    }
+
+    function addChecklistItem() {
+      const text = prompt('Add a daily operations task:');
+      if (!text?.trim()) return;
+      checklist.push({ id: Date.now(), text: text.trim(), done: false });
+      renderChecklist();
+    }
+    function toggleChecklistItem(id) { checklist = checklist.map(item => item.id === id ? { ...item, done: !item.done } : item); renderChecklist(); }
+    function deleteChecklistItem(id) { checklist = checklist.filter(item => item.id !== id); renderChecklist(); }
+
+    // Pomodoro and generated ambient audio -----------------------------------
+    let timerTotal = 1500;
+    let timerRemaining = timerTotal;
+    let timerInterval = null;
+    let audioContext = null;
+    let audioMaster = null;
+    let audioNodes = [];
+    let audioEnabled = false;
+
+    function changeTimerMode() {
+      timerTotal = Number(document.getElementById('timerMode').value);
+      timerRemaining = timerTotal;
+      pauseTimer();
+      updateTimerUI();
+    }
+
+    function updateTimerUI() {
+      const minutes = Math.floor(timerRemaining / 60).toString().padStart(2, '0');
+      const seconds = (timerRemaining % 60).toString().padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `${minutes}:${seconds}`;
+      const elapsed = timerTotal - timerRemaining;
+      document.getElementById('timerRing').style.setProperty('--progress', `${timerTotal ? elapsed / timerTotal * 360 : 0}deg`);
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      document.getElementById('timerState').textContent = 'Focusing';
+      document.getElementById('timerRing').classList.add('timer-running');
+      if (!audioEnabled) startFocusAudio();
+      timerInterval = setInterval(() => {
+        timerRemaining -= 1;
+        updateTimerUI();
+        if (timerRemaining <= 0) completeTimer();
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('timerState').textContent = timerRemaining === timerTotal ? 'Ready' : 'Paused';
+      document.getElementById('timerRing').classList.remove('timer-running');
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timerRemaining = timerTotal;
+      updateTimerUI();
+    }
+
+    function completeTimer() {
+      pauseTimer();
+      timerRemaining = 0;
+      updateTimerUI();
+      document.getElementById('timerState').textContent = 'Complete';
+      const count = Number(localStorage.getItem(POMODORO_COUNT_KEY) || 0) + 1;
+      localStorage.setItem(POMODORO_COUNT_KEY, count);
+      document.getElementById('pomodoroCount').textContent = count;
+      playCompletionChime();
+    }
+
+    function createAmbientVoice(frequency, detune, volume) {
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      oscillator.detune.value = detune;
+      gain.gain.value = volume;
+      oscillator.connect(gain).connect(audioMaster);
+      oscillator.start();
+      audioNodes.push(oscillator, gain);
+    }
+
+    function startFocusAudio() {
+      if (audioEnabled) return;
+      audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+      audioContext.resume();
+      audioMaster = audioContext.createGain();
+      audioMaster.gain.value = Number(document.getElementById('focusVolume').value) / 100 * .16;
+      audioMaster.connect(audioContext.destination);
+      createAmbientVoice(110, -5, .42);
+      createAmbientVoice(164.81, 4, .28);
+      createAmbientVoice(220, 1, .12);
+      audioEnabled = true;
+      document.getElementById('audioToggle').textContent = 'On';
+    }
+
+    function stopFocusAudio() {
+      audioNodes.forEach(node => { try { node.stop?.(); node.disconnect?.(); } catch {} });
+      audioNodes = [];
+      audioMaster?.disconnect();
+      audioMaster = null;
+      audioEnabled = false;
+      document.getElementById('audioToggle').textContent = 'Off';
+    }
+
+    function toggleFocusAudio() { audioEnabled ? stopFocusAudio() : startFocusAudio(); }
+    function setFocusVolume(value) { if (audioMaster) audioMaster.gain.value = Number(value) / 100 * .16; }
+
+    function playCompletionChime() {
+      if (!audioContext) return;
+      [523.25, 659.25, 783.99].forEach((frequency, index) => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(.0001, audioContext.currentTime + index * .13);
+        gain.gain.exponentialRampToValueAtTime(.1, audioContext.currentTime + index * .13 + .02);
+        gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + index * .13 + .25);
+        osc.connect(gain).connect(audioContext.destination);
+        osc.start(audioContext.currentTime + index * .13);
+        osc.stop(audioContext.currentTime + index * .13 + .28);
+      });
+    }
+
+    function initializeProductivityWidgets() {
+      renderPersonalTools();
+      renderChecklist();
+      updateTimerUI();
+      document.getElementById('pomodoroCount').textContent = localStorage.getItem(POMODORO_COUNT_KEY) || '0';
     }
 
     document.addEventListener('keydown', e => {
@@ -740,15 +1037,12 @@
       if (e.key === 'Escape') closeCommandPalette();
     });
 
-    function initializePortal() {
-      initTheme();
-      updateClock();
-      setRandomQuote();
-      fetchLinks();
-      setInterval(updateClock, 1000);
-    }
-
-    initializePortal();
+    initTheme();
+    setInterval(updateClock, 1000);
+    updateClock();
+    setRandomQuote();
+    fetchLinks();
+    initializeProductivityWidgets();
   </script>
 </body>
 </html>
