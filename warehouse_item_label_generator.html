@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warehouse Item Label Generator</title>
+  <meta name="description" content="Generate print-ready warehouse item labels with UID Code 128 barcodes from Excel or CSV.">
+
+  <!-- Browser libraries. For offline deployment, download these files and replace the CDN URLs with local paths. -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --ink: #14231b;
+      --muted: #68786f;
+      --green: #22543d;
+      --green-2: #2f6b4f;
+      --mint: #eaf5ef;
+      --pale: #f4f7f5;
+      --line: #d7e3db;
+      --white: #ffffff;
+      --amber: #b7791f;
+      --red: #b42318;
+      --blue: #286da8;
+      --shadow: 0 20px 50px rgba(20, 35, 27, .09);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(34, 84, 61, .13), transparent 28%),
+        linear-gradient(180deg, #f9fbfa, #edf3ef);
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .shell { max-width: 1440px; margin: 0 auto; padding: 20px; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 18px; margin-bottom: 18px;
+      background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 20px;
+      box-shadow: var(--shadow); backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 46px; height: 46px; border-radius: 15px;
+      display: grid; place-items: center; color: white; font-weight: 900;
+      background: linear-gradient(135deg, var(--green), #55b887);
+    }
+    .brand h1 { margin: 0; font-size: 18px; }
+    .brand p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      min-height: 40px; padding: 0 14px; border-radius: 12px;
+      border: 1px solid var(--line); background: white; color: var(--ink); font-weight: 800; font-size: 12px;
+    }
+    .btn:hover { border-color: var(--green); background: var(--mint); }
+    .btn.primary { background: var(--green); color: white; border-color: var(--green); }
+    .btn.primary:hover { background: var(--green-2); }
+    .btn.danger { color: var(--red); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .layout { display: grid; grid-template-columns: 350px 1fr; gap: 18px; align-items: start; }
+    .panel {
+      background: rgba(255,255,255,.91); border: 1px solid var(--line); border-radius: 22px;
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .panel-head { padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 5px 0 0; font-size: 11px; color: var(--muted); line-height: 1.5; }
+    .panel-body { padding: 16px 18px; }
+    .stack { display: grid; gap: 14px; }
+    .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; font-weight: 900; color: var(--muted); }
+
+    .dropzone {
+      border: 2px dashed #aac3b2; border-radius: 18px; min-height: 150px; padding: 20px;
+      display: grid; place-items: center; text-align: center; background: var(--pale); transition: .2s;
+    }
+    .dropzone.dragging { border-color: var(--green); background: var(--mint); transform: scale(1.01); }
+    .dropzone strong { display: block; margin-top: 8px; }
+    .dropzone span { display: block; color: var(--muted); font-size: 11px; margin-top: 5px; line-height: 1.5; }
+    .drop-icon { width: 52px; height: 52px; border-radius: 17px; background: var(--green); color: white; display: grid; place-items: center; font-size: 22px; margin: auto; }
+
+    .field-group { display: grid; gap: 6px; }
+    .field-group label { font-size: 10px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .field, select {
+      width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 11px;
+      background: #fff; color: var(--ink); outline: none;
+    }
+    .field:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(34,84,61,.08); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .check-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check {
+      display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 11px;
+      color: var(--ink); font-size: 11px; font-weight: 700; background: white;
+    }
+    .check input { accent-color: var(--green); }
+
+    .summary { display: grid; grid-template-columns: repeat(4, minmax(90px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .metric { padding: 12px; border: 1px solid var(--line); background: white; border-radius: 14px; }
+    .metric b { display: block; font-size: 22px; }
+    .metric span { font-size: 9px; text-transform: uppercase; color: var(--muted); font-weight: 900; }
+    .metric.good b { color: var(--green); }
+    .metric.warn b { color: var(--amber); }
+    .metric.bad b { color: var(--red); }
+
+    .toolbar { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .toolbar-left, .toolbar-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .search { min-width: 250px; }
+
+    .table-wrap { overflow: auto; max-height: 470px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1060px; }
+    th { position: sticky; top: 0; z-index: 2; background: var(--green); color: white; text-align: left; padding: 11px 10px; white-space: nowrap; }
+    td { padding: 10px; border-bottom: 1px solid #edf1ee; vertical-align: top; }
+    tr:hover td { background: #f8fbf9; }
+    tr.invalid td { background: #fff4f2; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .status { display: inline-flex; padding: 4px 7px; border-radius: 999px; font-size: 9px; font-weight: 900; }
+    .status.valid { background: #dff2e5; color: var(--green); }
+    .status.warning { background: #fff0d7; color: #8a560d; }
+    .status.error { background: #ffe1dd; color: var(--red); }
+
+    .workspace { display: grid; grid-template-rows: auto auto; gap: 18px; }
+    .preview-area { min-height: 390px; padding: 22px; display: grid; place-items: center; background: #dce4df; overflow: auto; }
+    .label-preview {
+      position: relative; width: 560px; aspect-ratio: 4 / 3; padding: 20px;
+      display: grid; grid-template-rows: auto 1fr auto; gap: 12px;
+      background: white; border: 4px solid #1f2924; border-radius: 22px; color: #111;
+      box-shadow: 0 18px 50px rgba(0,0,0,.19);
+    }
+    .label-top { display: flex; justify-content: space-between; align-items: start; gap: 14px; border-bottom: 3px solid #111; padding-bottom: 10px; }
+    .label-brand { font-weight: 1000; font-size: 18px; letter-spacing: -.02em; white-space: nowrap; }
+    .label-title { font-size: 20px; font-weight: 1000; text-align: right; overflow-wrap: anywhere; }
+    .label-data { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #111; }
+    .label-cell { padding: 9px 11px; border-right: 1px solid #111; border-bottom: 1px solid #111; min-height: 55px; }
+    .label-cell:nth-child(even) { border-right: 0; }
+    .label-cell:nth-last-child(-n+2) { border-bottom: 0; }
+    .label-key { font-size: 9px; font-weight: 900; text-transform: uppercase; color: #555; }
+    .label-value { margin-top: 5px; font-size: 14px; font-weight: 900; overflow-wrap: anywhere; }
+    .label-bottom { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 12px; }
+    .barcode-wrap { min-width: 0; }
+    .barcode-wrap svg { width: 100%; height: 74px; display: block; }
+    .uid-text { text-align: center; font-family: ui-monospace, monospace; font-weight: 900; font-size: 12px; margin-top: 2px; overflow-wrap: anywhere; }
+    .copy-badge { padding: 9px 12px; border-radius: 10px; background: #111; color: white; font-weight: 900; font-size: 10px; }
+
+    .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+    .empty strong { display: block; color: var(--ink); font-size: 16px; margin-bottom: 7px; }
+    .toast { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: none; max-width: 360px; padding: 12px 15px; border-radius: 13px; background: var(--ink); color: white; font-size: 12px; font-weight: 800; box-shadow: var(--shadow); }
+
+    @media (max-width: 1050px) {
+      .layout { grid-template-columns: 1fr; }
+      .topbar { position: relative; align-items: flex-start; }
+      .label-preview { width: min(560px, 92vw); }
+    }
+    @media (max-width: 640px) {
+      .shell { padding: 10px; }
+      .topbar { flex-direction: column; }
+      .summary { grid-template-columns: 1fr 1fr; }
+      .grid-2, .check-list { grid-template-columns: 1fr; }
+      .label-preview { padding: 12px; border-radius: 15px; }
+      .label-title { font-size: 15px; }
+      .label-cell { padding: 6px; min-height: 46px; }
+      .label-value { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">LBL</div>
+        <div>
+          <h1>Warehouse Item Label Generator</h1>
+          <p>Excel / CSV → Data validation → Code 128 UID barcode → Print-ready PDF</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="downloadTemplate()">Download Excel Template</button>
+        <button class="btn" onclick="exportValidation()" id="validationBtn" disabled>Export Validation</button>
+        <button class="btn primary" onclick="generatePDF(false)" id="pdfBtn" disabled>Generate PDF</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>Configuration</h2>
+          <p>One Excel row represents one UID and one label. Use Print Copies when duplicate physical copies are required.</p>
+        </div>
+        <div class="panel-body stack">
+          <div class="section-title">1. Upload Data</div>
+          <div id="dropzone" class="dropzone" onclick="fileInput.click()">
+            <div>
+              <div class="drop-icon">⇧</div>
+              <strong>Drop Excel or CSV here</strong>
+              <span>Accepts .xlsx, .xls, and .csv<br>Required: Item Code, Qty, UID No.</span>
+            </div>
+          </div>
+          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" hidden>
+          <div id="fileName" class="field" style="font-size:11px;color:var(--muted)">No file uploaded.</div>
+
+          <div class="section-title">2. Label Layout</div>
+          <div class="field-group">
+            <label>PDF Layout</label>
+            <select id="layoutPreset" onchange="updateSettings()">
+              <option value="thermal100x75">Thermal 100 × 75 mm — 1 label/page</option>
+              <option value="thermal100x50">Thermal 100 × 50 mm — 1 label/page</option>
+              <option value="a6">A6 105 × 148 mm — 1 label/page</option>
+              <option value="a4_2x4">A4 Multi-label — 2 columns × 4 rows</option>
+              <option value="a4_2x3">A4 Multi-label — 2 columns × 3 rows</option>
+            </select>
+          </div>
+          <div class="grid-2">
+            <div class="field-group"><label>Barcode</label><select disabled><option>Code 128</option></select></div>
+            <div class="field-group"><label>Default Copies</label><input id="defaultCopies" class="field" type="number" min="1" max="20" value="1" onchange="updateSettings()"></div>
+          </div>
+          <div class="field-group"><label>Brand / Warehouse Name</label><input id="brandName" class="field" value="CKB LOGISTICS" oninput="renderPreview()"></div>
+          <div class="field-group"><label>Label Heading</label><input id="labelHeading" class="field" value="WAREHOUSE ITEM LABEL" oninput="renderPreview()"></div>
+
+          <div class="section-title">3. Visible Fields</div>
+          <div class="check-list">
+            <label class="check"><input type="checkbox" data-field="itemCode" checked onchange="renderPreview()"> Item Code</label>
+            <label class="check"><input type="checkbox" data-field="itemDescription" checked onchange="renderPreview()"> Description</label>
+            <label class="check"><input type="checkbox" data-field="qty" checked onchange="renderPreview()"> Quantity</label>
+            <label class="check"><input type="checkbox" data-field="batchNo" checked onchange="renderPreview()"> Batch No.</label>
+            <label class="check"><input type="checkbox" data-field="expiryDate" checked onchange="renderPreview()"> Expiry</label>
+            <label class="check"><input type="checkbox" data-field="binLocation" checked onchange="renderPreview()"> BIN</label>
+            <label class="check"><input type="checkbox" data-field="storageUnit" onchange="renderPreview()"> Storage Unit</label>
+            <label class="check"><input type="checkbox" data-field="customer" onchange="renderPreview()"> Customer</label>
+          </div>
+
+          <div class="section-title">4. Print Scope</div>
+          <label class="check"><input id="validOnly" type="checkbox" checked> Generate valid rows only</label>
+          <label class="check"><input id="selectedOnly" type="checkbox"> Generate selected rows only</label>
+          <button class="btn danger" onclick="resetApp()">Reset Uploaded Data</button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Data Validation</h2>
+            <p>Review UID duplicates, missing mandatory fields, quantity, print copies, and barcode compatibility before generating the PDF.</p>
+          </div>
+          <div class="panel-body">
+            <div class="summary">
+              <div class="metric"><b id="totalCount">0</b><span>Total Rows</span></div>
+              <div class="metric good"><b id="validCount">0</b><span>Valid</span></div>
+              <div class="metric warn"><b id="warningCount">0</b><span>Warnings</span></div>
+              <div class="metric bad"><b id="errorCount">0</b><span>Errors</span></div>
+            </div>
+            <div class="toolbar">
+              <div class="toolbar-left">
+                <input id="searchInput" class="field search" placeholder="Search item code, UID, description..." oninput="renderTable()">
+                <select id="statusFilter" onchange="renderTable()" style="width:auto">
+                  <option value="all">All statuses</option>
+                  <option value="valid">Valid</option>
+                  <option value="warning">Warning</option>
+                  <option value="error">Error</option>
+                </select>
+              </div>
+              <div class="toolbar-right">
+                <button class="btn" onclick="selectAllVisible(true)">Select Visible</button>
+                <button class="btn" onclick="selectAllVisible(false)">Clear Selection</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Print</th><th>#</th><th>Status</th><th>Item Code</th><th>Description</th><th>Qty</th><th>UOM</th><th>UID No.</th><th>Batch</th><th>Expiry</th><th>Copies</th><th>Validation Message</th></tr></thead>
+                <tbody id="dataBody"><tr><td colspan="12"><div class="empty"><strong>No data yet</strong>Upload an Excel or CSV file to begin.</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Label Preview</h2>
+            <p>The preview uses the first selected valid row. The generated PDF applies the selected layout preset.</p>
+          </div>
+          <div id="previewArea" class="preview-area">
+            <div id="labelPreview" class="label-preview">
+              <div class="label-top"><div class="label-brand">CKB LOGISTICS</div><div class="label-title">WAREHOUSE ITEM LABEL</div></div>
+              <div class="label-data" id="previewFields"></div>
+              <div class="label-bottom"><div class="barcode-wrap"><svg id="previewBarcode"></svg><div id="previewUID" class="uid-text">UPLOAD DATA TO PREVIEW</div></div><div class="copy-badge">UID LABEL</div></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <canvas id="barcodeCanvas" hidden></canvas>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    'use strict';
+
+    const REQUIRED_FIELDS = ['itemCode', 'qty', 'uidNo'];
+    const HEADER_ALIASES = {
+      itemCode: ['item code', 'itemcode', 'item no', 'item number', 'sku'],
+      itemDescription: ['item description', 'description', 'product name', 'item name'],
+      qty: ['qty', 'quantity', 'item qty'],
+      uom: ['uom', 'unit', 'unit of measure'],
+      uidNo: ['uid no', 'uid', 'uid number', 'uid no.'],
+      batchNo: ['batch no', 'batch', 'batch number'],
+      manufactureDate: ['manufacture date', 'mfg date', 'production date'],
+      expiryDate: ['expiry date', 'expiration date', 'expired date'],
+      customer: ['customer', 'customer name'],
+      warehouse: ['warehouse', 'location'],
+      binLocation: ['bin location', 'bin', 'bin no', 'bin number'],
+      storageUnit: ['storage unit', 'su', 'pallet type'],
+      remarks: ['remarks', 'remark', 'notes'],
+      printCopies: ['print copies', 'copies', 'label copies']
+    };
+
+    const FIELD_LABELS = {
+      itemCode: 'Item Code', itemDescription: 'Description', qty: 'Quantity', batchNo: 'Batch No.',
+      expiryDate: 'Expiry Date', binLocation: 'BIN Location', storageUnit: 'Storage Unit', customer: 'Customer'
+    };
+
+    let rows = [];
+    let sourceFileName = '';
+
+    const $ = id => document.getElementById(id);
+    const dropzone = $('dropzone');
+    const fileInput = $('fileInput');
+
+    function normalizeHeader(value) {
+      return String(value ?? '').trim().toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ');
+    }
+
+    function mapHeaders(headers) {
+      const normalized = headers.map(normalizeHeader);
+      const mapping = {};
+      for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
+        const index = normalized.findIndex(header => aliases.includes(header));
+        if (index >= 0) mapping[field] = index;
+      }
+      return mapping;
+    }
+
+    function cellValue(rawRow, index) {
+      return index === undefined ? '' : rawRow[index] ?? '';
+    }
+
+    function formatExcelDate(value) {
+      if (!value) return '';
+      if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString().slice(0, 10);
+      if (typeof value === 'number' && window.XLSX?.SSF) {
+        const parsed = XLSX.SSF.parse_date_code(value);
+        if (parsed) return `${parsed.y}-${String(parsed.m).padStart(2, '0')}-${String(parsed.d).padStart(2, '0')}`;
+      }
+      return String(value).trim();
+    }
+
+    function validateRows() {
+      const uidFrequency = new Map();
+      rows.forEach(row => {
+        const uid = row.uidNo.trim().toUpperCase();
+        if (uid) uidFrequency.set(uid, (uidFrequency.get(uid) || 0) + 1);
+      });
+
+      rows.forEach(row => {
+        const errors = [];
+        const warnings = [];
+        if (!row.itemCode.trim()) errors.push('Item Code is required.');
+        if (!row.uidNo.trim()) errors.push('UID No. is required.');
+        if (!Number.isFinite(row.qty) || row.qty <= 0) errors.push('Qty must be greater than zero.');
+        if (!Number.isInteger(row.printCopies) || row.printCopies < 1 || row.printCopies > 20) errors.push('Print Copies must be an integer between 1 and 20.');
+        if (row.uidNo && uidFrequency.get(row.uidNo.trim().toUpperCase()) > 1) errors.push('Duplicate UID in uploaded file.');
+        if (row.uidNo.length > 48) warnings.push('UID is long; barcode may appear dense.');
+        if (!row.itemDescription) warnings.push('Item Description is empty.');
+        if (!row.uom) warnings.push('UOM is empty.');
+        row.errors = errors;
+        row.warnings = warnings;
+        row.status = errors.length ? 'error' : warnings.length ? 'warning' : 'valid';
+      });
+    }
+
+    function parseWorkbook(arrayBuffer, fileName) {
+      const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: true });
+      if (!data.length) throw new Error('The first worksheet is empty.');
+      const headers = data[0];
+      const mapping = mapHeaders(headers);
+      const missing = REQUIRED_FIELDS.filter(field => mapping[field] === undefined);
+      if (missing.length) throw new Error(`Missing required column(s): ${missing.map(field => FIELD_LABELS[field] || field).join(', ')}.`);
+
+      rows = data.slice(1).filter(rawRow => rawRow.some(value => String(value).trim() !== '')).map((rawRow, index) => ({
+        id: index + 1,
+        selected: true,
+        itemCode: String(cellValue(rawRow, mapping.itemCode)).trim(),
+        itemDescription: String(cellValue(rawRow, mapping.itemDescription)).trim(),
+        qty: Number(cellValue(rawRow, mapping.qty)),
+        uom: String(cellValue(rawRow, mapping.uom)).trim(),
+        uidNo: String(cellValue(rawRow, mapping.uidNo)).trim(),
+        batchNo: String(cellValue(rawRow, mapping.batchNo)).trim(),
+        manufactureDate: formatExcelDate(cellValue(rawRow, mapping.manufactureDate)),
+        expiryDate: formatExcelDate(cellValue(rawRow, mapping.expiryDate)),
+        customer: String(cellValue(rawRow, mapping.customer)).trim(),
+        warehouse: String(cellValue(rawRow, mapping.warehouse)).trim(),
+        binLocation: String(cellValue(rawRow, mapping.binLocation)).trim(),
+        storageUnit: String(cellValue(rawRow, mapping.storageUnit)).trim(),
+        remarks: String(cellValue(rawRow, mapping.remarks)).trim(),
+        printCopies: Math.trunc(Number(cellValue(rawRow, mapping.printCopies) || $('defaultCopies').value || 1))
+      }));
+
+      sourceFileName = fileName;
+      validateRows();
+      updateUI();
+      toast(`${rows.length} row(s) loaded from ${fileName}.`);
+    }
+
+    async function handleFile(file) {
+      if (!file) return;
+      $('fileName').textContent = `Loading ${file.name}...`;
+      try {
+        const buffer = await file.arrayBuffer();
+        parseWorkbook(buffer, file.name);
+        $('fileName').textContent = `${file.name} — ${rows.length} row(s)`;
+      } catch (error) {
+        console.error(error);
+        rows = [];
+        $('fileName').textContent = 'Upload failed.';
+        updateUI();
+        toast(error.message || 'Unable to read the file.');
+      }
+    }
+
+    fileInput.addEventListener('change', event => handleFile(event.target.files[0]));
+    ['dragenter', 'dragover'].forEach(type => dropzone.addEventListener(type, event => { event.preventDefault(); dropzone.classList.add('dragging'); }));
+    ['dragleave', 'drop'].forEach(type => dropzone.addEventListener(type, event => { event.preventDefault(); dropzone.classList.remove('dragging'); }));
+    dropzone.addEventListener('drop', event => handleFile(event.dataTransfer.files[0]));
+
+    function getFilteredRows() {
+      const query = $('searchInput').value.toLowerCase().trim();
+      const status = $('statusFilter').value;
+      return rows.filter(row => {
+        const searchText = `${row.itemCode} ${row.itemDescription} ${row.uidNo} ${row.batchNo}`.toLowerCase();
+        return (!query || searchText.includes(query)) && (status === 'all' || row.status === status);
+      });
+    }
+
+    function renderTable() {
+      const filtered = getFilteredRows();
+      $('dataBody').innerHTML = filtered.length ? filtered.map(row => {
+        const messages = [...row.errors, ...row.warnings].join(' ');
+        return `<tr class="${row.status === 'error' ? 'invalid' : ''}">
+          <td><input type="checkbox" ${row.selected ? 'checked' : ''} onchange="toggleRow(${row.id}, this.checked)"></td>
+          <td>${row.id}</td>
+          <td><span class="status ${row.status}">${row.status.toUpperCase()}</span></td>
+          <td><b>${escapeHTML(row.itemCode)}</b></td>
+          <td>${escapeHTML(row.itemDescription)}</td>
+          <td>${Number.isFinite(row.qty) ? row.qty : ''}</td>
+          <td>${escapeHTML(row.uom)}</td>
+          <td class="mono">${escapeHTML(row.uidNo)}</td>
+          <td>${escapeHTML(row.batchNo)}</td>
+          <td>${escapeHTML(row.expiryDate)}</td>
+          <td><input class="field" style="width:70px;min-height:32px;padding:5px" type="number" min="1" max="20" value="${row.printCopies || ''}" onchange="updateCopies(${row.id}, this.value)"></td>
+          <td style="max-width:300px;color:${row.status === 'error' ? 'var(--red)' : 'var(--muted)'}">${escapeHTML(messages || 'Ready to print.')}</td>
+        </tr>`;
+      }).join('') : '<tr><td colspan="12"><div class="empty"><strong>No matching rows</strong>Change the search or status filter.</div></td></tr>';
+    }
+
+    function toggleRow(id, selected) {
+      const row = rows.find(item => item.id === id);
+      if (row) row.selected = selected;
+      renderPreview();
+    }
+
+    function updateCopies(id, value) {
+      const row = rows.find(item => item.id === id);
+      if (!row) return;
+      row.printCopies = Math.trunc(Number(value));
+      validateRows();
+      updateUI();
+    }
+
+    function selectAllVisible(selected) {
+      getFilteredRows().forEach(row => row.selected = selected);
+      renderTable();
+      renderPreview();
+    }
+
+    function updateSettings() {
+      const defaultCopies = Math.max(1, Math.min(20, Math.trunc(Number($('defaultCopies').value) || 1)));
+      $('defaultCopies').value = defaultCopies;
+      renderPreview();
+    }
+
+    function updateUI() {
+      const valid = rows.filter(row => row.status === 'valid').length;
+      const warnings = rows.filter(row => row.status === 'warning').length;
+      const errors = rows.filter(row => row.status === 'error').length;
+      $('totalCount').textContent = rows.length;
+      $('validCount').textContent = valid;
+      $('warningCount').textContent = warnings;
+      $('errorCount').textContent = errors;
+      $('pdfBtn').disabled = !rows.length || valid + warnings === 0;
+      $('validationBtn').disabled = !rows.length;
+      renderTable();
+      renderPreview();
+    }
+
+    function visibleFieldKeys() {
+      return [...document.querySelectorAll('[data-field]:checked')].map(input => input.dataset.field);
+    }
+
+    function displayValue(row, key) {
+      if (key === 'qty') return `${Number.isFinite(row.qty) ? row.qty : ''}${row.uom ? ` ${row.uom}` : ''}`;
+      return row[key] || '-';
+    }
+
+    function previewRow() {
+      return rows.find(row => row.selected && row.status !== 'error') || rows.find(row => row.status !== 'error') || {
+        itemCode: 'ITEM-0001', itemDescription: 'Sample Warehouse Item', qty: 40, uom: 'CTN', uidNo: 'UID0000012345', batchNo: 'BATCH-001', expiryDate: '2027-12-31', binLocation: 'A01-01-01', storageUnit: 'PALLET', customer: 'Customer Name'
+      };
+    }
+
+    function renderPreview() {
+      const row = previewRow();
+      const keys = visibleFieldKeys();
+      $('labelPreview').querySelector('.label-brand').textContent = $('brandName').value || 'WAREHOUSE';
+      $('labelPreview').querySelector('.label-title').textContent = $('labelHeading').value || 'ITEM LABEL';
+      $('previewFields').innerHTML = keys.slice(0, 8).map(key => `<div class="label-cell"><div class="label-key">${FIELD_LABELS[key]}</div><div class="label-value">${escapeHTML(displayValue(row, key))}</div></div>`).join('');
+      $('previewUID').textContent = row.uidNo || 'NO UID';
+      try {
+        JsBarcode('#previewBarcode', row.uidNo || 'NO-UID', { format: 'CODE128', displayValue: false, margin: 0, height: 56, width: 1.6, background: '#ffffff', lineColor: '#111111' });
+      } catch { $('previewBarcode').innerHTML = ''; }
+    }
+
+    function selectedPrintableRows() {
+      let result = rows.filter(row => !$('validOnly').checked || row.status !== 'error');
+      if ($('selectedOnly').checked) result = result.filter(row => row.selected);
+      const expanded = [];
+      result.forEach(row => {
+        for (let copy = 1; copy <= row.printCopies; copy++) expanded.push({ ...row, copyNumber: copy, totalCopies: row.printCopies });
+      });
+      return expanded;
+    }
+
+    function barcodeDataURL(uid) {
+      const canvas = $('barcodeCanvas');
+      JsBarcode(canvas, uid, { format: 'CODE128', displayValue: false, margin: 0, height: 70, width: 2, background: '#ffffff', lineColor: '#111111' });
+      return canvas.toDataURL('image/png');
+    }
+
+    function truncate(doc, text, maxWidth) {
+      let value = String(text || '-');
+      if (doc.getTextWidth(value) <= maxWidth) return value;
+      while (value.length > 3 && doc.getTextWidth(`${value}…`) > maxWidth) value = value.slice(0, -1);
+      return `${value}…`;
+    }
+
+    function drawLabel(doc, row, x, y, w, h) {
+      const pad = Math.max(2.2, w * .035);
+      const titleHeight = Math.max(8, h * .16);
+      const barcodeHeight = Math.max(14, h * .24);
+      const fontScale = Math.min(w / 100, h / 75);
+      const keys = visibleFieldKeys().slice(0, 8);
+
+      doc.setDrawColor(25, 32, 28); doc.setLineWidth(Math.max(.5, w * .008)); doc.roundedRect(x, y, w, h, 2.5, 2.5, 'S');
+      doc.setFillColor(34, 84, 61); doc.rect(x, y, w, titleHeight, 'F');
+      doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(Math.max(6.5, 9 * fontScale));
+      doc.text(truncate(doc, $('brandName').value || 'WAREHOUSE', w * .34), x + pad, y + titleHeight * .63);
+      doc.setFontSize(Math.max(6.5, 10 * fontScale));
+      doc.text(truncate(doc, $('labelHeading').value || 'ITEM LABEL', w * .55), x + w - pad, y + titleHeight * .63, { align: 'right' });
+
+      const dataTop = y + titleHeight + 1.5;
+      const dataBottom = y + h - barcodeHeight - 5;
+      const dataHeight = Math.max(12, dataBottom - dataTop);
+      const rowsNeeded = Math.max(1, Math.ceil(keys.length / 2));
+      const cellH = dataHeight / rowsNeeded;
+      const colW = (w - pad * 2) / 2;
+      doc.setTextColor(25,32,28);
+
+      keys.forEach((key, index) => {
+        const col = index % 2; const line = Math.floor(index / 2);
+        const cx = x + pad + col * colW; const cy = dataTop + line * cellH;
+        doc.setDrawColor(180,190,184); doc.setLineWidth(.2); doc.rect(cx, cy, colW, cellH);
+        doc.setFont('helvetica','bold'); doc.setFontSize(Math.max(4.5, 5.7 * fontScale)); doc.setTextColor(95,102,98);
+        doc.text(FIELD_LABELS[key].toUpperCase(), cx + 1.4, cy + Math.min(3, cellH * .3));
+        doc.setFontSize(Math.max(5.5, 7.8 * fontScale)); doc.setTextColor(25,32,28);
+        doc.text(truncate(doc, displayValue(row, key), colW - 3), cx + 1.4, cy + Math.min(7.2, cellH * .72));
+      });
+
+      const barcodeY = y + h - barcodeHeight - 2.5;
+      const barcodeW = w * .72;
+      try { doc.addImage(barcodeDataURL(row.uidNo), 'PNG', x + pad, barcodeY, barcodeW - pad, barcodeHeight - 6); } catch {}
+      doc.setFont('courier','bold'); doc.setFontSize(Math.max(5, 6.5 * fontScale)); doc.setTextColor(20,20,20);
+      doc.text(truncate(doc, row.uidNo, barcodeW - pad), x + barcodeW / 2, y + h - 2.5, { align: 'center' });
+      doc.setFillColor(25,32,28); doc.roundedRect(x + w * .76, barcodeY + 2, w * .2, Math.max(7, barcodeHeight * .45), 1.3, 1.3, 'F');
+      doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(Math.max(4.5, 5.7 * fontScale));
+      doc.text(row.totalCopies > 1 ? `COPY ${row.copyNumber}/${row.totalCopies}` : 'UID LABEL', x + w * .86, barcodeY + Math.max(6.5, barcodeHeight * .29), { align: 'center' });
+    }
+
+    async function generatePDF() {
+      const printable = selectedPrintableRows();
+      if (!printable.length) return toast('No printable label rows match the current scope.');
+      const { jsPDF } = window.jspdf;
+      const preset = $('layoutPreset').value;
+      let doc, pageW, pageH, cols = 1, rowsPerPage = 1, margin = 3, gap = 2;
+
+      if (preset === 'thermal100x75') { pageW = 100; pageH = 75; doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [75,100] }); }
+      else if (preset === 'thermal100x50') { pageW = 100; pageH = 50; doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [50,100] }); }
+      else if (preset === 'a6') { pageW = 105; pageH = 148; doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a6' }); margin = 5; }
+      else { pageW = 210; pageH = 297; doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' }); cols = 2; rowsPerPage = preset === 'a4_2x4' ? 4 : 3; margin = 8; gap = 4; }
+
+      const labelW = (pageW - margin * 2 - gap * (cols - 1)) / cols;
+      const labelH = (pageH - margin * 2 - gap * (rowsPerPage - 1)) / rowsPerPage;
+      const perPage = cols * rowsPerPage;
+
+      printable.forEach((row, index) => {
+        if (index > 0 && index % perPage === 0) doc.addPage();
+        const position = index % perPage;
+        const col = position % cols; const line = Math.floor(position / cols);
+        drawLabel(doc, row, margin + col * (labelW + gap), margin + line * (labelH + gap), labelW, labelH);
+      });
+
+      const name = sourceFileName ? sourceFileName.replace(/\.[^.]+$/, '') : 'warehouse_labels';
+      doc.save(`${name}_UID_labels.pdf`);
+      toast(`${printable.length} label(s) generated.`);
+    }
+
+    function downloadTemplate() {
+      const sample = [{
+        'Item Code': 'SHELL-001', 'Item Description': 'Shell Lubricant Product A', Qty: 40, UOM: 'CTN',
+        'UID No.': 'UID0000012345', 'Batch No.': 'BATCH-001', 'Manufacture Date': '2026-08-01',
+        'Expiry Date': '2028-08-01', Customer: 'PT Shell Indonesia', Warehouse: 'Shell Warehouse',
+        'BIN Location': 'A01-01-01', 'Storage Unit': 'PALLET', Remarks: '', 'Print Copies': 1
+      }];
+      const sheet = XLSX.utils.json_to_sheet(sample);
+      sheet['!cols'] = [14,28,10,10,20,16,18,16,23,20,16,16,20,14].map(wch => ({ wch }));
+      const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, sheet, 'Item Labels');
+      XLSX.writeFile(book, 'Item_Label_Upload_Template.xlsx');
+    }
+
+    function exportValidation() {
+      const output = rows.map(row => ({
+        'Row': row.id, 'Status': row.status.toUpperCase(), 'Item Code': row.itemCode, 'Item Description': row.itemDescription,
+        'Qty': row.qty, 'UOM': row.uom, 'UID No.': row.uidNo, 'Batch No.': row.batchNo, 'Expiry Date': row.expiryDate,
+        'Print Copies': row.printCopies, 'Errors': row.errors.join(' '), 'Warnings': row.warnings.join(' ')
+      }));
+      const sheet = XLSX.utils.json_to_sheet(output); const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, sheet, 'Validation');
+      XLSX.writeFile(book, 'Item_Label_Validation_Result.xlsx');
+    }
+
+    function resetApp() {
+      if (rows.length && !confirm('Remove all uploaded data?')) return;
+      rows = []; sourceFileName = ''; fileInput.value = ''; $('fileName').textContent = 'No file uploaded.'; updateUI();
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[character]));
+    }
+
+    function toast(message) {
+      const element = $('toast'); element.textContent = message; element.style.display = 'block';
+      clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => element.style.display = 'none', 2800);
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
