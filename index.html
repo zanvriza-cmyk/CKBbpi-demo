@@ -1,1048 +1,498 @@
-<!DOCTYPE html>
-<html lang="id">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tools Hub</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>BPI Ops Tools Hub</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚓</text></svg>">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'Segoe UI', 'Arial', 'sans-serif'] },
-          colors: {
-            ckb: {
-              ink: '#102018',
-              forest: '#183528',
-              main: '#22543D',
-              mid: '#2F6B4F',
-              mint: '#EAF5EF',
-              pale: '#F3F7F4',
-              line: '#D7E3DB',
-              muted: '#66766C',
-              gold: '#B7791F'
-            }
-          },
-          boxShadow: {
-            soft: '0 18px 45px rgba(16,32,24,.10)',
-            glow: '0 18px 60px rgba(34,84,61,.22)'
-          }
-        }
-      }
-    }
-  </script>
   <style>
+    :root {
+      --bg: #f2f6f3;
+      --surface: #ffffff;
+      --surface-2: #f7faf8;
+      --ink: #14231b;
+      --muted: #697970;
+      --green: #22543d;
+      --green-2: #2f6b4f;
+      --mint: #e8f3ec;
+      --line: #d7e2db;
+      --gold: #b7791f;
+      --red: #b42318;
+      --shadow: 0 12px 35px rgba(20, 35, 27, .07);
+      --radius: 18px;
+    }
+
+    body.dark {
+      --bg: #0c1711;
+      --surface: #13241b;
+      --surface-2: #192d22;
+      --ink: #eff6f1;
+      --muted: #a7b7ad;
+      --green: #54a477;
+      --green-2: #66b88a;
+      --mint: #20392b;
+      --line: #2c4738;
+      --gold: #d3a24f;
+      --shadow: 0 12px 30px rgba(0, 0, 0, .2);
+    }
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-      background:
-        radial-gradient(circle at 10% 10%, rgba(34,84,61,.13), transparent 28%),
-        radial-gradient(circle at 90% 0%, rgba(47,107,79,.14), transparent 30%),
-        linear-gradient(180deg, #F6F8F7 0%, #EEF3F0 100%);
+      margin: 0;
       min-height: 100vh;
-      letter-spacing: -0.015em;
-      color: #102018;
-      overflow-x: hidden;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
     }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #C7D6CC; border-radius: 999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #22543D; }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
 
-    .noise {
-      position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .42;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+    .container { width: min(1180px, calc(100% - 32px)); margin-inline: auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      background: color-mix(in srgb, var(--surface) 96%, transparent);
+      border-bottom: 1px solid var(--line);
     }
-    .aurora {
-      position: absolute; inset: -180px -160px auto auto; width: 580px; height: 580px; border-radius: 999px;
-      background: radial-gradient(circle, rgba(74,222,128,.26), rgba(34,84,61,.05) 48%, transparent 70%);
-      filter: blur(2px); animation: floatAura 9s ease-in-out infinite alternate;
-    }
-    .aurora.two {
-      inset: 120px auto auto -180px; background: radial-gradient(circle, rgba(183,121,31,.14), rgba(47,107,79,.06) 45%, transparent 72%);
-      animation-duration: 12s;
-    }
-    @keyframes floatAura { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(-28px,22px,0) scale(1.04); } }
-    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes shimmer { 0% { background-position: -220% 0; } 100% { background-position: 220% 0; } }
-    @keyframes pulseDot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.45); opacity: .55; } }
+    .topbar-inner { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .brand-mark { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--green); color: white; font-weight: 900; }
+    .brand-title { font-weight: 850; letter-spacing: -.02em; }
+    .brand-subtitle { color: var(--muted); font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: .15em; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
 
-    .glass {
-      background: rgba(255,255,255,.74);
-      border: 1px solid rgba(215,227,219,.82);
-      box-shadow: 0 14px 36px rgba(16,32,24,.08);
-      backdrop-filter: blur(16px);
+    .btn {
+      min-height: 38px; border: 1px solid var(--line); border-radius: 11px;
+      padding: 0 13px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 800;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
     }
-    .card-enter { animation: rise .45s ease both; }
-    .tool-card { animation: rise .32s ease both; }
-    .tool-card:hover { transform: translateY(-4px); border-color: #22543D; box-shadow: 0 18px 36px rgba(16,32,24,.11); }
-    .hero-grid {
-      background-image:
-        linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
-      background-size: 34px 34px;
-    }
-    .shimmer {
-      background: linear-gradient(90deg, #eef3f0 0%, #f7faf8 45%, #eef3f0 90%);
-      background-size: 220% 100%; animation: shimmer 1.4s infinite;
-    }
-    .status-dot { animation: pulseDot 1.5s ease-in-out infinite; }
-    .category-pill.active { background: #22543D; color: #fff; border-color: #22543D; }
-    .quick-card:hover .quick-icon { transform: rotate(-4deg) scale(1.06); }
-    .quick-icon { transition: transform .2s ease; }
-    .ticker-track { animation: ticker 26s linear infinite; }
-    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    .modal-backdrop { backdrop-filter: blur(6px); }
+    .btn:hover { border-color: var(--green); background: var(--mint); }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary { color: white; background: var(--green); border-color: var(--green); }
+    .btn.primary:hover { background: var(--green-2); }
+    .icon-btn { width: 38px; padding: 0; display: grid; place-items: center; }
 
-
-    /* Dark Mode */
-    body.dark-mode {
-      background:
-        radial-gradient(circle at 10% 10%, rgba(34,84,61,.28), transparent 30%),
-        radial-gradient(circle at 90% 0%, rgba(183,121,31,.12), transparent 30%),
-        linear-gradient(180deg, #08120D 0%, #102018 52%, #0B1611 100%);
-      color: #E7F1EA;
-    }
-    body.dark-mode .bg-white,
-    body.dark-mode .glass,
-    body.dark-mode .tool-card,
-    body.dark-mode .quick-card {
-      background: rgba(16,32,24,.78) !important;
-      border-color: rgba(199,214,204,.18) !important;
-      color: #E7F1EA !important;
-      box-shadow: 0 18px 44px rgba(0,0,0,.28);
-    }
-    body.dark-mode header {
-      background: rgba(8,18,13,.80) !important;
-      border-color: rgba(199,214,204,.16) !important;
-    }
-    body.dark-mode .text-ckb-ink,
-    body.dark-mode .text-slate-900,
-    body.dark-mode .text-slate-800,
-    body.dark-mode .font-black,
-    body.dark-mode h1,
-    body.dark-mode h2,
-    body.dark-mode h3 {
-      color: #F3F7F4 !important;
-    }
-    body.dark-mode .text-ckb-muted,
-    body.dark-mode .text-slate-500,
-    body.dark-mode .text-slate-600,
-    body.dark-mode .text-gray-500,
-    body.dark-mode .text-gray-600 {
-      color: #A9B8AE !important;
-    }
-    body.dark-mode .bg-ckb-pale,
-    body.dark-mode .bg-slate-50,
-    body.dark-mode .bg-gray-50,
-    body.dark-mode .hover\:bg-ckb-pale:hover {
-      background: rgba(34,84,61,.28) !important;
-    }
-    body.dark-mode .border-ckb-line,
-    body.dark-mode .border-slate-200,
-    body.dark-mode .border-gray-200 {
-      border-color: rgba(199,214,204,.18) !important;
-    }
-    body.dark-mode input {
-      background: rgba(8,18,13,.72) !important;
-      border-color: rgba(199,214,204,.20) !important;
-      color: #F3F7F4 !important;
-    }
-    body.dark-mode input::placeholder { color: #8FA196 !important; }
-    body.dark-mode .category-pill {
-      background: rgba(16,32,24,.92) !important;
-      color: #A9B8AE !important;
-      border-color: rgba(199,214,204,.18) !important;
-    }
-    body.dark-mode .category-pill.active {
-      background: #2F6B4F !important;
-      color: #FFFFFF !important;
-      border-color: #2F6B4F !important;
-    }
-    body.dark-mode .hero-grid {
-      box-shadow: inset 0 -1px 0 rgba(255,255,255,.09);
-    }
-    body.dark-mode .ticker-track,
-    body.dark-mode .bg-white\/80 {
-      color: #A9B8AE !important;
-    }
-    body.dark-mode .shimmer {
-      background: linear-gradient(90deg, rgba(34,84,61,.30) 0%, rgba(47,107,79,.42) 45%, rgba(34,84,61,.30) 90%);
-      background-size: 220% 100%;
-    }
-    .theme-toggle {
+    .hero { padding: 34px 0 24px; }
+    .hero-card {
+      display: grid; grid-template-columns: 1.55fr .85fr; gap: 24px; align-items: center;
+      padding: 30px; border-radius: 24px; color: white;
+      background: linear-gradient(135deg, #173828, #276148);
+      box-shadow: var(--shadow);
+      overflow: hidden;
       position: relative;
-      width: 48px;
-      height: 28px;
-      border-radius: 999px;
-      border: 1px solid rgba(199,214,204,.72);
-      background: #FFFFFF;
-      display: inline-flex;
-      align-items: center;
-      padding: 3px;
-      cursor: pointer;
-      transition: background .2s ease, border-color .2s ease;
     }
-    .theme-toggle .knob {
-      width: 20px;
-      height: 20px;
-      border-radius: 999px;
-      background: #22543D;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      transition: transform .22s ease, background .22s ease;
+    .hero-card::after {
+      content: ''; position: absolute; width: 280px; height: 280px; border-radius: 50%;
+      right: -110px; top: -150px; background: rgba(255,255,255,.06); pointer-events: none;
     }
-    body.dark-mode .theme-toggle {
-      background: rgba(16,32,24,.88);
-      border-color: rgba(199,214,204,.20);
-    }
-    body.dark-mode .theme-toggle .knob {
-      transform: translateX(20px);
-      background: #B7791F;
-    }
+    .eyebrow { font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .17em; color: #cce6d5; }
+    .hero h1 { margin: 10px 0 8px; font-size: clamp(32px, 5vw, 55px); line-height: 1; letter-spacing: -.045em; }
+    .hero p { margin: 0; max-width: 650px; color: #dcebe1; font-size: 14px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+    .hero .btn.secondary { color: white; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); }
+    .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: relative; z-index: 1; }
+    .hero-stat { padding: 16px; border: 1px solid rgba(255,255,255,.14); border-radius: 15px; background: rgba(255,255,255,.07); }
+    .hero-stat strong { display: block; font-size: 25px; }
+    .hero-stat span { font-size: 10px; color: #cfe2d6; text-transform: uppercase; font-weight: 800; letter-spacing: .1em; }
+    .hero-stat.wide { grid-column: 1 / -1; }
 
+    .main-grid { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; padding-bottom: 38px; align-items: start; }
+    .content-column, .side-column { display: grid; gap: 16px; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .panel-pad { padding: 18px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: start; gap: 14px; margin-bottom: 14px; }
+    .panel h2 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+    .panel-copy { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .kicker { color: var(--muted); font-size: 9px; font-weight: 850; text-transform: uppercase; letter-spacing: .13em; }
 
-
-    /* Productivity widgets */
-    .productivity-panel {
-      background: rgba(255,255,255,.78);
-      border: 1px solid rgba(215,227,219,.88);
-      box-shadow: 0 14px 34px rgba(16,32,24,.07);
+    .search-wrap { position: relative; }
+    .search-wrap::before { content: '⌕'; position: absolute; left: 14px; top: 50%; transform: translateY(-51%); color: var(--muted); font-size: 20px; }
+    .search {
+      width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 13px;
+      background: var(--surface-2); color: var(--ink); padding: 0 14px 0 41px; outline: none;
     }
-    .recent-tool,
-    .favorite-tool { transition: transform .18s ease, border-color .18s ease, background .18s ease; }
-    .recent-tool:hover,
-    .favorite-tool:hover { transform: translateY(-2px); border-color: #22543D; }
-    .favorite-button { transition: transform .18s ease, color .18s ease; }
-    .favorite-button:hover { transform: scale(1.12); }
-    .favorite-button.is-favorite { color: #B7791F; }
-    .check-item.completed .check-label { text-decoration: line-through; opacity: .58; }
+    .search:focus { border-color: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 13%, transparent); }
+    .categories { display: flex; gap: 7px; overflow-x: auto; padding: 12px 0 2px; scrollbar-width: thin; }
+    .pill { white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); padding: 7px 11px; font-size: 10px; font-weight: 850; }
+    .pill.active { background: var(--green); border-color: var(--green); color: white; }
+
+    .tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
+    .tool-card {
+      display: grid; grid-template-columns: 46px minmax(0,1fr) auto; gap: 12px; align-items: start;
+      padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface);
+      transition: border-color .16s ease, transform .16s ease, background .16s ease;
+      content-visibility: auto; contain-intrinsic-size: 120px;
+    }
+    .tool-card:hover { border-color: var(--green); transform: translateY(-2px); background: var(--surface-2); }
+    .tool-icon { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: var(--mint); font-size: 21px; border: 1px solid var(--line); }
+    .tool-title { font-size: 13px; font-weight: 850; line-height: 1.3; }
+    .tool-description { margin-top: 5px; color: var(--muted); font-size: 10.5px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .tool-category { display: inline-block; margin-top: 9px; color: var(--green); font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; }
+    .favorite-btn { border: 0; background: transparent; color: var(--muted); font-size: 17px; padding: 2px; }
+    .favorite-btn.active { color: var(--gold); }
+
+    .personal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .compact-list { display: grid; gap: 7px; margin-top: 12px; }
+    .compact-tool { display: flex; align-items: center; gap: 9px; padding: 9px; border-radius: 11px; border: 1px solid var(--line); background: var(--surface-2); }
+    .compact-icon { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 9px; display: grid; place-items: center; background: var(--mint); }
+    .compact-name { min-width: 0; flex: 1; font-size: 10.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .empty { color: var(--muted); font-size: 11px; padding: 12px 1px; }
+
+    .checklist { display: grid; gap: 7px; }
+    .task { display: grid; grid-template-columns: 24px minmax(0, 1fr) 26px; align-items: center; gap: 8px; padding: 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-2); }
+    .task-toggle { width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: transparent; }
+    .task.done .task-toggle { background: var(--green); border-color: var(--green); color: white; }
+    .task.done .task-text { color: var(--muted); text-decoration: line-through; }
+    .task-text { font-size: 10.5px; font-weight: 750; }
+    .task-delete { border: 0; background: transparent; color: var(--muted); font-size: 15px; }
+    .progress-line { height: 6px; border-radius: 999px; background: var(--mint); overflow: hidden; margin-top: 11px; }
+    .progress-line div { height: 100%; width: 0; background: var(--green); transition: width .2s ease; }
+
+    .timer-wrap { display: grid; grid-template-columns: 116px 1fr; gap: 17px; align-items: center; }
     .timer-ring {
-      --progress: 0deg;
-      width: 138px;
-      height: 138px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: conic-gradient(#22543D var(--progress), #E5EDE8 0);
-      position: relative;
+      --progress: 0deg; width: 116px; height: 116px; border-radius: 50%; display: grid; place-items: center;
+      background: conic-gradient(var(--green) var(--progress), var(--mint) 0); position: relative;
     }
-    .timer-ring::before {
-      content: '';
-      position: absolute;
-      inset: 9px;
-      border-radius: inherit;
-      background: #fff;
-      border: 1px solid #D7E3DB;
-    }
-    .timer-ring > div { position: relative; z-index: 1; }
-    .timer-running { animation: timerPulse 2.2s ease-in-out infinite; }
-    @keyframes timerPulse { 50% { box-shadow: 0 0 0 10px rgba(34,84,61,.07); } }
-    .volume-slider { accent-color: #22543D; }
-    body.dark-mode .productivity-panel {
-      background: rgba(16,32,24,.96) !important;
-      border-color: rgba(199,214,204,.18) !important;
-      box-shadow: 0 10px 26px rgba(0,0,0,.22);
-    }
-    body.dark-mode .timer-ring { background: conic-gradient(#4BA778 var(--progress), #263C30 0); }
-    body.dark-mode .timer-ring::before { background: #102018; border-color: rgba(199,214,204,.18); }
-    body.dark-mode .recent-tool,
-    body.dark-mode .favorite-tool,
-    body.dark-mode .check-item { background: rgba(8,18,13,.56) !important; }
+    .timer-ring::before { content: ''; position: absolute; inset: 8px; border-radius: inherit; background: var(--surface); border: 1px solid var(--line); }
+    .timer-display { position: relative; text-align: center; }
+    .timer-time { font-size: 25px; font-weight: 900; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+    .timer-state { color: var(--muted); font-size: 8px; text-transform: uppercase; letter-spacing: .12em; font-weight: 850; }
+    .timer-controls { display: grid; gap: 8px; }
+    .timer-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    select { width: 100%; min-height: 36px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 0 9px; font-size: 10px; font-weight: 800; outline: none; }
+    .audio-row { display: flex; align-items: center; gap: 8px; padding-top: 4px; }
+    .audio-row input { min-width: 0; flex: 1; accent-color: var(--green); }
+    .small { font-size: 9.5px; color: var(--muted); }
 
+    .modal { position: fixed; inset: 0; z-index: 60; display: none; place-items: start center; padding: 75px 16px 20px; background: rgba(5, 14, 9, .47); }
+    .modal.open { display: grid; }
+    .palette { width: min(650px, 100%); max-height: 72vh; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 25px 70px rgba(0,0,0,.22); }
+    .palette-head { display: flex; align-items: center; gap: 10px; padding: 13px; border-bottom: 1px solid var(--line); }
+    .palette-head input { min-width: 0; flex: 1; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 13px; }
+    .palette-results { max-height: 58vh; overflow: auto; padding: 7px; }
+    .palette-item { display: grid; grid-template-columns: 37px 1fr auto; gap: 10px; padding: 10px; align-items: center; border-radius: 11px; }
+    .palette-item:hover { background: var(--surface-2); }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 80; display: none; max-width: 330px; padding: 11px 14px; border-radius: 11px; background: var(--ink); color: var(--surface); font-size: 11px; font-weight: 800; box-shadow: var(--shadow); }
+
+    @media (max-width: 920px) {
+      .hero-card, .main-grid { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(3, 1fr); }
+      .hero-stat.wide { grid-column: auto; }
+      .side-column { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .container { width: min(100% - 20px, 1180px); }
+      .brand-subtitle, .desktop-only { display: none; }
+      .hero { padding-top: 18px; }
+      .hero-card { padding: 22px; }
+      .hero-stats, .tools-grid, .personal-grid, .side-column { grid-template-columns: 1fr; }
+      .timer-wrap { grid-template-columns: 1fr; justify-items: center; }
+      .timer-controls { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
   </style>
 </head>
 <body>
-  <div class="noise"></div>
-  <div class="aurora"></div>
-  <div class="aurora two"></div>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">B</div>
+        <div><div class="brand-title">Ops Tools Hub</div><div class="brand-subtitle">CKB Logistics</div></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn desktop-only" onclick="refreshTools()">Refresh</button>
+        <button class="btn icon-btn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle theme"><span id="themeIcon">◐</span></button>
+        <button class="btn primary" onclick="openPalette()">Quick Search <span class="desktop-only">⌘K</span></button>
+      </div>
+    </div>
+  </header>
 
-  <button id="themeToggleMobile" class="md:hidden fixed bottom-5 right-5 z-50 w-12 h-12 rounded-2xl bg-ckb-main text-white shadow-glow flex items-center justify-center" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
-    <i id="themeIconMobile" class="fa-solid fa-moon"></i>
-  </button>
-
-  <div class="relative z-10 min-h-screen">
-    <!-- Top Navigation -->
-    <header class="sticky top-0 z-40 border-b border-white/60 bg-white/70 backdrop-blur-xl">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-ckb-main text-white flex items-center justify-center shadow-glow">
-            <i class="fa-solid fa-anchor"></i>
-          </div>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-card">
           <div>
-            <div class="font-black tracking-tight text-ckb-ink leading-tight">BPI OPS Tools Hub</div>
-            <div class="text-[10px] uppercase tracking-[.22em] font-black text-ckb-muted">CKB Logistics</div>
+            <div class="eyebrow">Operational workspace</div>
+            <h1>Tools Hub.</h1>
+            <p>i made this so the tools can be used by everyone. WHOAA WHAT A TOOL!</p>
+            <div class="hero-actions">
+              <button class="btn primary" style="background:white;color:#22543d;border-color:white" onclick="focusSearch()">Find a Tool</button>
+              <button class="btn secondary" onclick="openPalette()">Open Quick Search</button>
+            </div>
           </div>
-        </div>
-        <div class="hidden md:flex items-center gap-2 text-xs font-bold text-ckb-muted">
-          <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-ckb-line"><span class="w-2 h-2 rounded-full bg-green-500 status-dot"></span> Live Portal</span>
-          <button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="knob"><i id="themeIcon" class="fa-solid fa-moon"></i></span></button>
-          <button onclick="openCommandPalette()" class="px-3 py-1.5 rounded-full bg-ckb-main text-white hover:bg-ckb-forest transition"><i class="fa-solid fa-magnifying-glass mr-1"></i> Quick Search</button>
-        </div>
-      </div>
-    </header>
-
-    <!-- Hero -->
-    <section class="relative overflow-hidden">
-      <div class="hero-grid bg-gradient-to-br from-ckb-ink via-ckb-main to-ckb-mid text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div class="lg:col-span-7 card-enter">
-              <div class="inline-flex items-center gap-2 rounded-full bg-white/12 border border-white/20 px-3 py-1 text-xs font-extrabold uppercase tracking-[.18em] text-emerald-100 mb-5">
-                <i class="fa-solid fa-bolt"></i> Excellence Workspace
-              </div>
-              <h1 class="text-4xl md:text-6xl font-black leading-[1.02] tracking-tight">
-                Tools Hub <span class="text-emerald-200">BPI Ops</span>
-              </h1>
-              <p class="mt-4 text-sm md:text-base text-emerald-50/85 max-w-2xl leading-relaxed">
-                We made this to make your job become easier, pomodoro will help you to focus, woww what a tools!
-              </p>
-              <div class="mt-7 flex flex-col sm:flex-row gap-3">
-                <button onclick="focusSearch()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-ckb-main font-black hover:bg-emerald-50 transition shadow-soft">
-                  <i class="fa-solid fa-magnifying-glass"></i> Find Tools
-                </button>
-                <button onclick="scrollToTools()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 border border-white/25 text-white font-black hover:bg-white/15 transition">
-                  <i class="fa-solid fa-layer-group"></i> Browse Library
-                </button>
-              </div>
-            </div>
-
-            <div class="lg:col-span-5 card-enter" style="animation-delay:.08s">
-              <div class="glass rounded-3xl p-5 text-ckb-ink">
-                <div class="grid grid-cols-2 gap-3">
-                  <div class="rounded-2xl bg-ckb-pale border border-ckb-line p-4">
-                    <div class="text-[11px] font-black uppercase tracking-[.14em] text-ckb-muted">Current Time</div>
-                    <div id="timeWidget" class="text-3xl font-black mt-2 tabular-nums">00:00</div>
-                    <div id="dateWidget" class="text-xs text-ckb-muted mt-1 font-semibold">Loading date...</div>
-                  </div>
-                  <div class="rounded-2xl bg-white border border-ckb-line p-4">
-                    <div class="text-[11px] font-black uppercase tracking-[.14em] text-ckb-muted">Database</div>
-                    <div class="flex items-end gap-2 mt-2"><span id="toolCount" class="text-3xl font-black">0</span><span class="text-sm font-black text-ckb-muted mb-1">tools</span></div>
-                    <div class="text-xs text-ckb-muted mt-1 font-semibold" id="dbStatus">Connecting...</div>
-                  </div>
-                  <div class="col-span-2 rounded-2xl bg-white border border-ckb-line p-4">
-                    <div class="flex items-center justify-between gap-3">
-                      <div>
-                        <div class="text-[11px] font-black uppercase tracking-[.14em] text-ckb-muted">Featured Tool</div>
-                        <div id="featuredTitle" class="font-black text-ckb-ink mt-1">Loading...</div>
-                        <div id="featuredDesc" class="text-xs text-ckb-muted mt-1 line-clamp-2">Taking data from Google Sheets database.</div>
-                      </div>
-                      <button id="featuredBtn" disabled class="w-11 h-11 rounded-xl bg-ckb-main text-white disabled:opacity-40 hover:bg-ckb-forest transition flex items-center justify-center">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><strong id="toolCount">0</strong><span>Connected tools</span></div>
+            <div class="hero-stat"><strong id="favoriteCount">0</strong><span>Favorites</span></div>
+            <div class="hero-stat wide"><strong id="clock">00:00</strong><span id="today">Loading date</span></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Ticker -->
-    <section class="border-b border-ckb-line bg-white/80 overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div class="flex items-center gap-4">
-          <div class="shrink-0 text-xs font-black uppercase tracking-[.16em] text-ckb-main"><i class="fa-solid fa-bullhorn mr-2"></i>Info</div>
-          <div class="overflow-hidden whitespace-nowrap text-sm text-ckb-muted font-semibold">
-            <div class="ticker-track inline-flex gap-10">
-              <span>Use search to find tools faster.</span><span>Database source: Google Sheets published CSV.</span><span>Portal status: online and ready for OPS workspace.</span><span>Tip: pin frequently used links in browser favorites.</span>
-              <span>Use search to find tools faster.</span><span>Database source: Google Sheets published CSV.</span><span>Portal status: online and ready for OPS workspace.</span><span>Tip: pin frequently used links in browser favorites.</span>
-            </div>
+    <div class="container main-grid" id="toolsSection">
+      <section class="content-column">
+        <div class="panel panel-pad">
+          <div class="panel-header">
+            <div><div class="kicker">Connected database</div><h2>Tools Library</h2><p class="panel-copy" id="databaseStatus">Connecting to Google Sheets…</p></div>
+            <button class="btn" onclick="refreshTools()">↻ Refresh</button>
           </div>
+          <div class="search-wrap"><input id="searchInput" class="search" placeholder="Search tools, dashboards, forms, or reports…" oninput="renderTools()"></div>
+          <div id="categories" class="categories"></div>
         </div>
-      </div>
-    </section>
 
-    <!-- Main Content -->
-    <main id="toolsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Left: Tools Library -->
-        <section class="lg:col-span-8 space-y-5">
-          <div class="glass rounded-3xl p-4 md:p-5 card-enter">
-            <div class="flex flex-col md:flex-row md:items-center gap-4 justify-between">
-              <div>
-                <h2 class="text-xl font-black text-ckb-ink">Tools Library</h2>
-                <p class="text-sm text-ckb-muted mt-1">Search all tools from connected Google Sheets database.</p>
-              </div>
-              <button onclick="fetchLinks(true)" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-ckb-line text-ckb-main font-black hover:bg-ckb-pale transition">
-                <i class="fa-solid fa-rotate-right"></i> Refresh
-              </button>
-            </div>
-            <div class="mt-5 relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-ckb-muted"></i>
-              <input type="text" id="searchInput" placeholder="Cari tools, dokumen, dashboard, form, report..." oninput="filterLinks()" class="w-full h-14 rounded-2xl bg-white border border-ckb-line pl-12 pr-4 text-sm font-semibold outline-none focus:ring-4 focus:ring-ckb-main/10 focus:border-ckb-main transition">
-            </div>
-            <div id="categoryBar" class="mt-4 flex gap-2 overflow-x-auto pb-1"></div>
-          </div>
+        <div id="toolsGrid" class="tools-grid">
+          <div class="panel panel-pad empty">Loading tools…</div>
+        </div>
 
-          <div id="linksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="rounded-2xl border border-ckb-line bg-white p-5 shimmer h-32"></div>
-            <div class="rounded-2xl border border-ckb-line bg-white p-5 shimmer h-32"></div>
-            <div class="rounded-2xl border border-ckb-line bg-white p-5 shimmer h-32"></div>
-            <div class="rounded-2xl border border-ckb-line bg-white p-5 shimmer h-32"></div>
-          </div>
-
-
-          <!-- Personal Workspace -->
-          <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="productivity-panel rounded-3xl p-5">
-              <div class="flex items-center justify-between gap-3 mb-4">
-                <div>
-                  <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Personal History</div>
-                  <h2 class="font-black text-ckb-ink mt-1">Recently Opened</h2>
-                </div>
-                <button onclick="clearRecentTools()" class="text-xs font-black text-ckb-muted hover:text-ckb-main transition">Clear</button>
-              </div>
-              <div id="recentTools" class="space-y-2"></div>
-            </div>
-            <div class="productivity-panel rounded-3xl p-5">
-              <div class="flex items-center justify-between gap-3 mb-4">
-                <div>
-                  <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Pinned by You</div>
-                  <h2 class="font-black text-ckb-ink mt-1">Favorites</h2>
-                </div>
-                <i class="fa-solid fa-star text-amber-500"></i>
-              </div>
-              <div id="favoriteTools" class="space-y-2"></div>
-            </div>
+        <div class="personal-grid">
+          <section class="panel panel-pad">
+            <div class="panel-header"><div><div class="kicker">Personal history</div><h2>Recently Opened</h2></div><button class="btn" onclick="clearRecent()">Clear</button></div>
+            <div id="recentList" class="compact-list"></div>
           </section>
+          <section class="panel panel-pad">
+            <div class="panel-header"><div><div class="kicker">made by - zanov</div><h2>Favorites</h2></div><span style="color:var(--gold)">★</span></div>
+            <div id="favoriteList" class="compact-list"></div>
+          </section>
+        </div>
+      </section>
 
-          <div id="emptyState" class="hidden bg-white border border-dashed border-ckb-line rounded-3xl p-10 text-center">
-            <div class="w-14 h-14 mx-auto rounded-2xl bg-ckb-pale flex items-center justify-center text-ckb-main text-xl"><i class="fa-solid fa-magnifying-glass"></i></div>
-            <h3 class="mt-4 font-black text-ckb-ink">No matching tools found</h3>
-            <p class="text-sm text-ckb-muted mt-1">Try different keywords or reset the category filter.</p>
+      <aside class="side-column">
+        <section class="panel panel-pad">
+          <div class="panel-header">
+            <div><div class="kicker">Daily workspace</div><h2>Operations Checklist</h2></div>
+            <button class="btn icon-btn primary" onclick="addTask()" title="Add task">＋</button>
           </div>
+          <div id="checklist" class="checklist"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:11px" class="small"><span>Daily progress</span><span id="taskProgress">0 / 0</span></div>
+          <div class="progress-line"><div id="taskBar"></div></div>
         </section>
 
-        <!-- Right: Widgets -->
-        <aside class="lg:col-span-4 space-y-5">
-
-          <!-- Daily Operations Checklist -->
-          <section class="productivity-panel rounded-3xl p-5 card-enter">
-            <div class="flex items-center justify-between gap-3 mb-4">
-              <div>
-                <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Daily Workspace</div>
-                <h2 class="font-black text-ckb-ink mt-1">Operations Checklist</h2>
-              </div>
-              <button onclick="addChecklistItem()" class="w-10 h-10 rounded-2xl bg-ckb-main text-white hover:bg-ckb-forest transition" title="Add task"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            <div id="checklistItems" class="space-y-2"></div>
-            <div class="mt-4">
-              <div class="flex justify-between text-xs font-black text-ckb-muted mb-1"><span>Daily Progress</span><span id="checklistProgressText">0 / 0</span></div>
-              <div class="h-2 rounded-full bg-white border border-ckb-line overflow-hidden"><div id="checklistProgressBar" class="h-full bg-ckb-main rounded-full transition-all" style="width:0%"></div></div>
-            </div>
-          </section>
-
-          <!-- Pomodoro Focus Timer -->
-          <section class="productivity-panel rounded-3xl p-5 card-enter">
-            <div class="flex items-center justify-between gap-3 mb-4">
-              <div>
-                <div class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Deep Work</div>
-                <h2 class="font-black text-ckb-ink mt-1">Pomodoro Focus</h2>
-              </div>
-              <select id="timerMode" onchange="changeTimerMode()" class="rounded-xl bg-white border border-ckb-line px-2 py-2 text-xs font-black text-ckb-main outline-none">
-                <option value="1500">Focus 25</option>
-                <option value="300">Break 5</option>
-                <option value="3000">Deep 50</option>
-              </select>
-            </div>
-            <div class="flex justify-center py-2">
-              <div id="timerRing" class="timer-ring">
-                <div class="text-center">
-                  <div id="timerDisplay" class="text-3xl font-black tabular-nums text-ckb-ink">25:00</div>
-                  <div id="timerState" class="text-[10px] uppercase tracking-[.14em] font-black text-ckb-muted mt-1">Ready</div>
-                </div>
-              </div>
-            </div>
-            <div class="grid grid-cols-3 gap-2 mt-4">
-              <button onclick="startTimer()" class="py-2.5 rounded-xl bg-ckb-main text-white text-xs font-black hover:bg-ckb-forest transition"><i class="fa-solid fa-play mr-1"></i>Start</button>
-              <button onclick="pauseTimer()" class="py-2.5 rounded-xl bg-white border border-ckb-line text-ckb-main text-xs font-black hover:bg-ckb-pale transition"><i class="fa-solid fa-pause mr-1"></i>Pause</button>
-              <button onclick="resetTimer()" class="py-2.5 rounded-xl bg-white border border-ckb-line text-ckb-main text-xs font-black hover:bg-ckb-pale transition"><i class="fa-solid fa-rotate-left mr-1"></i>Reset</button>
-            </div>
-            <div class="mt-4 rounded-2xl bg-ckb-pale border border-ckb-line p-3">
-              <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2"><i class="fa-solid fa-headphones text-ckb-main"></i><span class="text-xs font-black text-ckb-ink">Low-key Focus Audio</span></div>
-                <button id="audioToggle" onclick="toggleFocusAudio()" class="text-xs font-black text-ckb-main">Off</button>
-              </div>
-              <div class="flex items-center gap-2 mt-3"><i class="fa-solid fa-volume-low text-ckb-muted text-xs"></i><input id="focusVolume" class="volume-slider w-full" type="range" min="0" max="100" value="22" oninput="setFocusVolume(this.value)"></div>
-              <p class="text-[10px] text-ckb-muted mt-2 leading-relaxed">A lightweight ambient soundscape generated in the browser. No external song file or streaming service needed.</p>
-            </div>
-            <div class="text-center text-xs font-bold text-ckb-muted mt-3">Completed sessions: <span id="pomodoroCount" class="text-ckb-main font-black">0</span></div>
-          </section>
-
-          <section class="glass rounded-3xl p-5 card-enter" style="animation-delay:.04s">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-[11px] uppercase tracking-[.16em] font-black text-ckb-muted">Today Focus</div>
-                <h2 class="font-black text-ckb-ink mt-1" id="greetingText">Halo Warrior!</h2>
-              </div>
-              <div class="w-12 h-12 rounded-2xl bg-ckb-main text-white flex items-center justify-center"><i class="fa-solid fa-compass"></i></div>
-            </div>
-            <p id="focusText" class="text-sm text-ckb-muted mt-4 leading-relaxed">Keep the operation clear, fast, and documented.</p>
-            <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-              <div class="rounded-2xl bg-white border border-ckb-line p-3"><div id="todayDay" class="text-lg font-black">--</div><div class="text-[10px] font-black uppercase text-ckb-muted">Day</div></div>
-              <div class="rounded-2xl bg-white border border-ckb-line p-3"><div id="weekNumber" class="text-lg font-black">--</div><div class="text-[10px] font-black uppercase text-ckb-muted">Week</div></div>
-              <div class="rounded-2xl bg-white border border-ckb-line p-3"><div id="monthName" class="text-lg font-black">--</div><div class="text-[10px] font-black uppercase text-ckb-muted">Month</div></div>
-            </div>
-          </section>
-
-          <section class="bg-ckb-ink text-white rounded-3xl p-5 overflow-hidden relative card-enter" style="animation-delay:.08s">
-            <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-emerald-300/10"></div>
-            <div class="relative">
-              <div class="text-[11px] uppercase tracking-[.16em] font-black text-emerald-100/70">Quote of the Day</div>
-              <p id="quoteWidget" class="mt-3 text-sm leading-relaxed text-emerald-50 italic">Loading quote...</p>
-              <div id="quoteAuthor" class="mt-4 text-xs font-black text-emerald-200 text-right">-</div>
-            </div>
-          </section>
-
-          <section class="glass rounded-3xl p-5 card-enter" style="animation-delay:.12s">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="font-black text-ckb-ink">Quick Launch</h2>
-              <span class="text-[10px] uppercase tracking-[.16em] font-black text-ckb-muted">Shortcuts</span>
-            </div>
-            <div id="quickLaunch" class="grid grid-cols-2 gap-3"></div>
-          </section>
-
-          <section class="glass rounded-3xl p-5 card-enter" style="animation-delay:.16s">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="font-black text-ckb-ink">Portal Insights</h2>
-              <i class="fa-solid fa-chart-simple text-ckb-main"></i>
-            </div>
-            <div class="space-y-3">
-              <div>
-                <div class="flex justify-between text-xs font-black text-ckb-muted mb-1"><span>Database Load</span><span id="loadPct">0%</span></div>
-                <div class="h-2 rounded-full bg-white border border-ckb-line overflow-hidden"><div id="loadBar" class="h-full bg-ckb-main rounded-full transition-all duration-700" style="width:0%"></div></div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-2xl bg-white border border-ckb-line p-3"><div class="text-2xl font-black" id="visibleTools">0</div><div class="text-xs font-bold text-ckb-muted">Visible</div></div>
-                <div class="rounded-2xl bg-white border border-ckb-line p-3"><div class="text-2xl font-black" id="categoryCount">0</div><div class="text-xs font-bold text-ckb-muted">Categories</div></div>
-              </div>
-            </div>
-          </section>
-
-          <section class="glass rounded-3xl p-5 card-enter" style="animation-delay:.20s">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-2xl bg-ckb-pale border border-ckb-line text-ckb-main flex items-center justify-center"><i class="fa-solid fa-newspaper"></i></div>
-              <div>
-                <h2 class="font-black text-ckb-ink leading-tight">Ops Bulletin</h2>
-                <p class="text-xs font-semibold text-ckb-muted">Static portal announcement</p>
-              </div>
-            </div>
-            <div class="space-y-3 text-sm">
-              <div class="rounded-2xl bg-white border border-ckb-line p-3"><b>Reminder</b><p class="text-xs text-ckb-muted mt-1 leading-relaxed">Pastikan link tools di Google Sheets sudah menggunakan URL aktif dan description jelas.</p></div>
-              <div class="rounded-2xl bg-white border border-ckb-line p-3"><b>Tip</b><p class="text-xs text-ckb-muted mt-1 leading-relaxed">Gunakan keyword singkat di search seperti “SUJ”, “report”, “form”, atau “dashboard”.</p></div>
-            </div>
-          </section>
-        </aside>
-      </div>
-    </main>
-  </div>
-
-  <!-- Command Palette -->
-  <div id="commandPalette" class="hidden fixed inset-0 z-50 bg-ckb-ink/45 modal-backdrop items-start justify-center px-4 pt-20">
-    <div class="w-full max-w-2xl rounded-3xl bg-white shadow-glow border border-ckb-line overflow-hidden">
-      <div class="p-4 border-b border-ckb-line flex items-center gap-3">
-        <i class="fa-solid fa-magnifying-glass text-ckb-muted"></i>
-        <input id="paletteInput" type="text" placeholder="Quick search tools..." oninput="renderPalette()" class="w-full outline-none font-bold text-ckb-ink">
-        <button onclick="closeCommandPalette()" class="w-8 h-8 rounded-xl hover:bg-ckb-pale text-ckb-muted"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div id="paletteResults" class="max-h-[420px] overflow-y-auto p-2"></div>
-    </div>
-  </div>
-
-  <script>
-    // Google Sheets CSV database link - original source kept
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_6E9ASMLc7I0q7LmPsucMUr7fMuNaciYvx4pR6CMUtGZKPtbYVpk1FqDs-07kE3gRdzfJaxXGDh2t/pub?gid=0&single=true&output=csv";
-
-    let tools = [];
-    let activeCategory = 'All';
-
-    const quotes = [
-      { text: 'Continuous improvement is better than delayed perfection.', author: 'Mark Twain' },
-      { text: 'Without data you are just another person with an opinion.', author: 'W. Edwards Deming' },
-      { text: 'The line between disorder and order lies in logistics.', author: 'Sun Tzu' },
-      { text: 'Behind every smooth operation is a clear process.', author: 'BPI OPS' },
-      { text: 'No, AI will not take my job. People with AI will.', author: 'zanov' },
-      { text: 'Small automation, repeated daily, becomes operational leverage.', author: 'BPI OPS' }
-    ];
-
-    function parseCSV(text) {
-      const rows = [];
-      let row = [], cur = '', inQuotes = false;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i], next = text[i + 1];
-        if (ch === '"' && inQuotes && next === '"') { cur += '"'; i++; }
-        else if (ch === '"') inQuotes = !inQuotes;
-        else if (ch === ',' && !inQuotes) { row.push(cur); cur = ''; }
-        else if ((ch === '\n' || ch === '\r') && !inQuotes) {
-          if (cur || row.length) { row.push(cur); rows.push(row); row = []; cur = ''; }
-          if (ch === '\r' && next === '\n') i++;
-        } else cur += ch;
-      }
-      if (cur || row.length) { row.push(cur); rows.push(row); }
-      return rows;
-    }
-
-    function normalizeCategory(title, desc) {
-      const hay = `${title} ${desc}`.toLowerCase();
-      if (hay.includes('dashboard') || hay.includes('monitoring')) return 'Dashboard';
-      if (hay.includes('form') || hay.includes('request')) return 'Form';
-      if (hay.includes('report') || hay.includes('rekap') || hay.includes('laporan')) return 'Report';
-      if (hay.includes('suj') || hay.includes('uang jalan')) return 'SUJ';
-      if (hay.includes('database') || hay.includes('master')) return 'Database';
-      return 'Tools';
-    }
-
-    async function fetchLinks(force = false) {
-      setLoadProgress(22);
-      document.getElementById('dbStatus').textContent = force ? 'Refreshing...' : 'Connecting...';
-      try {
-        const response = await fetch(csvUrl + (force ? `&t=${Date.now()}` : ''));
-        setLoadProgress(54);
-        const data = await response.text();
-        const rows = parseCSV(data);
-        tools = [];
-        for (let i = 1; i < rows.length; i++) {
-          const cols = rows[i] || [];
-          const title = (cols[0] || '').trim();
-          const link = (cols[1] || '#').trim();
-          const desc = (cols[2] || '').trim();
-          const emoji = (cols[3] || '📄').trim();
-          if (title) tools.push({ title, link, desc, emoji, category: normalizeCategory(title, desc) });
-        }
-        setLoadProgress(100);
-        document.getElementById('dbStatus').textContent = 'Connected';
-        renderCategories();
-        renderTools();
-        renderQuickLaunch();
-        renderFeaturedTool();
-        updateStats();
-        renderPersonalTools();
-      } catch (error) {
-        console.error('Error loading CSV:', error);
-        document.getElementById('dbStatus').textContent = 'Failed';
-        document.getElementById('linksContainer').innerHTML = `
-          <div class="col-span-full bg-red-50 border border-red-200 rounded-3xl p-10 text-center">
-            <i class="fa-solid fa-triangle-exclamation text-red-500 text-3xl mb-3"></i>
-            <p class="font-black text-red-700">Gagal memuat data dari database.</p>
-            <p class="text-sm text-red-500 mt-1">Cek publish setting Google Sheets atau koneksi internet.</p>
-          </div>`;
-      }
-    }
-
-    function setLoadProgress(num) {
-      document.getElementById('loadBar').style.width = num + '%';
-      document.getElementById('loadPct').textContent = num + '%';
-    }
-
-    function renderCategories() {
-      const cats = ['All', ...Array.from(new Set(tools.map(t => t.category))).sort()];
-      document.getElementById('categoryBar').innerHTML = cats.map(cat => `
-        <button onclick="setCategory('${cat}')" class="category-pill ${cat === activeCategory ? 'active' : ''} shrink-0 px-3 py-2 rounded-xl border border-ckb-line bg-white text-xs font-black text-ckb-muted hover:bg-ckb-pale transition">
-          ${cat} <span class="opacity-60">${cat === 'All' ? tools.length : tools.filter(t => t.category === cat).length}</span>
-        </button>`).join('');
-      document.getElementById('categoryCount').textContent = cats.length - 1;
-    }
-
-    function setCategory(cat) {
-      activeCategory = cat;
-      renderCategories();
-      renderTools();
-      updateStats();
-    }
-
-    function getFilteredTools() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      return tools.filter(t => {
-        const matchCategory = activeCategory === 'All' || t.category === activeCategory;
-        const matchSearch = !q || t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
-        return matchCategory && matchSearch;
-      });
-    }
-
-    function renderTools() {
-      const filtered = getFilteredTools();
-      const container = document.getElementById('linksContainer');
-      document.getElementById('emptyState').classList.toggle('hidden', filtered.length !== 0);
-      if (!filtered.length) { container.innerHTML = ''; updateStats(); return; }
-      container.innerHTML = filtered.map((t, idx) => `
-        <a href="${t.link}" target="_blank" onclick="recordToolOpen('${encodeURIComponent(t.title)}')" class="tool-card group rounded-3xl bg-white border border-ckb-line p-5 transition-all duration-200" style="animation-delay:${Math.min(idx * 0.025, .35)}s">
-          <div class="flex gap-4">
-            <div class="shrink-0 w-14 h-14 rounded-2xl bg-ckb-pale border border-ckb-line flex items-center justify-center text-2xl group-hover:bg-white transition">${t.emoji || '📄'}</div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-start justify-between gap-3">
-                <h3 class="font-black text-ckb-ink group-hover:text-ckb-main transition leading-snug">${escapeHTML(t.title)}</h3>
-                <div class="flex items-center gap-2">
-                  <button type="button" onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite('${encodeURIComponent(t.title)}')" class="favorite-button ${isFavorite(t.title) ? 'is-favorite' : 'text-ckb-muted'}" title="Favorite"><i class="fa-${isFavorite(t.title) ? 'solid' : 'regular'} fa-star"></i></button>
-                  <i class="fa-solid fa-arrow-up-right-from-square text-ckb-muted group-hover:text-ckb-main text-xs mt-1"></i>
-                </div>
-              </div>
-              <p class="text-sm text-ckb-muted mt-2 leading-relaxed line-clamp-2">${escapeHTML(t.desc || 'No description available.')}</p>
-              <span class="inline-flex mt-4 px-2.5 py-1 rounded-lg bg-ckb-pale border border-ckb-line text-[10px] font-black uppercase tracking-[.12em] text-ckb-main">${t.category}</span>
+        <section class="panel panel-pad">
+          <div class="panel-header"><div><div class="kicker">Deep work</div><h2>Pomodoro Focus</h2></div><span class="small">Sessions: <b id="sessionCount">0</b></span></div>
+          <div class="timer-wrap">
+            <div id="timerRing" class="timer-ring"><div class="timer-display"><div id="timerTime" class="timer-time">25:00</div><div id="timerState" class="timer-state">Ready</div></div></div>
+            <div class="timer-controls">
+              <select id="timerMode" onchange="changeTimerMode()"><option value="1500">Focus · 25 min</option><option value="300">Break · 5 min</option><option value="3000">Deep work · 50 min</option></select>
+              <div class="timer-buttons"><button class="btn primary" onclick="startTimer()">Start</button><button class="btn" onclick="pauseTimer()">Pause</button><button class="btn" onclick="resetTimer()">Reset</button></div>
+              <div class="audio-row"><button id="audioButton" class="btn" onclick="toggleAudio()">♫ Audio Off</button><input id="volume" type="range" min="0" max="100" value="20" oninput="changeVolume(this.value)"></div>
+              <div class="small">Built-in low-key ambient tones. No stream or external song file.</div>
             </div>
           </div>
-        </a>`).join('');
-      updateStats();
-    }
+        </section>
+      </aside>
+    </div>
+  </main>
 
-    function filterLinks() { renderTools(); }
+  <div id="paletteModal" class="modal" onclick="if(event.target===this) closePalette()">
+    <div class="palette">
+      <div class="palette-head"><span>⌕</span><input id="paletteInput" placeholder="Search all tools…" oninput="renderPalette()"><button class="btn icon-btn" onclick="closePalette()">×</button></div>
+      <div id="paletteResults" class="palette-results"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
 
-    function renderQuickLaunch() {
-      const pick = tools.slice(0, 4);
-      document.getElementById('quickLaunch').innerHTML = pick.map(t => `
-        <a href="${t.link}" target="_blank" class="quick-card rounded-2xl bg-white border border-ckb-line p-3 hover:bg-ckb-pale transition">
-          <div class="quick-icon w-9 h-9 rounded-xl bg-ckb-pale text-lg flex items-center justify-center mb-2">${t.emoji || '📄'}</div>
-          <div class="text-xs font-black text-ckb-ink leading-snug line-clamp-2">${escapeHTML(t.title)}</div>
-        </a>`).join('') || '<p class="text-sm text-ckb-muted">No shortcuts available.</p>';
-    }
+  <script>
+    'use strict';
 
-    function renderFeaturedTool() {
-      if (!tools.length) return;
-      const t = tools[Math.floor(Math.random() * tools.length)];
-      document.getElementById('featuredTitle').textContent = t.title;
-      document.getElementById('featuredDesc').textContent = t.desc || 'Open this tool from the database list.';
-      const btn = document.getElementById('featuredBtn');
-      btn.disabled = false;
-      btn.onclick = () => window.open(t.link, '_blank');
-    }
-
-    function updateStats() {
-      document.getElementById('toolCount').textContent = tools.length;
-      document.getElementById('visibleTools').textContent = getFilteredTools().length;
-    }
-
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('timeWidget').textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-      document.getElementById('dateWidget').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-      document.getElementById('todayDay').textContent = now.toLocaleDateString('id-ID', { weekday: 'short' });
-      document.getElementById('monthName').textContent = now.toLocaleDateString('id-ID', { month: 'short' });
-      document.getElementById('weekNumber').textContent = getWeekNumber(now);
-      const hour = now.getHours();
-      document.getElementById('greetingText').textContent = hour < 11 ? 'Morning Warrior!' : hour < 15 ? 'Afternoon Warrior!' : 'Evening Warrior!';
-    }
-
-    function getWeekNumber(date) {
-      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-      const dayNum = d.getUTCDay() || 7;
-      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-      const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-      return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-    }
-
-    function setRandomQuote() {
-      const q = quotes[Math.floor(Math.random() * quotes.length)];
-      document.getElementById('quoteWidget').textContent = `"${q.text}"`;
-      document.getElementById('quoteAuthor').textContent = `- ${q.author}`;
-    }
-
-    function focusSearch() { document.getElementById('searchInput').focus(); }
-    function scrollToTools() { document.getElementById('toolsSection').scrollIntoView({ behavior: 'smooth' }); }
-
-    function openCommandPalette() {
-      document.getElementById('commandPalette').classList.remove('hidden');
-      document.getElementById('commandPalette').classList.add('flex');
-      document.getElementById('paletteInput').value = '';
-      renderPalette();
-      setTimeout(() => document.getElementById('paletteInput').focus(), 50);
-    }
-    function closeCommandPalette() {
-      document.getElementById('commandPalette').classList.add('hidden');
-      document.getElementById('commandPalette').classList.remove('flex');
-    }
-    function renderPalette() {
-      const q = document.getElementById('paletteInput').value.toLowerCase().trim();
-      const rows = tools.filter(t => !q || t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)).slice(0, 8);
-      document.getElementById('paletteResults').innerHTML = rows.map(t => `
-        <a href="${t.link}" target="_blank" onclick="closeCommandPalette()" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-ckb-pale transition">
-          <div class="w-10 h-10 rounded-xl bg-ckb-pale border border-ckb-line flex items-center justify-center text-lg">${t.emoji || '📄'}</div>
-          <div class="flex-1 min-w-0"><div class="font-black text-ckb-ink truncate">${escapeHTML(t.title)}</div><div class="text-xs text-ckb-muted truncate">${escapeHTML(t.desc || t.category)}</div></div>
-          <i class="fa-solid fa-arrow-up-right-from-square text-ckb-muted text-xs"></i>
-        </a>`).join('') || '<div class="p-8 text-center text-ckb-muted font-bold">No result found.</div>';
-    }
-
-    function escapeHTML(str) {
-      return String(str || '').replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
-    }
-
-
-    function applyTheme(theme) {
-      const isDark = theme === 'dark';
-      document.body.classList.toggle('dark-mode', isDark);
-      document.getElementById('themeIcon')?.classList.toggle('fa-moon', !isDark);
-      document.getElementById('themeIcon')?.classList.toggle('fa-sun', isDark);
-      document.getElementById('themeIconMobile')?.classList.toggle('fa-moon', !isDark);
-      document.getElementById('themeIconMobile')?.classList.toggle('fa-sun', isDark);
-      localStorage.setItem('bpi_theme', theme);
-    }
-
-    function toggleTheme() {
-      const isDark = document.body.classList.contains('dark-mode');
-      applyTheme(isDark ? 'light' : 'dark');
-    }
-
-    function initTheme() {
-      const savedTheme = localStorage.getItem('bpi_theme');
-      if (savedTheme) { applyTheme(savedTheme); return; }
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyTheme(prefersDark ? 'dark' : 'light');
-    }
-
-
-
-    // Personal workspace ------------------------------------------------------
-    const RECENT_TOOLS_KEY = 'bpi_recent_tools';
-    const FAVORITE_TOOLS_KEY = 'bpi_favorite_tools';
-    const CHECKLIST_KEY = 'bpi_daily_checklist';
-    const POMODORO_COUNT_KEY = 'bpi_pomodoro_count';
-
-    function readStorage(key, fallback = []) {
-      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-      catch { return fallback; }
-    }
-
-    function writeStorage(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function findTool(title) {
-      return tools.find(tool => tool.title === title);
-    }
-
-    function recordToolOpen(encodedTitle) {
-      const title = decodeURIComponent(encodedTitle);
-      const recent = readStorage(RECENT_TOOLS_KEY).filter(item => item !== title);
-      recent.unshift(title);
-      writeStorage(RECENT_TOOLS_KEY, recent.slice(0, 6));
-      renderPersonalTools();
-    }
-
-    function clearRecentTools() {
-      writeStorage(RECENT_TOOLS_KEY, []);
-      renderPersonalTools();
-    }
-
-    function isFavorite(title) {
-      return readStorage(FAVORITE_TOOLS_KEY).includes(title);
-    }
-
-    function toggleFavorite(encodedTitle) {
-      const title = decodeURIComponent(encodedTitle);
-      const favorites = readStorage(FAVORITE_TOOLS_KEY);
-      const next = favorites.includes(title)
-        ? favorites.filter(item => item !== title)
-        : [...favorites, title];
-      writeStorage(FAVORITE_TOOLS_KEY, next);
-      renderTools();
-      renderPersonalTools();
-    }
-
-    function compactToolRow(tool, className, removable = false) {
-      return `
-        <div class="${className} flex items-center gap-3 rounded-2xl bg-white border border-ckb-line p-3">
-          <a href="${tool.link}" target="_blank" onclick="recordToolOpen('${encodeURIComponent(tool.title)}')" class="flex items-center gap-3 min-w-0 flex-1">
-            <div class="w-10 h-10 shrink-0 rounded-xl bg-ckb-pale border border-ckb-line flex items-center justify-center text-lg">${tool.emoji || '📄'}</div>
-            <div class="min-w-0"><div class="font-black text-xs text-ckb-ink truncate">${escapeHTML(tool.title)}</div><div class="text-[10px] text-ckb-muted truncate mt-1">${escapeHTML(tool.category)}</div></div>
-          </a>
-          ${removable ? `<button onclick="toggleFavorite('${encodeURIComponent(tool.title)}')" class="text-amber-500" title="Remove favorite"><i class="fa-solid fa-star"></i></button>` : ''}
-        </div>`;
-    }
-
-    function renderPersonalTools() {
-      const recent = readStorage(RECENT_TOOLS_KEY).map(findTool).filter(Boolean);
-      const favorites = readStorage(FAVORITE_TOOLS_KEY).map(findTool).filter(Boolean);
-      const recentContainer = document.getElementById('recentTools');
-      const favoriteContainer = document.getElementById('favoriteTools');
-      if (!recentContainer || !favoriteContainer) return;
-      recentContainer.innerHTML = recent.length
-        ? recent.map(tool => compactToolRow(tool, 'recent-tool')).join('')
-        : '<p class="text-xs text-ckb-muted leading-relaxed">Your recently opened tools will appear here.</p>';
-      favoriteContainer.innerHTML = favorites.length
-        ? favorites.map(tool => compactToolRow(tool, 'favorite-tool', true)).join('')
-        : '<p class="text-xs text-ckb-muted leading-relaxed">Click the star on a tool card to pin it here.</p>';
-    }
-
-    // Daily checklist ---------------------------------------------------------
-    function todayKey() { return new Date().toISOString().slice(0, 10); }
-
-    function loadChecklist() {
-      const saved = readStorage(CHECKLIST_KEY, {});
-      if (saved.date === todayKey()) return saved.items || [];
-      return [
-        { id: Date.now() + 1, text: 'Review open operational issues', done: false },
-        { id: Date.now() + 2, text: 'Follow up project testing', done: false },
-        { id: Date.now() + 3, text: 'Update process documentation', done: false }
-      ];
-    }
-
-    let checklist = loadChecklist();
-    function saveChecklist() { writeStorage(CHECKLIST_KEY, { date: todayKey(), items: checklist }); }
-
-    function renderChecklist() {
-      const container = document.getElementById('checklistItems');
-      if (!container) return;
-      container.innerHTML = checklist.map(item => `
-        <div class="check-item ${item.done ? 'completed' : ''} flex items-center gap-3 rounded-2xl bg-white border border-ckb-line p-3">
-          <button onclick="toggleChecklistItem(${item.id})" class="w-6 h-6 shrink-0 rounded-lg border ${item.done ? 'bg-ckb-main border-ckb-main text-white' : 'border-ckb-line text-transparent'}"><i class="fa-solid fa-check text-xs"></i></button>
-          <span class="check-label text-xs font-bold text-ckb-ink flex-1">${escapeHTML(item.text)}</span>
-          <button onclick="deleteChecklistItem(${item.id})" class="text-ckb-muted hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
-        </div>`).join('') || '<p class="text-xs text-ckb-muted">No task yet. Add one to begin.</p>';
-      const completed = checklist.filter(item => item.done).length;
-      const pct = checklist.length ? Math.round(completed / checklist.length * 100) : 0;
-      document.getElementById('checklistProgressText').textContent = `${completed} / ${checklist.length}`;
-      document.getElementById('checklistProgressBar').style.width = `${pct}%`;
-      saveChecklist();
-    }
-
-    function addChecklistItem() {
-      const text = prompt('Add a daily operations task:');
-      if (!text?.trim()) return;
-      checklist.push({ id: Date.now(), text: text.trim(), done: false });
-      renderChecklist();
-    }
-    function toggleChecklistItem(id) { checklist = checklist.map(item => item.id === id ? { ...item, done: !item.done } : item); renderChecklist(); }
-    function deleteChecklistItem(id) { checklist = checklist.filter(item => item.id !== id); renderChecklist(); }
-
-    // Pomodoro and generated ambient audio -----------------------------------
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_6E9ASMLc7I0q7LmPsucMUr7fMuNaciYvx4pR6CMUtGZKPtbYVpk1FqDs-07kE3gRdzfJaxXGDh2t/pub?gid=0&single=true&output=csv';
+    const STORAGE = {
+      theme: 'bpi_theme', recent: 'bpi_recent_tools', favorites: 'bpi_favorite_tools',
+      checklist: 'bpi_daily_checklist', sessions: 'bpi_pomodoro_count'
+    };
+    let tools = [];
+    let activeCategory = 'All';
+    let checklist = [];
     let timerTotal = 1500;
-    let timerRemaining = timerTotal;
-    let timerInterval = null;
+    let timerRemaining = 1500;
+    let timerHandle = null;
     let audioContext = null;
     let audioMaster = null;
     let audioNodes = [];
-    let audioEnabled = false;
+    let audioOn = false;
 
-    function changeTimerMode() {
-      timerTotal = Number(document.getElementById('timerMode').value);
-      timerRemaining = timerTotal;
-      pauseTimer();
-      updateTimerUI();
+    const $ = id => document.getElementById(id);
+    const read = (key, fallback = []) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
+    const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+    const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+    function parseCSV(text) {
+      const output = []; let row = [], value = '', quoted = false;
+      for (let index = 0; index < text.length; index++) {
+        const char = text[index], next = text[index + 1];
+        if (char === '"' && quoted && next === '"') { value += '"'; index++; }
+        else if (char === '"') quoted = !quoted;
+        else if (char === ',' && !quoted) { row.push(value); value = ''; }
+        else if ((char === '\n' || char === '\r') && !quoted) {
+          if (value || row.length) { row.push(value); output.push(row); row = []; value = ''; }
+          if (char === '\r' && next === '\n') index++;
+        } else value += char;
+      }
+      if (value || row.length) { row.push(value); output.push(row); }
+      return output;
     }
 
-    function updateTimerUI() {
-      const minutes = Math.floor(timerRemaining / 60).toString().padStart(2, '0');
-      const seconds = (timerRemaining % 60).toString().padStart(2, '0');
-      document.getElementById('timerDisplay').textContent = `${minutes}:${seconds}`;
-      const elapsed = timerTotal - timerRemaining;
-      document.getElementById('timerRing').style.setProperty('--progress', `${timerTotal ? elapsed / timerTotal * 360 : 0}deg`);
+    function categoryFor(title, description) {
+      const text = `${title} ${description}`.toLowerCase();
+      if (text.includes('dashboard') || text.includes('monitoring')) return 'Dashboard';
+      if (text.includes('form') || text.includes('request')) return 'Form';
+      if (text.includes('report') || text.includes('rekap') || text.includes('laporan')) return 'Report';
+      if (text.includes('suj') || text.includes('uang jalan')) return 'SUJ';
+      if (text.includes('database') || text.includes('master')) return 'Database';
+      return 'Tools';
     }
 
-    function startTimer() {
-      if (timerInterval) return;
-      document.getElementById('timerState').textContent = 'Focusing';
-      document.getElementById('timerRing').classList.add('timer-running');
-      if (!audioEnabled) startFocusAudio();
-      timerInterval = setInterval(() => {
-        timerRemaining -= 1;
-        updateTimerUI();
-        if (timerRemaining <= 0) completeTimer();
-      }, 1000);
+    async function loadTools(force = false) {
+      $('databaseStatus').textContent = force ? 'Refreshing database…' : 'Connecting to Google Sheets…';
+      try {
+        const response = await fetch(CSV_URL + (force ? `&cache=${Date.now()}` : ''));
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const rows = parseCSV(await response.text());
+        tools = rows.slice(1).map(columns => ({
+          title: (columns[0] || '').trim(), link: (columns[1] || '#').trim(),
+          description: (columns[2] || '').trim(), emoji: (columns[3] || '📄').trim()
+        })).filter(tool => tool.title).map(tool => ({...tool, category: categoryFor(tool.title, tool.description)}));
+        $('databaseStatus').textContent = `Connected · ${tools.length} tools available`;
+        $('toolCount').textContent = tools.length;
+        renderCategories(); renderTools(); renderPersonal(); renderPalette();
+      } catch (error) {
+        console.error(error);
+        $('databaseStatus').textContent = 'Database unavailable. Check the published sheet or connection.';
+        $('toolsGrid').innerHTML = '<div class="panel panel-pad empty">Unable to load the tool database.</div>';
+      }
     }
 
-    function pauseTimer() {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      document.getElementById('timerState').textContent = timerRemaining === timerTotal ? 'Ready' : 'Paused';
-      document.getElementById('timerRing').classList.remove('timer-running');
-    }
-
-    function resetTimer() {
-      pauseTimer();
-      timerRemaining = timerTotal;
-      updateTimerUI();
-    }
-
-    function completeTimer() {
-      pauseTimer();
-      timerRemaining = 0;
-      updateTimerUI();
-      document.getElementById('timerState').textContent = 'Complete';
-      const count = Number(localStorage.getItem(POMODORO_COUNT_KEY) || 0) + 1;
-      localStorage.setItem(POMODORO_COUNT_KEY, count);
-      document.getElementById('pomodoroCount').textContent = count;
-      playCompletionChime();
-    }
-
-    function createAmbientVoice(frequency, detune, volume) {
-      const oscillator = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.value = frequency;
-      oscillator.detune.value = detune;
-      gain.gain.value = volume;
-      oscillator.connect(gain).connect(audioMaster);
-      oscillator.start();
-      audioNodes.push(oscillator, gain);
-    }
-
-    function startFocusAudio() {
-      if (audioEnabled) return;
-      audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-      audioContext.resume();
-      audioMaster = audioContext.createGain();
-      audioMaster.gain.value = Number(document.getElementById('focusVolume').value) / 100 * .16;
-      audioMaster.connect(audioContext.destination);
-      createAmbientVoice(110, -5, .42);
-      createAmbientVoice(164.81, 4, .28);
-      createAmbientVoice(220, 1, .12);
-      audioEnabled = true;
-      document.getElementById('audioToggle').textContent = 'On';
-    }
-
-    function stopFocusAudio() {
-      audioNodes.forEach(node => { try { node.stop?.(); node.disconnect?.(); } catch {} });
-      audioNodes = [];
-      audioMaster?.disconnect();
-      audioMaster = null;
-      audioEnabled = false;
-      document.getElementById('audioToggle').textContent = 'Off';
-    }
-
-    function toggleFocusAudio() { audioEnabled ? stopFocusAudio() : startFocusAudio(); }
-    function setFocusVolume(value) { if (audioMaster) audioMaster.gain.value = Number(value) / 100 * .16; }
-
-    function playCompletionChime() {
-      if (!audioContext) return;
-      [523.25, 659.25, 783.99].forEach((frequency, index) => {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.frequency.value = frequency;
-        gain.gain.setValueAtTime(.0001, audioContext.currentTime + index * .13);
-        gain.gain.exponentialRampToValueAtTime(.1, audioContext.currentTime + index * .13 + .02);
-        gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + index * .13 + .25);
-        osc.connect(gain).connect(audioContext.destination);
-        osc.start(audioContext.currentTime + index * .13);
-        osc.stop(audioContext.currentTime + index * .13 + .28);
+    function filteredTools(query = $('searchInput').value.trim().toLowerCase()) {
+      return tools.filter(tool => {
+        const categoryMatch = activeCategory === 'All' || tool.category === activeCategory;
+        const searchMatch = !query || `${tool.title} ${tool.description} ${tool.category}`.toLowerCase().includes(query);
+        return categoryMatch && searchMatch;
       });
     }
 
-    function initializeProductivityWidgets() {
-      renderPersonalTools();
-      renderChecklist();
-      updateTimerUI();
-      document.getElementById('pomodoroCount').textContent = localStorage.getItem(POMODORO_COUNT_KEY) || '0';
+    function renderCategories() {
+      const categories = ['All', ...new Set(tools.map(tool => tool.category))];
+      $('categories').innerHTML = categories.map(category => `<button class="pill ${category === activeCategory ? 'active' : ''}" onclick="setCategory('${escapeHTML(category)}')">${escapeHTML(category)} · ${category === 'All' ? tools.length : tools.filter(tool => tool.category === category).length}</button>`).join('');
+    }
+    function setCategory(category) { activeCategory = category; renderCategories(); renderTools(); }
+
+    function isFavorite(title) { return read(STORAGE.favorites).includes(title); }
+    function renderTools() {
+      const filtered = filteredTools();
+      $('toolsGrid').innerHTML = filtered.length ? filtered.map(tool => `
+        <a class="tool-card" href="${tool.link}" target="_blank" rel="noopener" onclick="recordOpen('${encodeURIComponent(tool.title)}')">
+          <div class="tool-icon">${tool.emoji || '📄'}</div>
+          <div><div class="tool-title">${escapeHTML(tool.title)}</div><div class="tool-description">${escapeHTML(tool.description || 'No description available.')}</div><div class="tool-category">${escapeHTML(tool.category)}</div></div>
+          <button class="favorite-btn ${isFavorite(tool.title) ? 'active' : ''}" onclick="event.preventDefault();event.stopPropagation();toggleFavorite('${encodeURIComponent(tool.title)}')" aria-label="Favorite">${isFavorite(tool.title) ? '★' : '☆'}</button>
+        </a>`).join('') : '<div class="panel panel-pad empty">No tools match the selected filter.</div>';
     }
 
-    document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandPalette(); }
-      if (e.key === 'Escape') closeCommandPalette();
+    function toolByTitle(title) { return tools.find(tool => tool.title === title); }
+    function recordOpen(encodedTitle) {
+      const title = decodeURIComponent(encodedTitle);
+      const recent = read(STORAGE.recent).filter(item => item !== title);
+      recent.unshift(title); write(STORAGE.recent, recent.slice(0, 6)); renderPersonal();
+    }
+    function toggleFavorite(encodedTitle) {
+      const title = decodeURIComponent(encodedTitle); const favorites = read(STORAGE.favorites);
+      write(STORAGE.favorites, favorites.includes(title) ? favorites.filter(item => item !== title) : [...favorites, title]);
+      renderTools(); renderPersonal();
+    }
+    function clearRecent() { write(STORAGE.recent, []); renderPersonal(); }
+
+    function compactRow(tool, favorite = false) {
+      return `<div class="compact-tool"><a href="${tool.link}" target="_blank" rel="noopener" onclick="recordOpen('${encodeURIComponent(tool.title)}')" style="display:flex;align-items:center;gap:9px;min-width:0;flex:1"><span class="compact-icon">${tool.emoji || '📄'}</span><span class="compact-name">${escapeHTML(tool.title)}</span></a>${favorite ? `<button class="favorite-btn active" onclick="toggleFavorite('${encodeURIComponent(tool.title)}')">★</button>` : ''}</div>`;
+    }
+    function renderPersonal() {
+      const recent = read(STORAGE.recent).map(toolByTitle).filter(Boolean);
+      const favorites = read(STORAGE.favorites).map(toolByTitle).filter(Boolean);
+      $('recentList').innerHTML = recent.length ? recent.map(tool => compactRow(tool)).join('') : '<div class="empty">Opened tools will appear here.</div>';
+      $('favoriteList').innerHTML = favorites.length ? favorites.map(tool => compactRow(tool, true)).join('') : '<div class="empty">Use the star button to pin tools.</div>';
+      $('favoriteCount').textContent = favorites.length;
+    }
+
+    function todayKey() { return new Date().toLocaleDateString('en-CA'); }
+    function loadChecklist() {
+      const stored = read(STORAGE.checklist, {});
+      checklist = stored.date === todayKey() ? stored.items || [] : [
+        {id: Date.now()+1, text:'Review active issues', done:false},
+        {id: Date.now()+2, text:'Follow up project testing', done:false},
+        {id: Date.now()+3, text:'Update process documentation', done:false}
+      ];
+      renderChecklist();
+    }
+    function saveChecklist() { write(STORAGE.checklist, {date: todayKey(), items: checklist}); }
+    function renderChecklist() {
+      $('checklist').innerHTML = checklist.length ? checklist.map(task => `<div class="task ${task.done ? 'done' : ''}"><button class="task-toggle" onclick="toggleTask(${task.id})">✓</button><span class="task-text">${escapeHTML(task.text)}</span><button class="task-delete" onclick="deleteTask(${task.id})">×</button></div>`).join('') : '<div class="empty">No task yet. Add one to begin.</div>';
+      const completed = checklist.filter(task => task.done).length;
+      $('taskProgress').textContent = `${completed} / ${checklist.length}`;
+      $('taskBar').style.width = `${checklist.length ? completed/checklist.length*100 : 0}%`;
+      saveChecklist();
+    }
+    function addTask() { const text = prompt('Add a daily task:'); if (text?.trim()) { checklist.push({id:Date.now(),text:text.trim(),done:false}); renderChecklist(); } }
+    function toggleTask(id) { checklist = checklist.map(task => task.id === id ? {...task, done:!task.done} : task); renderChecklist(); }
+    function deleteTask(id) { checklist = checklist.filter(task => task.id !== id); renderChecklist(); }
+
+    function updateTimer() {
+      $('timerTime').textContent = `${String(Math.floor(timerRemaining/60)).padStart(2,'0')}:${String(timerRemaining%60).padStart(2,'0')}`;
+      $('timerRing').style.setProperty('--progress', `${timerTotal ? (timerTotal-timerRemaining)/timerTotal*360 : 0}deg`);
+    }
+    function changeTimerMode() { pauseTimer(); timerTotal = Number($('timerMode').value); timerRemaining = timerTotal; updateTimer(); $('timerState').textContent='Ready'; }
+    function startTimer() {
+      if (timerHandle) return;
+      $('timerState').textContent='Focusing'; if (!audioOn) startAudio();
+      timerHandle = setInterval(() => { timerRemaining--; updateTimer(); if (timerRemaining <= 0) completeTimer(); }, 1000);
+    }
+    function pauseTimer() { clearInterval(timerHandle); timerHandle = null; $('timerState').textContent = timerRemaining === timerTotal ? 'Ready' : 'Paused'; }
+    function resetTimer() { pauseTimer(); timerRemaining = timerTotal; updateTimer(); }
+    function completeTimer() { pauseTimer(); timerRemaining = 0; updateTimer(); $('timerState').textContent='Complete'; const count=Number(localStorage.getItem(STORAGE.sessions)||0)+1; localStorage.setItem(STORAGE.sessions,count); $('sessionCount').textContent=count; chime(); }
+
+    function addVoice(frequency, detune, gainValue) {
+      const oscillator=audioContext.createOscillator(), gain=audioContext.createGain();
+      oscillator.type='sine'; oscillator.frequency.value=frequency; oscillator.detune.value=detune; gain.gain.value=gainValue;
+      oscillator.connect(gain).connect(audioMaster); oscillator.start(); audioNodes.push(oscillator,gain);
+    }
+    function startAudio() {
+      if (audioOn) return;
+      audioContext ||= new (window.AudioContext || window.webkitAudioContext)(); audioContext.resume();
+      audioMaster=audioContext.createGain(); audioMaster.gain.value=Number($('volume').value)/100*.15; audioMaster.connect(audioContext.destination);
+      addVoice(110,-5,.40); addVoice(164.81,4,.27); addVoice(220,1,.11); audioOn=true; $('audioButton').textContent='♫ Audio On';
+    }
+    function stopAudio() { audioNodes.forEach(node=>{try{node.stop?.();node.disconnect?.();}catch{}}); audioNodes=[]; audioMaster?.disconnect(); audioMaster=null; audioOn=false; $('audioButton').textContent='♫ Audio Off'; }
+    function toggleAudio() { audioOn ? stopAudio() : startAudio(); }
+    function changeVolume(value) { if(audioMaster) audioMaster.gain.value=Number(value)/100*.15; }
+    function chime() { if(!audioContext) return; [523.25,659.25,783.99].forEach((frequency,index)=>{const o=audioContext.createOscillator(),g=audioContext.createGain(),t=audioContext.currentTime+index*.12;o.frequency.value=frequency;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.08,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.22);o.connect(g).connect(audioContext.destination);o.start(t);o.stop(t+.24);}); }
+
+    function updateClock() { const now=new Date(); $('clock').textContent=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); $('today').textContent=now.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}); }
+    function applyTheme(theme) { document.body.classList.toggle('dark',theme==='dark'); localStorage.setItem(STORAGE.theme,theme); $('themeIcon').textContent=theme==='dark'?'☀':'◐'; }
+    function toggleTheme() { applyTheme(document.body.classList.contains('dark')?'light':'dark'); }
+
+    function openPalette() { $('paletteModal').classList.add('open'); $('paletteInput').value=''; renderPalette(); setTimeout(()=>$('paletteInput').focus(),30); }
+    function closePalette() { $('paletteModal').classList.remove('open'); }
+    function renderPalette() {
+      const query=$('paletteInput')?.value.trim().toLowerCase()||'';
+      const matches=tools.filter(tool=>!query||`${tool.title} ${tool.description}`.toLowerCase().includes(query)).slice(0,10);
+      if ($('paletteResults')) $('paletteResults').innerHTML=matches.length?matches.map(tool=>`<a class="palette-item" href="${tool.link}" target="_blank" rel="noopener" onclick="recordOpen('${encodeURIComponent(tool.title)}');closePalette()"><span class="compact-icon">${tool.emoji||'📄'}</span><span><b style="display:block;font-size:11px">${escapeHTML(tool.title)}</b><span class="small">${escapeHTML(tool.description||tool.category)}</span></span><span>↗</span></a>`).join(''):'<div class="empty">No result found.</div>';
+    }
+    function focusSearch() { $('toolsSection').scrollIntoView(); setTimeout(()=>$('searchInput').focus(),250); }
+    function refreshTools() { loadTools(true); }
+    function toast(message) { $('toast').textContent=message; $('toast').style.display='block'; clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>$('toast').style.display='none',2200); }
+
+    document.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()==='k') { event.preventDefault(); openPalette(); }
+      if (event.key==='Escape') closePalette();
     });
 
-    initTheme();
-    setInterval(updateClock, 1000);
-    updateClock();
-    setRandomQuote();
-    fetchLinks();
-    initializeProductivityWidgets();
+    applyTheme(localStorage.getItem(STORAGE.theme) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light'));
+    loadChecklist(); updateTimer(); updateClock(); setInterval(updateClock,30000);
+    $('sessionCount').textContent=localStorage.getItem(STORAGE.sessions)||'0';
+    renderPersonal(); loadTools();
   </script>
 </body>
 </html>
