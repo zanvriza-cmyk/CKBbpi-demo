@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selamat Ulang Tahun ke-23 ❤️</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #434343, #1c1c1c);
+    color: white;
+    overflow-x: hidden;
+}
+
+/* Welcome Screen Overlay */
+#welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #434343, #1c1c1c);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 1s ease;
+}
+
+#welcome-screen button {
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    color: #333; 
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(238, 156, 167, 0.3);
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.2s;
+    animation: pulse 1.5s infinite;
+}
+
+#welcome-screen button:hover {
+    transform: scale(1.05);
+}
+
+/* Main Content Wrapper */
+#main-content {
+    display: none;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Falling Emoji Animation */
+@keyframes fall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+.falling-emoji {
+    position: fixed;
+    top: -50px;
+    z-index: 9998;
+    font-size: 28px;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+.heart {
+    display: inline-block;
+    color: #ee9ca7; 
+    animation: pulse 1.5s infinite;
+}
+
+/* Hero Section */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.hero h1 {
+    font-size: 40px; 
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    min-height: 120px; 
+}
+
+.hero p {
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: auto;
+    color: #d1d1d1; 
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 3s; 
+}
+
+/* Timeline Cards */
+.timeline {
+    max-width: 800px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+.card {
+    background: rgba(238, 156, 167, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(238, 156, 167, 0.25);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(238, 156, 167, 0.2);
+    background: rgba(238, 156, 167, 0.12);
+}
+
+/* Gambar Single Rasio 1:1 (Kotak) */
+.card-image {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Rasio 1:1 */
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Grid Galeri untuk Foto Masa Kecil */
+.gallery-kecil {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.gallery-kecil img {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Rasio 1:1 untuk setiap foto kecil */
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.card h3 {
+    margin-bottom: 8px;
+    font-size: 20px;
+    color: #ffdde1; 
+}
+
+.card p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #e0e0e0;
+}
+
+/* Message Section */
+.message {
+    text-align: center;
+    padding: 50px 20px;
+    background: rgba(238, 156, 167, 0.08);
+    border: 1px solid rgba(238, 156, 167, 0.2);
+    margin: 20px;
+    border-radius: 20px;
+}
+
+.message h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    color: #ffdde1;
+}
+
+.message p {
+    color: #e0e0e0;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    color: #a0a0a0;
+}
+</style>
+</head>
+<body>
+
+<!-- Audio dari GitHub Kamu -->
+<audio id="bg-music" loop>
+    <source src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/hbd.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Welcome Screen -->
+<div id="welcome-screen">
+    <button onclick="startSurprise()">"Hai Sayang!" klik di sini>></button>
+</div>
+
+<!-- Main Content -->
+<div id="main-content">
+    <section class="hero">
+        <div class="hero-content">
+            <h1 id="typewriter-text"></h1>
+            <p>
+                Hari ini aku ingin mengajak kamu melihat kembali
+                perjalanan indah yang sudah kita lalui bersama.
+            </p>
+        </div>
+    </section>
+
+    <section class="timeline">
+        <!-- Sesi Foto Masa Kecil (3 Foto Berjejer Kotak) -->
+        <div class="card">
+            <div class="gallery-kecil">
+                <img src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/kecil1.jpg" alt="Foto Kecil 1">
+                <img src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/kecil2.jpg" alt="Foto Kecil 2">
+                <img src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/kecil3.jpg" alt="Foto Kecil 3">
+            </div>
+            <h3>👶 Gemes Banget!</h3>
+            <p>Ini foto waktu kamu kecill banget, ga kerasa itu udah hampir 20 tahun yang lalu, pasti dia bangga banget ngelihat kamu sekarang yaa hehe.</p>
+        </div>
+
+        <div class="card">
+            <!-- Gambar Single 1:1 -->
+            <img class="card-image" src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/alay1.jpg" alt="Foto Kenalan">
+            <h3>🌟 Pertama Kenalan</h3>
+            <p>Siapa sangka obrolan sederhana waktu itu menjadi awal cerita kita.</p>
+        </div>
+
+        <div class="card">
+            <!-- Gambar Single 1:1 -->
+            <img class="card-image" src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/alay2.jpg" alt="First Date">
+            <h3>☕ First Date</h3>
+            <p>Aku masih ingat rasa gugup saat pertama bertemu denganmu.</p>
+        </div>
+
+        <div class="card">
+            <!-- Gambar Single 1:1 -->
+            <img class="card-image" src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/alay3.jpg" alt="Resmi Bersama">
+            <h3>💕 Resmi Bersama</h3>
+            <p>Hari ketika hidupku terasa lebih berwarna karena kamu ada di dalamnya.</p>
+        </div>
+
+        <div class="card">
+            <!-- Gambar Single 1:1 -->
+            <img class="card-image" src="https://raw.githubusercontent.com/zanvriza-cmyk/CKBbpi-demo/main/Monas.jpg" alt="Kenangan Favorit">
+            <h3>✈️ Kenangan Favorit</h3>
+            <p>Semua foto, perjalanan, tawa dan cerita akan selalu aku simpan.</p>
+        </div>
+    </section>
+
+    <section class="message">
+        <h2>💌 Untukmu</h2>
+        <p>
+            Selamat ulang tahun ke-23, sayang <span class="heart">❤️</span><br><br>
+            Terima kasih sudah menjadi bagian terindah dalam hidupku.<br>
+            Semoga semua impianmu tercapai dan semoga aku masih ada dalam setiap cerita bahagiamu.
+        </p>
+    </section>
+
+    <footer>
+        Dibuat dengan <span class="heart">❤️</span> oleh Zaki untuk Cut Zulfa Zahrani
+    </footer>
+</div>
+
+<script>
+    // Memulai Musik & Transisi Halaman
+    function startSurprise() {
+        let welcomeScreen = document.getElementById('welcome-screen');
+        let mainContent = document.getElementById('main-content');
+        let bgMusic = document.getElementById('bg-music');
+
+        bgMusic.play();
+
+        welcomeScreen.style.opacity = '0';
+        setTimeout(() => {
+            welcomeScreen.style.display = 'none';
+            mainContent.style.display = 'block';
+            
+            typeWriter();
+            
+            // Memulai efek hujan emoji
+            setInterval(createFallingEmoji, 400); 
+        }, 1000);
+    }
+
+    // Animasi Mengetik
+    const textToType = "Selamat Ulang Tahun ke-23,\nCut Zulfa Zahrani ❤️";
+    let i = 0;
+    const speed = 100; 
+
+    function typeWriter() {
+        if (i < textToType.length) {
+            let char = textToType.charAt(i);
+            if (char === '\n') {
+                document.getElementById("typewriter-text").innerHTML += "<br>";
+            } else {
+                document.getElementById("typewriter-text").innerHTML += char;
+            }
+            i++;
+            setTimeout(typeWriter, speed);
+        }
+    }
+
+    // Fungsi Hujan Emoji
+    function createFallingEmoji() {
+        const emojis = ['🥳', '🎂', '🎉', '💖', '✨', '🎁'];
+        const emojiElement = document.createElement('div');
+        
+        emojiElement.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        emojiElement.classList.add('falling-emoji');
+        
+        emojiElement.style.left = Math.random() * 100 + 'vw';
+        emojiElement.style.animationDuration = Math.random() * 3 + 3 + 's';
+        
+        document.body.appendChild(emojiElement);
+
+        setTimeout(() => {
+            emojiElement.remove();
+        }, 6000);
+    }
+</script>
+
+</body>
+</html>
