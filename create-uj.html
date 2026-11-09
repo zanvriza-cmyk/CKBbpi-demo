@@ -1,0 +1,3002 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SUJ Code Creation and Governance Engine</title>
+  <style>
+    :root {
+      --ink: #162522;
+      --green: #006f68;
+      --green-2: #00857d;
+      --mint: #e8f5f3;
+      --bg: #f5f8fa;
+      --surface: #ffffff;
+      --line: #d7e4e0;
+      --muted: #687a72;
+      --amber: #a9650d;
+      --red: #b42318;
+      --blue: #2c6ea6;
+      --shadow: 0 12px 30px rgba(16, 29, 22, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.5 Inter, "Segoe UI", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .page {
+      max-width: 1580px;
+      margin: 0 auto;
+      padding: 22px 20px 34px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--mint);
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid #dfeee3;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2d9d5a;
+    }
+    .title h1 {
+      margin: 10px 0 4px;
+      font-size: 30px;
+      letter-spacing: -0.04em;
+    }
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 980px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0 14px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .btn:hover { border-color: var(--green); background: var(--mint); }
+    .btn-primary {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .btn-ghost { background: #fafcfb; }
+    .btn-small {
+      min-height: 32px;
+      padding: 0 11px;
+      font-size: 11px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.6fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .workspace { display: grid; gap: 14px; }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 17px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .panel-head p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .panel-body { padding: 17px; }
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f9fbfa;
+      color: var(--muted);
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+    .step .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      background: #edf4ef;
+      color: var(--green);
+      margin-right: 6px;
+      font-size: 9px;
+    }
+    .step.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .step.active .num {
+      background: rgba(255,255,255,.14);
+      color: #fff;
+    }
+    .step.done {
+      background: #edf8f0;
+      border-color: #d3e8d9;
+      color: #2c6d46;
+    }
+    .step.done .num {
+      background: #dfeee3;
+      color: #2c6d46;
+    }
+    .section-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fafcfb;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+    }
+    .legend-dot.required { border: 2px solid var(--green); background: #fff; }
+    .legend-dot.optional { border: 2px solid #b0bab4; background: #fff; }
+    .legend-dot.auto { border: 2px solid #9db7a3; background: #ebf5ee; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 16px;
+      row-gap: 18px;
+    }
+    .field { display: flex; flex-direction: column; min-width: 0; }
+    .w3 { grid-column: span 3; }
+    .w4 { grid-column: span 4; }
+    .w6 { grid-column: span 6; }
+    .w8 { grid-column: span 8; }
+    .w12 { grid-column: span 12; }
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      min-height: 50px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      line-height: 1.35;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .tag.required { background: #fff1ee; color: var(--red); }
+    .tag.optional { background: #f3f5f4; color: var(--muted); }
+    .tag.auto { background: #edf4fa; color: var(--blue); }
+    .control {
+      width: 100%;
+      min-width: 0;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 11px;
+      outline: none;
+    }
+    .control:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(34, 84, 61, 0.08);
+    }
+    .control.readonly {
+      background: #f5f8f7;
+      color: #3d574c;
+      border-color: #d7e2db;
+    }
+    .route-box, .info-box {
+      padding: 12px 13px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #f9fbfa;
+    }
+    .local-note {
+      margin: 9px 1px 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .fuel-disabled { opacity: .48; }
+    .route-box {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .route-point span {
+      display: block;
+      color: var(--muted);
+      font-size: 8px;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .route-point strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 13px;
+    }
+    .route-arrow {
+      font-size: 22px;
+      color: var(--green);
+      font-weight: 900;
+    }
+    .summary-card {
+      position: sticky;
+      top: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .summary-head {
+      padding: 18px 18px 14px;
+      background: linear-gradient(135deg, #173828, #2f6b4f);
+      color: #fff;
+    }
+    .summary-head small {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #d7ebdd;
+      font-weight: 900;
+    }
+    .summary-head h2 {
+      margin: 8px 0 0;
+      font-size: 18px;
+    }
+    .summary-body { padding: 16px; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .summary-grid > div {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #f8faf9;
+    }
+    .summary-grid span {
+      display: block;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .summary-grid b {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+    .breakdown { display: grid; gap: 8px; }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #edf1ee;
+      font-size: 11px;
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-row span { color: var(--muted); }
+    .breakdown-row.total {
+      margin-top: 8px;
+      padding: 12px 10px;
+      background: var(--mint);
+      border: 1px solid #dfeee3;
+      border-radius: 10px;
+    }
+    .breakdown-row.total span, .breakdown-row.total b {
+      color: var(--green);
+      font-size: 14px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #edf8f2;
+      color: #2a6d45;
+      font-size: 8px;
+      font-weight: 900;
+    }
+    .status-badge.warn { background: #fff8e5; color: #8d5d13; }
+    .status-badge.error { background: #fff0ed; color: var(--red); }
+    .component-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .grid > .field > .btn { width: 100%; margin-top: auto; }
+    .step-panel[data-step="1"] .field label { min-height: 34px; }
+    .step-panel .field label { font-size: 12px; letter-spacing: 0.04em; }
+    .step-panel .panel-head p, .step-panel .local-note, .step-panel small { font-size: 14px; }
+    .step-panel .control { font-size: 14px; }
+    .step-panel .btn { min-height: 42px; font-size: 13px; }
+    .source-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .source-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-height: 64px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .source-option:has(input:checked) {
+      border-color: var(--green);
+      background: var(--mint);
+      box-shadow: 0 0 0 2px rgba(0, 111, 104, .08);
+    }
+    .source-option input { margin-top: 3px; }
+    .source-option strong { display: block; font-size: 14px; }
+    .source-option small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .section-card {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fbfdfc;
+    }
+    .section-card > h3 { margin: 0 0 11px; font-size: 15px; }
+    .calculation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .calculation-value {
+      padding: 12px;
+      border: 1px solid #cfe4df;
+      border-radius: 9px;
+      background: #f0faf7;
+    }
+    .calculation-value span { display: block; color: var(--muted); font-size: 12px; }
+    .calculation-value strong { display: block; margin-top: 4px; color: var(--green); font-size: 20px; }
+    .component-row, .cost-item-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, .7fr) minmax(0, 1.3fr) auto;
+      gap: 10px;
+      align-items: end;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .cost-item-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .component-row:last-child, .cost-item-row:last-child { border-bottom: 0; }
+    .cost-section-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .cost-list { display: grid; gap: 8px; }
+    .cost-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .cost-item small { display: block; color: var(--muted); }
+    .cost-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 9px;
+      padding-top: 9px;
+      border-top: 1px solid var(--line);
+      font-weight: 800;
+    }
+    .auto-field { background: #eff7f5 !important; color: #355b52 !important; }
+    .validation-error { color: var(--red); }
+    [hidden] { display: none !important; }
+    .component-table {
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      background: #f5f8f6;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: left;
+      padding: 10px 12px;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eef2ef;
+      font-size: 11px;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .money { text-align: right; font-weight: 900; }
+    .actions-cell { text-align: right; }
+    .mini-btn {
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 0 10px;
+    }
+    .mini-btn.warn {
+      border-color: #f0d4cf;
+      background: #fff7f5;
+      color: var(--red);
+    }
+    .scenario-list { display: grid; gap: 10px; }
+    .scenario-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 11px;
+      background: #fbfcfb;
+    }
+    .scenario-item.selected {
+      border-color: var(--green);
+      background: #f4faf5;
+    }
+    .scenario-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .scenario-name { font-weight: 900; }
+    .scenario-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .scenario-meta div {
+      padding: 8px;
+      border: 1px solid #e7eeea;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .scenario-meta span {
+      display: block;
+      color: var(--muted);
+      font-size: 8px;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .scenario-meta b {
+      display: block;
+      margin-top: 3px;
+      font-size: 10px;
+    }
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .review-box {
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fafcfb;
+    }
+    .review-box h4 {
+      margin: 0 0 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .review-box ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+    .footer-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      display: none;
+      padding: 11px 14px;
+      border-radius: 10px;
+      background: #182a22;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      z-index: 40;
+    }
+    .hide { display: none !important; }
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .summary-card { position: static; }
+    }
+    @media (max-width: 760px) {
+      .page { padding: 14px; }
+      .topbar { flex-direction: column; }
+      .header-actions { width: 100%; }
+      .header-actions .btn { flex: 1; }
+      .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+      .w3, .w4, .w6, .w8, .w12 { grid-column: 1; }
+      .w3, .w4, .w6, .w8 { grid-column: span 6; }
+      .w12 { grid-column: 1 / -1; }
+      .review-grid, .scenario-meta, .summary-grid { grid-template-columns: 1fr; }
+      .source-options, .cost-section-grid, .calculation-grid { grid-template-columns: 1fr; }
+      .component-row, .cost-item-row { grid-template-columns: 1fr; }
+      .field label { min-height: 0; }
+      .step-panel[data-step="1"] .field label { min-height: 0; }
+      .route-box { grid-template-columns: 1fr; }
+      .route-arrow { text-align: center; transform: rotate(90deg); }
+      .stepper { grid-template-columns: repeat(4, minmax(110px, 1fr)); overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="title">
+        <div class="eyebrow">SUJ Code Creation and Governance Engine</div>
+        <h1>Create SUJ Code Request</h1>
+        <p>Configure trip identity, route variant, cost components, compare scenario options, and prepare the proposal for review and publication.</p>
+      </div>
+      <div class="header-actions">
+        <a class="btn btn-ghost" href="SUJ-Detail.html">Review SUJ</a>
+        <button type="button" class="btn btn-ghost" id="saveDraftBtn">Save Draft</button>
+        <button type="button" class="btn" id="duplicateBtn">Duplicate Existing SUJ</button>
+        <button type="button" class="btn" id="newRequestBtn" hidden>Start New Request</button>
+        <button type="button" class="btn btn-primary" id="submitBtn">Submit for Review</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <main class="workspace">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>SUJ request workflow</h2>
+              <p>Four-step governance workflow for trip identity, lead time, non-fuel cost, and review.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="stepper">
+              <div class="step active"><span class="num">1</span>Trip Identity</div>
+              <div class="step"><span class="num">2</span>Distance &amp; LT</div>
+              <div class="step"><span class="num">3</span>Non-Fuel Costs</div>
+              <div class="step"><span class="num">4</span>Review</div>
+            </div>
+            <div class="info-box">
+              <div class="route-box">
+                <div class="route-point">
+                  <span>Request No.</span>
+                  <strong id="requestNoDisplay">SUJ-REQ-2026-014</strong>
+                </div>
+                <div class="route-arrow">→</div>
+                <div class="route-point">
+                  <span>Status</span>
+                  <strong id="statusDisplay">Draft</strong>
+                </div>
+              </div>
+              <p class="local-note">Masukkan nilai operasional yang telah dikonfirmasi sebelum mengajukan SUJ untuk review.</p>
+            </div>
+          </div>
+        </div>
+
+        <section class="panel step-panel" data-step="1">
+          <div class="panel-head">
+            <div>
+              <h2>Step 1 · Trip identity</h2>
+              <p>Define the trip context, route variant, and commercial terms.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="section-legend">
+              <div class="legend-item"><span class="legend-dot required"></span> required</div>
+              <div class="legend-item"><span class="legend-dot optional"></span> optional</div>
+              <div class="legend-item"><span class="legend-dot auto"></span> auto-populated</div>
+            </div>
+            <div class="grid">
+              <div class="field w4">
+                <label>Cabang <span class="tag required">Required</span></label>
+                <select id="branch" class="control" required>
+                  <option value="">Pilih cabang</option>
+                  <option value="JASUM">JASUM</option>
+                  <option value="SUB EI">SUB EI</option>
+                  <option value="KAL">KAL</option>
+                </select>
+              </div>
+              <div class="field w4">
+                <label>Dibuat oleh <span class="tag required">Required</span></label>
+                <input id="createdBy" class="control" maxlength="120" autocomplete="name" placeholder="Nama pembuat SUJ" required />
+              </div>
+              <div class="field w4">
+                <label>Tipe Trip <span class="tag required">Required</span></label>
+                <select id="tripType" class="control" required disabled>
+                  <option value="">Pilih tipe trip</option>
+                  <option>SLA Intercity</option>
+                  <option>Langsir</option>
+                  <option>Reguler</option>
+                  <option>SLA Luar Kota</option>
+                  <option>Adhoc</option>
+                  <option>Backload</option>
+                  <option>KIR</option>
+                  <option>Service</option>
+                </select>
+              </div>
+              <div class="field w4">
+                <label>Customer / Deployment <span class="tag optional">Optional</span></label>
+                <input id="customer" class="control" value="" />
+              </div>
+              <div class="field w4">
+                <label>Origin <span class="tag required">Required</span></label>
+                <input id="origin" class="control" value="" />
+              </div>
+              <div class="field w4">
+                <label>Destination <span class="tag required">Required</span></label>
+                <input id="destination1" class="control" value="" />
+              </div>
+              <div class="field w4">
+                <label>Optional Destination 2 <span class="tag optional">Optional</span></label>
+                <input id="destination2" class="control" placeholder="e.g. additional port or site transfer" />
+              </div>
+              <div class="field w4">
+                <label>Additional Stops <span class="tag optional">Optional</span></label>
+                <input id="additionalStops" class="control" placeholder="e.g. SPBE - HSP - TBS" />
+              </div>
+              <div class="field w4">
+                <label>Terms / Route Variant <span class="tag required">Required</span></label>
+                <select id="terms" class="control">
+                  <option>Tol - Tol</option>
+                  <option>Tol - Non Tol</option>
+                  <option>Tol - Non Toll</option>
+                  <option>Non Tol</option>
+                  <option>Tol</option>
+                  <option>Toll</option>
+                  <option>Sekali jalan</option>
+                </select>
+              </div>
+              <div class="field w4">
+                <label>Vehicle Type <span class="tag required">Required</span></label>
+                <select id="vehicleType" class="control">
+                  <option>LOWBED 30 TON - 8800 CC</option>
+                  <option>LOWBED 20 TON - 8800 CC</option>
+                  <option>TRAILER 40FT - 8800 CC</option>
+                  <option>TRAILER 20FT - 8800 CC</option>
+                  <option>TRONTON BAK - 7800 CC</option>
+                  <option>FUSO BAK - 7000 CC</option>
+                  <option>CDD BAK - 4000 CC</option>
+                  <option>PICK UP BOX - 2500 CC</option>
+                  <option>PICK UP BAK - 1500 CC</option>
+                  <option>BLINDVAN - 1500 CC</option>
+                  <option>Lowbed 20 Ton HINO 350, Iveco 682 380</option>
+                  <option>Lowbed 20 Ton HINO 285, Iveco 682 340</option>
+                  <option>Trailer 40</option>
+                  <option>Trailer 20</option>
+                  <option>Trinton</option>
+                  <option>Tronton</option>
+                  <option>Fuso</option>
+                  <option>CDD</option>
+                  <option>CDE</option>
+                  <option>L300 Box</option>
+                </select>
+              </div>
+              <div class="field w4">
+                <label>Outbound Condition <span class="tag required">Required</span></label>
+                <select id="outboundCondition" class="control">
+                  <option>PERGI ISI</option>
+                  <option>PERGI KOSONG</option>
+                  <option>PERGI ISI - PULANG KOSONG</option>
+                  <option>PERGI KOSONG - PULANG ISI</option>
+                </select>
+              </div>
+              <div class="field w4">
+                <label>Return Condition <span class="tag required">Required</span></label>
+                <select id="returnCondition" class="control">
+                  <option>PULANG KOSONG</option>
+                  <option>PULANG ISI</option>
+                  <option>RETURN LOAD</option>
+                </select>
+              </div>
+              <div class="field w4">
+                <label>Route Notes / Path Description <span class="tag optional">Optional</span></label>
+                <input id="routeNotes" class="control" value="" />
+              </div>
+              <div class="field w12" id="revisionReasonField" hidden>
+                <label>Revision Reason <span class="tag required">Required for revision</span></label>
+                <input id="revisionReason" class="control" placeholder="Explain why this SUJ Code Version is being revised" />
+              </div>
+            </div>
+            <div class="footer-actions">
+              <button type="button" class="btn btn-primary" data-next-step="2">Continue to Distance &amp; Lead Time</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel step-panel hide" data-step="2">
+          <div class="panel-head">
+            <div>
+              <h2>Step 2 · Distance &amp; Lead Time</h2>
+              <p>Tentukan sumber data jarak dan rasio BBM, lalu bandingkan rekomendasi sistem dengan lead time final.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <section class="section-card">
+              <h3>1. Distance and Fuel Reference Source</h3>
+              <div class="source-options">
+                <label class="source-option">
+                  <input type="radio" name="distanceSource" id="distanceSourceFuelCode" value="fuelCode" checked>
+                  <span><strong>Retrieve from Fuel Code</strong><small>Load eligible route, distance, ratio, and fuel reference data.</small></span>
+                </label>
+                <label class="source-option">
+                  <input type="radio" name="distanceSource" id="distanceSourceManual" value="manual">
+                  <span><strong>Manual Entry</strong><small>Enter the approved distance and fuel-reference values directly.</small></span>
+                </label>
+              </div>
+              <div class="grid" style="margin-top:12px">
+                <div class="field w12" id="fuelCodeSourceField">
+                  <label>Eligible Fuel Code <span class="tag required">Required</span></label>
+                  <select id="fuelCodeSelect" class="control"><option value="">Pilih Fuel Code</option></select>
+                </div>
+                <div class="field w12" id="fuelIntegrationNote" aria-live="polite">
+                  Pilih Fuel Code yang sesuai dengan rute dan jenis kendaraan.
+                </div>
+              </div>
+            </section>
+            <section class="section-card">
+              <h3>2. Distance and Fuel Reference Values</h3>
+              <div class="grid">
+                <div class="field w4"><label>KM Outbound <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="kmOut" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>KM Return <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="kmReturn" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>Total KM <span class="tag auto">Calculated</span></label><input id="totalKm" class="control readonly" readonly value="0" /></div>
+                <div class="field w4"><label>Average Speed (km/h) <span class="tag required">Required</span></label><input id="speedKmh" class="control" type="number" min="0.1" step="any" value="" /></div>
+                <div class="field w4"><label>Fuel Ratio Outbound (km/L) <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="fuelRatioOut" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>Fuel Ratio Return Empty (km/L) <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="fuelRatioEmpty" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>Fuel Ratio Return Loaded (km/L) <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="fuelRatioLoaded" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>Safety Factor (%) <span class="tag optional">Optional</span></label><input id="safetyFactor" class="control" type="number" min="0" max="100" step="any" value="10" /></div>
+                <div class="field w4"><label>Fuel Cost Reference (Rp) <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="fuelCodeCost" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>Diesel Premium Price (Rp/L) <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="dieselPremiumPrice" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>Diesel Subsidized Price (Rp/L) <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="subsidizedDieselPrice" class="control auto-field" type="number" min="0" step="any" value="" /></div>
+                <div class="field w4"><label>Premium Fuel Share (%) <span class="tag auto" data-source-tag>Auto-Populated</span></label><input id="premiumFuelShare" class="control auto-field" type="number" min="0" max="100" step="any" value="" /></div>
+                <div class="field w4"><label>Blended Fuel Price (Rp/L) <span class="tag auto">Calculated</span></label><input id="blendedFuelPrice" class="control readonly" readonly value="Rp 0" /></div>
+                <div class="field w4"><label>Fuel Code / Source <span class="tag auto">Master Data Source</span></label><input id="fuelCode" class="control auto-field" readonly value="" /></div>
+                <div class="field w4" style="align-self:end"><label class="tag optional"><input id="includeFuel" type="checkbox" checked> Include Fuel Cost</label></div>
+              </div>
+              <small id="fuelRatioLoadedNote" class="local-note"></small>
+            </section>
+            <section class="section-card">
+              <div class="component-head">
+                <h3 style="margin:0">3. Lead Time Components</h3>
+                <button type="button" class="btn btn-small" id="addLeadTimeComponent">+ Add Time Component</button>
+              </div>
+              <div id="leadTimeStandardComponents"></div>
+              <div id="leadTimeCustomComponents"></div>
+              <div class="cost-total"><span>Total Additional Time Components</span><strong id="leadTimeComponentSubtotal">0.00 hours</strong></div>
+            </section>
+            <section class="section-card">
+              <h3>4. System Recommendation vs Final Lead Time</h3>
+              <div class="calculation-grid">
+                <div class="calculation-value"><span>Total Calculated Hours</span><strong id="systemLeadTimeHours">—</strong></div>
+                <div class="calculation-value"><span>System-Calculated Lead Time (Days)</span><strong id="systemLeadTimeDays">—</strong></div>
+                <div class="calculation-value"><span>Rounding Rule</span><strong style="font-size:14px">Maximum 2 decimal places</strong></div>
+              </div>
+              <div class="grid" style="margin-top:12px">
+                <div class="field w4">
+                  <label>Final Lead Time in Days <span class="tag required">Required</span></label>
+                  <input id="finalLeadTime" class="control" type="number" min="0" step="any" value="" />
+                  <button type="button" class="btn btn-small" id="useLeadTimeRecommendation" style="margin-top:7px">Use System Recommendation</button>
+                </div>
+                <div class="field w8">
+                  <label>Lead Time Adjustment Reason <span id="leadTimeAdjustmentTag" class="tag optional">Optional</span></label>
+                  <input id="leadTimeAdjustmentReason" class="control" placeholder="Required when Final Lead Time differs from recommendation" />
+                </div>
+              </div>
+              <div class="cost-total" aria-live="polite">
+                <span id="leadTimeComparison">System Recommendation: — · Final Lead Time: — · Difference: —</span>
+              </div>
+            </section>
+            <div class="footer-actions">
+              <button type="button" class="btn" data-previous-step="1">Kembali</button>
+              <button type="button" class="btn btn-primary" data-next-step="3">Continue to Non-Fuel Costs</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel step-panel hide" data-step="3">
+          <div class="panel-head">
+            <div>
+              <h2>Step 3 · Non-Fuel Cost Components</h2>
+              <p>Pilih biaya Tol dan ASDP per arah, biaya operasional tambahan, serta meal rates cabang.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <section class="section-card">
+              <h3>1. Toll Components</h3>
+              <div class="cost-section-grid">
+                <div class="section-card" style="margin:0">
+                  <h3>Outbound Toll</h3>
+                  <div class="grid">
+                    <div class="field w8"><label>Select Toll Segment</label><select id="outboundTollSelect" class="control"></select></div>
+                    <div class="field w4"><button type="button" class="btn" id="addOutboundToll">Add toll</button></div>
+                  </div>
+                  <div id="outboundTollList" class="cost-list"></div>
+                  <div class="cost-total"><span>Outbound Toll Subtotal</span><strong id="outboundTollSubtotal">Rp 0</strong></div>
+                </div>
+                <div class="section-card" style="margin:0">
+                  <h3>Return Toll</h3>
+                  <div class="grid">
+                    <div class="field w8"><label>Select Toll Segment</label><select id="returnTollSelect" class="control"></select></div>
+                    <div class="field w4"><button type="button" class="btn" id="addReturnToll">Add toll</button></div>
+                  </div>
+                  <div id="returnTollList" class="cost-list"></div>
+                  <div class="cost-total"><span>Return Toll Subtotal</span><strong id="returnTollSubtotal">Rp 0</strong></div>
+                </div>
+              </div>
+            </section>
+            <section class="section-card">
+              <h3>2. Crossing / ASDP Components</h3>
+              <div class="cost-section-grid">
+                <div class="section-card" style="margin:0">
+                  <h3>Outbound Crossing / ASDP</h3>
+                  <div class="grid">
+                    <div class="field w8"><label>Select Crossing</label><select id="outboundCrossingSelect" class="control"></select></div>
+                    <div class="field w4"><button type="button" class="btn" id="addOutboundCrossing">Add crossing</button></div>
+                  </div>
+                  <div id="outboundCrossingList" class="cost-list"></div>
+                  <div class="cost-total"><span>Outbound Crossing Subtotal</span><strong id="outboundCrossingSubtotal">Rp 0</strong></div>
+                </div>
+                <div class="section-card" style="margin:0">
+                  <h3>Return Crossing / ASDP</h3>
+                  <div class="grid">
+                    <div class="field w8"><label>Select Crossing</label><select id="returnCrossingSelect" class="control"></select></div>
+                    <div class="field w4"><button type="button" class="btn" id="addReturnCrossing">Add crossing</button></div>
+                  </div>
+                  <div id="returnCrossingList" class="cost-list"></div>
+                  <div class="cost-total"><span>Return Crossing Subtotal</span><strong id="returnCrossingSubtotal">Rp 0</strong></div>
+                </div>
+              </div>
+            </section>
+            <section class="section-card">
+              <div class="component-head">
+                <h3 style="margin:0">3. Portal, Parking, and Additional Costs</h3>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <select id="extraCostType" class="control" style="min-width:240px">
+                    <option value="">Select cost component</option>
+                    <option>Portal</option><option>Parking</option><option>Escort</option>
+                    <option>Handling</option><option>Accommodation</option><option>Loading Labor</option>
+                    <option>Unloading Labor</option><option>Miscellaneous Operational Cost</option>
+                    <option>Other Approved Non-Fuel Cost</option>
+                  </select>
+                  <button type="button" class="btn btn-small" id="addExtraCost">+ Add Component</button>
+                </div>
+              </div>
+              <div id="extraCostComponents"></div>
+              <div class="cost-total"><span>Additional Cost Subtotal</span><strong id="extraCostSubtotal">Rp 0</strong></div>
+            </section>
+            <section class="section-card">
+              <h3>4. Driver and Helper Meals · <span id="mealBranchLabel">Branch not selected</span></h3>
+              <div class="cost-section-grid">
+                <div class="calculation-value"><span>Driver Meal Rate / Day</span><strong id="driverMealRate">Not configured</strong></div>
+                <div class="calculation-value"><span>Helper Meal Rate / Day</span><strong id="helperMealRate">Not configured</strong></div>
+                <div class="calculation-value"><span>Final Lead Time × Driver Rate</span><strong id="driverMealAmount">Rp 0</strong></div>
+                <div class="calculation-value"><span>Final Lead Time × Helper Rate (1 helper)</span><strong id="helperMealAmount">Rp 0</strong></div>
+              </div>
+              <div class="cost-total"><span>Combined Meal Total · Final Lead Time: <b id="mealFinalLeadTime">—</b> days</span><strong id="mealTotal">Rp 0</strong></div>
+              <p class="local-note" id="mealConfigurationNote" aria-live="polite"></p>
+            </section>
+            <section class="section-card">
+              <h3>5. Non-Fuel Cost Summary</h3>
+              <div class="breakdown">
+                <div class="breakdown-row"><span>Outbound Toll</span><b id="summaryOutboundToll">Rp 0</b></div>
+                <div class="breakdown-row"><span>Return Toll</span><b id="summaryReturnToll">Rp 0</b></div>
+                <div class="breakdown-row"><span>Outbound Crossing / ASDP</span><b id="summaryOutboundCrossing">Rp 0</b></div>
+                <div class="breakdown-row"><span>Return Crossing / ASDP</span><b id="summaryReturnCrossing">Rp 0</b></div>
+                <div class="breakdown-row"><span>Portal</span><b id="summaryPortal">Rp 0</b></div>
+                <div class="breakdown-row"><span>Parking</span><b id="summaryParking">Rp 0</b></div>
+                <div class="breakdown-row"><span>Escort</span><b id="summaryEscort">Rp 0</b></div>
+                <div class="breakdown-row"><span>Handling</span><b id="summaryHandling">Rp 0</b></div>
+                <div class="breakdown-row"><span>Accommodation</span><b id="summaryAccommodation">Rp 0</b></div>
+                <div class="breakdown-row"><span>Other Costs</span><b id="summaryOtherCosts">Rp 0</b></div>
+                <div class="breakdown-row"><span>Driver Meal</span><b id="summaryDriverMeal">Rp 0</b></div>
+                <div class="breakdown-row"><span>Helper Meal</span><b id="summaryHelperMeal">Rp 0</b></div>
+                <div class="breakdown-row total"><span>Total Non-Fuel Cost</span><b id="step3TotalNonFuel">Rp 0</b></div>
+              </div>
+            </section>
+            <div class="grid" style="margin-top:12px">
+              <div class="field w4"><label>Previous SUJ Total (Rp) <span class="tag optional">For variance</span></label><input id="previousSujTotal" class="control" type="number" min="0" step="any" value="" /></div>
+            </div>
+            <p class="local-note" id="masterDataNote" aria-live="polite"></p>
+            <div class="footer-actions">
+              <button type="button" class="btn" data-previous-step="2">Back</button>
+              <button type="button" class="btn btn-primary" data-next-step="4">Continue to Review</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel step-panel hide" data-step="4">
+          <div class="panel-head">
+            <div>
+              <h2>Step 4 · Review and submit</h2>
+              <p>Confirm trip structure, route, cost snapshot, approval status, and historical comparison.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="review-grid">
+              <div class="review-box">
+                <h4>Trip configuration</h4>
+                <ul>
+                  <li>Branch / Trip Type: <strong id="reviewBranchTrip">Not selected</strong></li>
+                  <li>Customer: <strong id="reviewCustomer">Not provided</strong></li>
+                  <li>Origin / Destination: <strong id="reviewRoute">Not provided</strong></li>
+                  <li>Vehicle: <strong id="reviewVehicle">Lowbed 20 Ton HINO 350, Iveco 682 380</strong></li>
+                  <li>Terms: <strong id="reviewTerms">Toll to Toll</strong></li>
+                  <li>Revision of: <strong id="reviewRevisionOf">Not a revision</strong></li>
+                  <li>Revision Reason: <strong id="reviewRevisionReason">Not applicable</strong></li>
+                </ul>
+              </div>
+              <div class="review-box">
+                <h4>Lead time and fuel</h4>
+                <ul>
+                  <li>Final LT: <strong id="reviewFinalLT">Not provided</strong></li>
+                  <li>System Recommendation: <strong id="reviewSystemLT">Not calculated</strong></li>
+                  <li>Lead Time Adjustment Reason: <strong id="reviewLeadTimeReason">Not required</strong></li>
+                  <li>Distance / Fuel Reference Source: <strong id="reviewReferenceSource">Not selected</strong></li>
+                  <li>Fuel Code: <strong id="reviewFuelCode">Not provided</strong></li>
+                  <li>Fuel · return empty: <strong id="reviewFuelAmount">Rp 0</strong></li>
+                  <li>Fuel · return loaded: <strong id="reviewLoadedFuelAmount">Rp 0</strong></li>
+                </ul>
+              </div>
+              <div class="review-box">
+                <h4>Non-Fuel Cost Snapshot</h4>
+                <ul>
+                  <li>Outbound / Return Toll: <strong id="reviewTollTotal">Rp 0</strong></li>
+                  <li>Outbound / Return Crossing: <strong id="reviewCrossingTotal">Rp 0</strong></li>
+                  <li>Additional Costs: <strong id="reviewAdditionalTotal">Rp 0</strong></li>
+                  <li>Driver Meal: <strong id="reviewDriverMeal">Rp 0</strong></li>
+                  <li>Helper Meal: <strong id="reviewHelperMeal">Rp 0</strong></li>
+                  <li>Total Non-Fuel: <strong id="reviewNonFuelTotal">Rp 0</strong></li>
+                </ul>
+              </div>
+              <div class="review-box">
+                <h4>Variance vs published version</h4>
+                <ul>
+                  <li>Previous Published: <strong id="reviewPrevious">Not provided</strong></li>
+                  <li>Return-empty Total: <strong id="reviewTotal">Rp 0</strong></li>
+                  <li>Return-loaded Total: <strong id="reviewLoadedTotal">Rp 0</strong></li>
+                  <li>Selected Estimate: <strong id="reviewSelectedTotal">Rp 0</strong></li>
+                  <li>Variance vs previous: <strong id="reviewVarianceAmount">Not available</strong></li>
+                  <li>Variance percentage: <strong id="reviewVariancePercent">Not available</strong></li>
+                </ul>
+              </div>
+              <div class="review-box">
+                <h4>Approval workflow</h4>
+                <ul>
+                  <li>Status: <strong id="reviewApprovalStatus">Pending Internal Review</strong></li>
+                  <li>Supporting notes: <strong>Operational review documents attached</strong></li>
+                  <li>Historical version: <strong>V2 reserved on approval</strong></li>
+                  <li>Usage history: <strong>RAMCO placeholder enabled</strong></li>
+                </ul>
+              </div>
+            </div>
+            <section class="section-card">
+              <h3>Publication and Effective Period</h3>
+              <div class="grid">
+                <div class="field w6">
+                  <label>Effective From <span class="tag required">Required for publication review</span></label>
+                  <input id="effectiveFrom" type="date" class="control" value="" />
+                </div>
+                <div class="field w6">
+                  <label>Effective To <span class="tag optional">Optional</span></label>
+                  <input id="effectiveTo" type="date" class="control" />
+                </div>
+              </div>
+            </section>
+            <div class="footer-actions">
+              <button type="button" class="btn" id="goBackBtn">Back</button>
+              <button type="button" class="btn btn-primary" id="finalSubmitBtn">Submit SUJ Code Request</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="summary-card">
+        <div class="summary-head">
+          <small>Ringkasan kalkulasi</small>
+          <h2>Estimasi SUJ</h2>
+        </div>
+        <div class="summary-body">
+          <div class="summary-grid">
+            <div><span>Biaya BBM sesuai kondisi</span><b id="summaryFuel">Rp 0</b></div>
+            <div><span>Total biaya non-BBM</span><b id="summaryNonFuel">Rp 0</b></div>
+            <div><span>Total estimasi SUJ</span><b id="summaryLoadedTotal">Rp 0</b></div>
+            <div><span>Selected SUJ total</span><b id="summaryTotal">Rp 0</b></div>
+          </div>
+          <div class="breakdown">
+            <div class="breakdown-row"><span>Previous published version</span><b id="summaryPreviousVersion">Not provided</b></div>
+            <div class="breakdown-row"><span>Variance</span><b id="summaryVariance">Not available</b></div>
+            <div class="breakdown-row"><span>Validation status</span><b><span id="summaryStatusBadge" class="status-badge">Validated</span></b></div>
+            <div class="breakdown-row total"><span>Selected SUJ total</span><b id="summaryApprovedTotal">Rp 0</b></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="SUJ-Fuel-Code.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        var state = {
+          step: 1,
+          returnMode: 'empty',
+          distanceSource: 'fuelCode',
+          createdRequestNo: null,
+          revisionOf: null,
+          routeIdentity: null,
+          activeBranch: '',
+          fuelReference: null,
+          costSelections: {
+            outboundToll: [],
+            returnToll: [],
+            outboundCrossing: [],
+            returnCrossing: []
+          },
+          leadTimeValues: {},
+          customLeadComponents: [],
+          nextCustomLeadComponent: 1,
+          extraCostComponents: [],
+          nextExtraCostId: 1,
+          masterDataError: false,
+          masterRecordsLoaded: false,
+          masterRecords: [],
+          fuelRecordsLoaded: false,
+          fuelRecords: []
+        };
+        var leadTimeComponentsByTrip = {
+          'SLA Luar Kota': ['crossingQueue', 'crossingDuration', 'loadingTime', 'unloadingTime',
+            'loadingQueue', 'unloadingQueue', 'fuelQueue'],
+          'Adhoc': ['crossingQueue', 'crossingDuration', 'loadingTime', 'unloadingTime',
+            'loadingQueue', 'unloadingQueue', 'fuelQueue'],
+          'Backload': ['crossingQueue', 'crossingDuration', 'loadingTime', 'unloadingTime',
+            'loadingQueue', 'unloadingQueue', 'fuelQueue'],
+          'Langsir': ['loadingTime', 'unloadingTime', 'loadingQueue', 'unloadingQueue'],
+          'Reguler': ['loadingTime', 'unloadingTime', 'loadingQueue', 'unloadingQueue']
+        };
+        var leadTimeComponentLabels = {
+          crossingQueue: 'Antrean penyeberangan (jam)',
+          crossingDuration: 'Lama penyeberangan (jam)',
+          loadingTime: 'Loading (jam)',
+          unloadingTime: 'Unloading (jam)',
+          loadingQueue: 'Antrean loading (jam)',
+          unloadingQueue: 'Antrean unloading (jam)',
+          fuelQueue: 'Antrean BBM (jam)',
+          restTime: 'Istirahat / pergantian driver (jam)',
+          siteWait: 'Site waiting (jam)',
+          overnightRest: 'Overnight rest (jam)',
+          adminWait: 'Administrative waiting time (jam)',
+          otherTime: 'Lainnya'
+        };
+        var initialComponentValues = {
+          dieselPremiumPrice: '',
+          subsidizedDieselPrice: '',
+          premiumFuelShare: '',
+          fuelCode: '',
+          fuelCodeCost: '',
+          previousSujTotal: '',
+          kmOut: '',
+          kmReturn: '',
+          fuelRatioOut: '',
+          fuelRatioEmpty: '',
+          fuelRatioLoaded: '',
+          finalLeadTime: '',
+          leadTimeAdjustmentReason: ''
+        };
+        var estimates = null;
+
+      function $(id) {
+        return document.getElementById(id.charAt(0) === '#' ? id.slice(1) : id);
+      }
+      function getValue(id, fallback) {
+        var el = $(id);
+        return el ? (el.value !== undefined ? el.value : fallback) : fallback;
+      }
+      function setValue(id, value) {
+        var el = $(id);
+        if (!el) return;
+        if (el.type === 'checkbox') el.checked = Boolean(value);
+        else if ('value' in el) el.value = value;
+      }
+      function setText(id, value) {
+        var el = $(id);
+        if (el) el.textContent = value;
+      }
+      function money(value) { return 'Rp ' + Number(value).toLocaleString('id-ID'); }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (char) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+        });
+      }
+
+      function numberValue(id) {
+        var value = Number(getValue(id, 0));
+        return Number.isFinite(value) ? value : 0;
+      }
+
+      function readMasterRecords() {
+        if (state.masterRecordsLoaded) return state.masterRecords;
+        try {
+          var stored = localStorage.getItem('sujMasterDataRecords');
+          var records = stored ? JSON.parse(stored) : [];
+          if (!Array.isArray(records)) throw new Error('Stored master data is not a list');
+          records.forEach(function (record) {
+            if (!record || typeof record.id !== 'string' || typeof record.category !== 'string' ||
+                typeof record.branch !== 'string' || typeof record.name !== 'string' ||
+                !Number.isFinite(Number(record.rate))) {
+              throw new Error('Stored master data contains an invalid record');
+            }
+          });
+          state.masterRecords = records;
+        } catch (error) {
+          state.masterDataError = true;
+          setText('masterDataNote', 'Master data belum dapat ditampilkan. Periksa konfigurasi tarif atau hubungi administrator.');
+          showToast('Master data cabang belum dapat dibaca');
+          state.masterRecords = [];
+        }
+        state.masterRecordsLoaded = true;
+        return state.masterRecords;
+      }
+
+      function appendMasterOptions(selectId, category, multiple) {
+        var select = $(selectId);
+        if (!select) return;
+        var selectedIds = multiple
+          ? Array.from(select.selectedOptions).map(function (option) { return option.value; })
+          : [select.value];
+        var branch = getValue('branch', '');
+        var today = new Date().toISOString().slice(0, 10);
+        var options = readMasterRecords().filter(function (record) {
+          var recordCategoryMatches = record.category === category ||
+            (category === 'meals' && (record.category === 'meal-driver' || record.category === 'meal-helper'));
+          return record.branch === branch && recordCategoryMatches && record.active !== false &&
+            record.status !== 'Inactive' &&
+            (!record.effectiveFrom || record.effectiveFrom <= today) &&
+            (!record.effectiveTo || record.effectiveTo >= today);
+        });
+        select.replaceChildren();
+        if (!multiple) {
+          var placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = branch ? 'Pilih master (opsional)' : 'Pilih cabang terlebih dahulu';
+          select.appendChild(placeholder);
+        }
+        options.forEach(function (record) {
+          var option = document.createElement('option');
+          option.value = record.id;
+          var vehicleClass = record.vehicleClass ? ' · ' + record.vehicleClass : '';
+          var routeUsage = record.routeUsage ? ' · ' + record.routeUsage : '';
+          var tariffId = record.tariffId ? record.tariffId + ' · ' : '';
+          option.textContent = tariffId + record.name + vehicleClass + routeUsage +
+            ' — ' + money(record.rate);
+          option.dataset.rate = String(record.rate);
+          option.dataset.mealRole = record.mealRole ||
+            (record.category === 'meal-driver' ? 'Driver' : record.category === 'meal-helper' ? 'Helper' : 'Driver & Helper');
+          if (record.mealRole || record.category === 'meal-driver' || record.category === 'meal-helper') {
+            option.textContent = option.dataset.mealRole + ' · ' + option.textContent;
+          }
+          option.selected = selectedIds.indexOf(record.id) !== -1;
+          select.appendChild(option);
+        });
+        if (multiple && options.length === 0) {
+          var emptyOption = document.createElement('option');
+          emptyOption.disabled = true;
+          emptyOption.textContent = branch ? 'Belum ada master untuk cabang ini' : 'Pilih cabang terlebih dahulu';
+          select.appendChild(emptyOption);
+        }
+      }
+
+      function renderMasterOptions() {
+        var tripTypeSelect = $('#tripType');
+        tripTypeSelect.disabled = !getValue('branch', '');
+        if (tripTypeSelect.disabled) tripTypeSelect.value = '';
+        if (state.masterDataError) {
+          setText('masterDataNote', 'Master data belum dapat ditampilkan. Nilai dapat dimasukkan manual; periksa konfigurasi tarif.');
+        } else {
+          setText('masterDataNote', getValue('branch', '')
+            ? 'Master yang tersedia untuk ' + getValue('branch', '') + ' ditampilkan di atas.'
+            : 'Pilih cabang di Langkah 1 untuk melihat master tarif yang sesuai.');
+        }
+        ['outboundTollSelect', 'returnTollSelect'].forEach(function (id) {
+          appendMasterOptions(id, 'toll', false);
+        });
+        ['outboundCrossingSelect', 'returnCrossingSelect'].forEach(function (id) {
+          appendMasterOptions(id, 'crossing', false);
+        });
+        updateMealRates();
+      }
+
+      function sumSelectedMasterRates(selectId, predicate) {
+        var select = $(selectId);
+        return Array.from(select.selectedOptions).reduce(function (total, option) {
+          return total + (!predicate || predicate(option)
+            ? Number(option.dataset.rate || 0) : 0);
+        }, 0);
+      }
+
+      function updateMasterAmounts() { updateReadOnlyFields(); }
+
+      function renderLeadTimeComponents() {
+        var standard = $('#leadTimeStandardComponents');
+        if (!standard) return;
+        standard.innerHTML = '';
+        var tripType = getValue('tripType', '');
+        (leadTimeComponentsByTrip[tripType] || []).forEach(function (componentId) {
+          var row = document.createElement('div');
+          row.className = 'component-row';
+          var field = document.createElement('div');
+          field.className = 'field';
+          var label = document.createElement('label');
+          label.textContent = leadTimeComponentLabels[componentId];
+          var badge = document.createElement('span');
+          badge.className = 'tag required';
+          badge.textContent = 'Wajib';
+          label.appendChild(badge);
+          var input = document.createElement('input');
+          input.className = 'control';
+          input.type = 'number';
+          input.min = '0';
+          input.step = '0.1';
+          input.required = true;
+          input.dataset.leadComponent = componentId;
+          input.value = Object.prototype.hasOwnProperty.call(state.leadTimeValues, componentId)
+            ? state.leadTimeValues[componentId] : '';
+          input.addEventListener('input', function () {
+            state.leadTimeValues[componentId] = input.value;
+            updateReadOnlyFields();
+          });
+          field.appendChild(label);
+          field.appendChild(input);
+          row.appendChild(field);
+          standard.appendChild(row);
+        });
+      }
+
+      function renderCustomLeadComponents() {
+        var container = $('#leadTimeCustomComponents');
+        container.innerHTML = '';
+        state.customLeadComponents.forEach(function (component) {
+          var row = document.createElement('div');
+          row.className = 'component-row';
+          var typeField = document.createElement('div');
+          typeField.className = 'field';
+          var typeLabel = document.createElement('label');
+          typeLabel.textContent = 'Component Type';
+          var typeSelect = document.createElement('select');
+          typeSelect.className = 'control';
+          typeSelect.setAttribute('aria-label', 'Lead time component type');
+          [
+            ['crossingQueue', leadTimeComponentLabels.crossingQueue],
+            ['crossingDuration', leadTimeComponentLabels.crossingDuration],
+            ['loadingTime', leadTimeComponentLabels.loadingTime],
+            ['unloadingTime', leadTimeComponentLabels.unloadingTime],
+            ['loadingQueue', leadTimeComponentLabels.loadingQueue],
+            ['unloadingQueue', leadTimeComponentLabels.unloadingQueue],
+            ['fuelQueue', leadTimeComponentLabels.fuelQueue],
+            ['restTime', leadTimeComponentLabels.restTime],
+            ['siteWait', leadTimeComponentLabels.siteWait],
+            ['overnightRest', leadTimeComponentLabels.overnightRest],
+            ['adminWait', leadTimeComponentLabels.adminWait],
+            ['otherTime', leadTimeComponentLabels.otherTime]
+          ].forEach(function (optionData) {
+            var option = document.createElement('option');
+            option.value = optionData[0];
+            option.textContent = optionData[1];
+            typeSelect.appendChild(option);
+          });
+          typeSelect.value = component.type || 'otherTime';
+          typeSelect.addEventListener('change', function () {
+            component.type = typeSelect.value;
+            renderCustomLeadComponents();
+            updateReadOnlyFields();
+          });
+          typeField.appendChild(typeLabel);
+          typeField.appendChild(typeSelect);
+          var durationField = document.createElement('div');
+          durationField.className = 'field';
+          var durationLabel = document.createElement('label');
+          durationLabel.textContent = 'Duration (Hours)';
+          var hours = document.createElement('input');
+          hours.className = 'control';
+          hours.type = 'number';
+          hours.min = '0';
+          hours.step = 'any';
+          hours.placeholder = '0 or more';
+          hours.value = component.hours;
+          hours.required = true;
+          hours.dataset.customLeadHours = component.id;
+          hours.setAttribute('aria-label', 'Duration in hours');
+          hours.addEventListener('input', function () { component.hours = hours.value; updateReadOnlyFields(); });
+          durationField.appendChild(durationLabel);
+          durationField.appendChild(hours);
+          var descriptionField = document.createElement('div');
+          descriptionField.className = 'field';
+          var descriptionLabel = document.createElement('label');
+          descriptionLabel.textContent = 'Description (Optional)';
+          var description = document.createElement('input');
+          description.className = 'control';
+          description.type = 'text';
+          description.maxLength = 100;
+          description.placeholder = 'Optional details';
+          description.value = component.description || component.name || '';
+          description.setAttribute('aria-label', 'Lead time component description');
+          description.addEventListener('input', function () { component.description = description.value; });
+          descriptionField.appendChild(descriptionLabel);
+          descriptionField.appendChild(description);
+          var remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'btn btn-small';
+          remove.textContent = 'Remove';
+          remove.addEventListener('click', function () {
+            state.customLeadComponents = state.customLeadComponents.filter(function (item) {
+              return item.id !== component.id;
+            });
+            renderCustomLeadComponents();
+            updateReadOnlyFields();
+          });
+          row.appendChild(typeField);
+          row.appendChild(durationField);
+          row.appendChild(descriptionField);
+          row.appendChild(remove);
+          container.appendChild(row);
+        });
+      }
+
+      function addCustomLeadComponent(component) {
+        state.customLeadComponents.push(component || {
+          id: 'custom-' + state.nextCustomLeadComponent++,
+          type: 'otherTime',
+          name: '',
+          description: '',
+          hours: '',
+          required: true
+        });
+        renderCustomLeadComponents();
+        updateReadOnlyFields();
+      }
+
+      function loadFuelRecords() {
+        if (state.fuelRecordsLoaded) return state.fuelRecords;
+        var masterRecords = Array.isArray(window.SUJ_FUEL_CODE_MASTER)
+          ? window.SUJ_FUEL_CODE_MASTER.map(function (record) {
+            return Object.assign({}, record);
+          })
+          : [];
+        try {
+          var stored = localStorage.getItem('sujFuelCodeRecords');
+          var records = stored ? JSON.parse(stored) : [];
+          if (!Array.isArray(records)) throw new Error('Fuel code data is not a list');
+          records.forEach(function (record) {
+            var code = record.fuelCode || record.code || record['Fuel Code'] || '';
+            if (!code) return;
+            var existingIndex = masterRecords.findIndex(function (item) {
+              return item.fuelCode === code;
+            });
+            if (existingIndex === -1) masterRecords.push(Object.assign({}, record));
+            else masterRecords[existingIndex] = Object.assign({}, masterRecords[existingIndex], record);
+          });
+          state.fuelRecords = masterRecords.map(function (record) {
+            return {
+              fuelCode: record.fuelCode || record.code || record['Fuel Code'] || '',
+              branch: record.branch || record.Branch || '',
+              status: record.status !== undefined ? record.status : record.Status,
+              fuelCost: parseLocalizedNumber(record.fuelCost !== undefined ? record.fuelCost :
+                record['Fuel Cost']),
+              origin: record.origin || record.Origin || '',
+              destination: record.destination || record.Destination || '',
+              condition: record.condition || record.Condition || '',
+              kmOut: parseLocalizedNumber(record.kmOut !== undefined ? record.kmOut :
+                record['KM Pergi']),
+              kmReturn: parseLocalizedNumber(record.kmReturn !== undefined ? record.kmReturn :
+                record['KM Pulang']),
+              vehicleType: record.vehicleType || record['Vehicle Type'] || '',
+              fuelType: record.fuelType || record['Fuel Type'] || '',
+              ratioIsi: parseLocalizedNumber(record.ratioIsi !== undefined ? record.ratioIsi :
+                record['Rasio Isi'] !== undefined ? record['Rasio Isi'] : record['Ratio Isi']),
+              ratioKosong: parseLocalizedNumber(record.ratioKosong !== undefined ? record.ratioKosong :
+                record['Rasio Kosong'] !== undefined ? record['Rasio Kosong'] : record['Ratio Kosong']),
+              dieselPremiumPrice: parseLocalizedNumber(record.dieselPremiumPrice),
+              subsidizedDieselPrice: parseLocalizedNumber(record.subsidizedDieselPrice),
+              premiumFuelShare: parseLocalizedNumber(record.premiumFuelShare)
+            };
+          });
+        } catch (error) {
+          state.fuelRecords = masterRecords.map(function (record) {
+            return {
+              fuelCode: record.fuelCode || '',
+              branch: record.branch || '',
+              status: record.status || 'Active',
+              fuelCost: parseLocalizedNumber(record.fuelCost),
+              origin: record.origin || '',
+              destination: record.destination || '',
+              condition: record.condition || '',
+              kmOut: parseLocalizedNumber(record.kmOut),
+              kmReturn: parseLocalizedNumber(record.kmReturn),
+              vehicleType: record.vehicleType || '',
+              fuelType: record.fuelType || '',
+              ratioIsi: parseLocalizedNumber(record.ratioIsi),
+              ratioKosong: parseLocalizedNumber(record.ratioKosong),
+              dieselPremiumPrice: parseLocalizedNumber(record.dieselPremiumPrice),
+              subsidizedDieselPrice: parseLocalizedNumber(record.subsidizedDieselPrice),
+              premiumFuelShare: parseLocalizedNumber(record.premiumFuelShare)
+            };
+          });
+          setText('fuelIntegrationNote', 'Beberapa Fuel Code tambahan belum dapat dimuat. Referensi Fuel Code utama tetap tersedia.');
+        }
+        state.fuelRecordsLoaded = true;
+        return state.fuelRecords;
+      }
+
+      function addFuelVehicleOptions() {
+        var select = $('#vehicleType');
+        if (!select) return;
+        var existing = Array.from(select.options).map(function (option) {
+          return normalizeMatch(option.value || option.textContent);
+        });
+        loadFuelRecords().forEach(function (record) {
+          var vehicleType = String(record.vehicleType || '').trim();
+          var normalized = normalizeMatch(vehicleType);
+          if (!vehicleType || existing.indexOf(normalized) !== -1) return;
+          var option = document.createElement('option');
+          option.value = vehicleType;
+          option.textContent = vehicleType;
+          option.dataset.fuelMaster = 'true';
+          select.appendChild(option);
+          existing.push(normalized);
+        });
+      }
+
+      function parseLocalizedNumber(value) {
+        if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+        if (value === null || value === undefined || String(value).trim() === '') return null;
+        var text = String(value).trim().replace(/^Rp\s*/i, '').replace(/\s/g, '');
+        if (/^-?\d{1,3}(\.\d{3})+$/.test(text)) return Number(text.replace(/\./g, ''));
+        if (/^-?\d{1,3}(,\d{3})+$/.test(text)) return Number(text.replace(/,/g, ''));
+        if (text.indexOf(',') !== -1 && text.indexOf('.') !== -1) {
+          text = text.lastIndexOf(',') > text.lastIndexOf('.')
+            ? text.replace(/\./g, '').replace(',', '.')
+            : text.replace(/,/g, '');
+        } else {
+          text = text.replace(',', '.');
+        }
+        var parsed = Number(text);
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+
+      function normalizeMatch(value) {
+        return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      }
+
+      function fuelRecordMatchesTrip(record) {
+        if (!record || String(record.status || '').toLowerCase() !== 'active') return false;
+        var origin = normalizeMatch(getValue('origin', ''));
+        var destination = normalizeMatch(getValue('destination1', ''));
+        var branch = normalizeMatch(getValue('branch', ''));
+        var vehicle = normalizeMatch(getValue('vehicleType', ''));
+        var outboundCondition = normalizeMatch(getValue('outboundCondition', ''));
+        var returnCondition = normalizeMatch(getValue('returnCondition', ''));
+        var condition = outboundCondition.indexOf(returnCondition) !== -1
+          ? outboundCondition : normalizeMatch(outboundCondition + ' ' + returnCondition);
+        var recordOrigin = normalizeMatch(record.origin);
+        var recordDestination = normalizeMatch(record.destination);
+        var recordVehicle = normalizeMatch(record.vehicleType);
+        var recordCondition = normalizeMatch(record.condition);
+        var recordBranch = normalizeMatch(record.branch);
+        var vehicleMatches = !recordVehicle || !vehicle || recordVehicle === vehicle ||
+          recordVehicle.indexOf(vehicle) !== -1 || vehicle.indexOf(recordVehicle) !== -1 ||
+          (recordVehicle.indexOf('lowbed') !== -1 && vehicle.indexOf('lowbed') !== -1);
+        return (!recordBranch || !branch || recordBranch === branch) &&
+          (!recordOrigin || !origin || recordOrigin === origin) &&
+          (!recordDestination || !destination || recordDestination === destination) &&
+          vehicleMatches && (!recordCondition || !condition || recordCondition === condition ||
+            condition.indexOf(recordCondition) !== -1);
+      }
+
+      function renderFuelCodeOptions() {
+        var select = $('#fuelCodeSelect');
+        if (!select) return;
+        var selectedCode = select.value;
+        var records = loadFuelRecords().filter(function (record) {
+          return fuelRecordMatchesTrip(record);
+        });
+        select.replaceChildren();
+        var placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = records.length ? 'Pilih Fuel Code' : 'Tidak ada Fuel Code eligible';
+        select.appendChild(placeholder);
+        records.forEach(function (record) {
+          var option = document.createElement('option');
+          option.value = record.fuelCode;
+          option.textContent = [record.fuelCode, [record.origin, record.destination].filter(Boolean).join(' → '),
+            record.vehicleType, record.condition].filter(Boolean).join(' · ');
+          select.appendChild(option);
+        });
+        var selectedRecordStillEligible = records.some(function (record) {
+          return record.fuelCode === selectedCode;
+        });
+        if (selectedRecordStillEligible) {
+          select.value = selectedCode;
+        }
+        setText('fuelIntegrationNote', records.length
+          ? 'Fuel Code difilter berdasarkan origin, tujuan, jenis kendaraan, kondisi perjalanan, dan status aktif.'
+          : 'Tidak ditemukan Fuel Code aktif yang cocok. Pilih Manual Entry untuk mengisi nilai referensi secara langsung.');
+      }
+
+      function applyFuelCode(code) {
+        if (!code) {
+          resetDistanceAndLeadTime();
+          return;
+        }
+        if (state.fuelReference && state.fuelReference.fuelCode !== code) {
+          resetDistanceAndLeadTime();
+          setValue('fuelCodeSelect', code);
+        }
+        var record = loadFuelRecords().find(function (item) {
+          return item.fuelCode === code && fuelRecordMatchesTrip(item);
+        });
+        if (!record) return;
+        state.fuelReference = JSON.parse(JSON.stringify(record));
+        setValue('fuelCode', record.fuelCode);
+        setValue('fuelCodeCost', record.fuelCost == null ? '' : record.fuelCost);
+        setValue('kmOut', record.kmOut == null ? '' : record.kmOut);
+        setValue('kmReturn', record.kmReturn == null ? '' : record.kmReturn);
+        var outboundIsEmpty = normalizeMatch(getValue('outboundCondition', '')).indexOf('kosong') !== -1;
+        setValue('fuelRatioOut', (outboundIsEmpty ? record.ratioKosong : record.ratioIsi) == null
+          ? '' : (outboundIsEmpty ? record.ratioKosong : record.ratioIsi));
+        setValue('fuelRatioEmpty', record.ratioKosong == null ? '' : record.ratioKosong);
+        setValue('fuelRatioLoaded', record.ratioIsi == null ? '' : record.ratioIsi);
+        setValue('dieselPremiumPrice', record.dieselPremiumPrice == null ? '' : record.dieselPremiumPrice);
+        setValue('subsidizedDieselPrice', record.subsidizedDieselPrice == null ? '' : record.subsidizedDieselPrice);
+        setValue('premiumFuelShare', record.premiumFuelShare == null ? '' : record.premiumFuelShare);
+        setText('fuelIntegrationNote', record.fuelType === 'z'
+          ? 'Fuel Code ' + record.fuelCode + ' dimuat. Jenis BBM pada referensi tertulis "z" dan perlu diverifikasi.'
+          : 'Fuel Code ' + record.fuelCode + ' dimuat. Nilai jarak, rasio, dan biaya mengikuti referensi master.');
+        updateDistanceSourceState();
+      }
+
+      function renderExtraCostComponents() {
+        var container = $('#extraCostComponents');
+        container.replaceChildren();
+        state.extraCostComponents.forEach(function (component) {
+          var row = document.createElement('div');
+          row.className = 'cost-item-row';
+          var fields = [
+            ['Site / Master Reference', 'reference', component.reference || '', false],
+            ['Description', 'description', component.description || component.name || '', true],
+            ['Charging Basis', 'basis', component.basis || 'Per trip', false],
+            ['Quantity', 'quantity', component.quantity == null ? '1' : component.quantity, true],
+            ['Rate (Rp)', 'rate', component.rate == null ? '' : component.rate, true],
+            ['Manual Cost Reason', 'adjustmentReason', component.adjustmentReason || '', true]
+          ];
+          fields.forEach(function (fieldData) {
+            var field = document.createElement('div');
+            field.className = 'field';
+            var label = document.createElement('label');
+            label.textContent = fieldData[0] + (fieldData[1] === 'adjustmentReason' ? ' · Manual' : '');
+            var input;
+            if (fieldData[1] === 'basis') {
+              input = document.createElement('select');
+              ['Per trip', 'Per unit', 'Per day', 'Per person', 'Per kilometer'].forEach(function (basis) {
+                var option = document.createElement('option');
+                option.value = basis;
+                option.textContent = basis;
+                input.appendChild(option);
+              });
+              input.value = fieldData[2];
+            } else {
+              input = document.createElement('input');
+              input.type = fieldData[1] === 'quantity' || fieldData[1] === 'rate' ? 'number' : 'text';
+              if (input.type === 'number') {
+                input.min = '0';
+                input.step = 'any';
+              }
+              input.value = fieldData[2];
+            }
+            input.className = 'control';
+            input.required = fieldData[3];
+            input.dataset.extraCostField = fieldData[1];
+            input.addEventListener('input', function () {
+              component[fieldData[1]] = input.value;
+              if (fieldData[1] === 'basis') component.basis = input.value;
+              amount.value = money((Number(component.quantity) || 0) * (Number(component.rate) || 0));
+              updateReadOnlyFields();
+            });
+            input.addEventListener('change', function () {
+              component[fieldData[1]] = input.value;
+              amount.value = money((Number(component.quantity) || 0) * (Number(component.rate) || 0));
+              updateReadOnlyFields();
+            });
+            field.appendChild(label);
+            field.appendChild(input);
+            row.appendChild(field);
+          });
+          var amountField = document.createElement('div');
+          amountField.className = 'field';
+          var amountLabel = document.createElement('label');
+          amountLabel.textContent = component.type + ' · Amount';
+          var amount = document.createElement('input');
+          amount.className = 'control readonly';
+          amount.readOnly = true;
+          amount.value = money((Number(component.quantity) || 0) * (Number(component.rate) || 0));
+          amountField.appendChild(amountLabel);
+          amountField.appendChild(amount);
+          row.appendChild(amountField);
+          var remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'btn btn-small';
+          remove.textContent = 'Remove';
+          remove.addEventListener('click', function () {
+            state.extraCostComponents = state.extraCostComponents.filter(function (item) {
+              return item.id !== component.id;
+            });
+            renderExtraCostComponents();
+            updateReadOnlyFields();
+          });
+          row.appendChild(remove);
+          container.appendChild(row);
+        });
+      }
+
+      function addExtraCost() {
+        var type = getValue('extraCostType', '');
+        if (!type) {
+          showToast('Pilih jenis biaya tambahan terlebih dahulu');
+          return;
+        }
+        state.extraCostComponents.push({
+          id: 'cost-' + state.nextExtraCostId++,
+          type: type,
+          reference: '',
+          description: '',
+          basis: 'Per trip',
+          quantity: '1',
+          rate: '',
+          source: 'manual',
+          masterReferenceId: null,
+          manualAdjustment: false,
+          adjustmentReason: ''
+        });
+        setValue('extraCostType', '');
+        renderExtraCostComponents();
+        updateReadOnlyFields();
+      }
+
+      function activeBranchRecords(category) {
+        var today = new Date().toISOString().slice(0, 10);
+        return readMasterRecords().filter(function (record) {
+          var categoryMatches = record.category === category ||
+            (category === 'meals' && (record.category === 'meal-driver' || record.category === 'meal-helper'));
+          return categoryMatches && record.branch === getValue('branch', '') && record.active !== false &&
+            record.status !== 'Inactive' && (!record.effectiveFrom || record.effectiveFrom <= today) &&
+            (!record.effectiveTo || record.effectiveTo >= today);
+        });
+      }
+
+      function getMealRates() {
+        var meals = activeBranchRecords('meals');
+        function pickRate(role) {
+          var exact = meals.filter(function (record) {
+            return record.mealRole === role ||
+              (role === 'Driver' && record.category === 'meal-driver') ||
+              (role === 'Helper' && record.category === 'meal-helper');
+          });
+          var shared = meals.filter(function (record) {
+            return record.mealRole === 'Driver & Helper' && exact.indexOf(record) === -1;
+          });
+          var candidates = exact.length ? exact : shared;
+          return candidates.length === 1 ? candidates[0] : null;
+        }
+        return { driver: pickRate('Driver'), helper: pickRate('Helper') };
+      }
+
+      function updateMealRates() {
+        var rates = getMealRates();
+        var driver = rates.driver;
+        var helper = rates.helper;
+        setText('mealBranchLabel', getValue('branch', 'Branch not selected'));
+        setText('driverMealRate', driver ? money(driver.rate) : 'Not configured');
+        setText('helperMealRate', helper ? money(helper.rate) : 'Not configured');
+        setText('mealConfigurationNote', driver && helper
+          ? 'Meal rates are read-only and mapped from active branch master records.'
+          : 'Configuration error: create exactly one applicable Driver and Helper meal rate in Master Data for ' +
+            (getValue('branch', '') || 'the selected branch') + '. Final submission is blocked until both are configured.');
+        return rates;
+      }
+
+      function customCostTotal() {
+        return state.extraCostComponents.reduce(function (total, component) {
+          component.amount = (Number(component.quantity) || 0) * (Number(component.rate) || 0);
+          return total + component.amount;
+        }, 0);
+      }
+
+      function updateFuelRatioState() {
+        var isReturnEmpty = normalizeMatch(getValue('returnCondition', '')).indexOf('kosong') !== -1;
+        var loadedRatio = $('#fuelRatioLoaded');
+        var manualMode = getValue('distanceSourceManual', false) === true ||
+          $('#distanceSourceManual').checked;
+        loadedRatio.disabled = isReturnEmpty || (!manualMode && currentDistanceSource() === 'fuelCode');
+        loadedRatio.readOnly = !manualMode && !isReturnEmpty;
+        loadedRatio.required = !isReturnEmpty && manualMode && $('#includeFuel').checked;
+        if (isReturnEmpty) {
+          loadedRatio.value = '';
+          loadedRatio.setAttribute('aria-describedby', 'fuelRatioLoadedNote');
+        } else {
+          loadedRatio.removeAttribute('aria-describedby');
+        }
+        setText('fuelRatioLoadedNote', isReturnEmpty
+          ? 'Not required because the return trip is empty.'
+          : 'Enter a positive return-loaded ratio when the return trip is loaded.');
+      }
+
+      function currentDistanceSource() {
+        return $('#distanceSourceManual').checked ? 'manual' : 'fuelCode';
+      }
+
+      function currentRouteIdentity() {
+        return {
+          origin: getValue('origin', ''),
+          destination1: getValue('destination1', ''),
+          destination2: getValue('destination2', ''),
+          additionalStops: getValue('additionalStops', ''),
+          terms: getValue('terms', ''),
+          vehicleType: getValue('vehicleType', '')
+        };
+      }
+
+      function hasSelectedRouteCosts() {
+        return Object.keys(state.costSelections).some(function (key) {
+          return state.costSelections[key].length > 0;
+        });
+      }
+
+      function clearRouteCosts() {
+        state.costSelections = {
+          outboundToll: [],
+          returnToll: [],
+          outboundCrossing: [],
+          returnCrossing: []
+        };
+        renderCostSelections();
+      }
+
+      function resetDistanceAndLeadTime() {
+        state.fuelReference = null;
+        state.leadTimeValues = {};
+        state.customLeadComponents = [];
+        state.nextCustomLeadComponent = 1;
+        ['fuelCodeSelect', 'fuelCode', 'kmOut', 'kmReturn', 'fuelRatioOut',
+          'fuelRatioEmpty', 'fuelRatioLoaded', 'fuelCodeCost', 'dieselPremiumPrice',
+          'subsidizedDieselPrice', 'premiumFuelShare', 'finalLeadTime',
+          'speedKmh', 'leadTimeAdjustmentReason'].forEach(function (id) {
+          setValue(id, '');
+        });
+        renderLeadTimeComponents();
+        renderCustomLeadComponents();
+        estimates = null;
+        updateDistanceSourceState();
+        updateReadOnlyFields();
+      }
+
+      function updateDistanceSourceState() {
+        var manual = currentDistanceSource() === 'manual';
+        $('#fuelCodeSourceField').hidden = manual;
+        $('#fuelCodeSelect').disabled = manual;
+        ['kmOut', 'kmReturn', 'fuelRatioOut', 'fuelRatioEmpty', 'fuelRatioLoaded',
+          'fuelCodeCost', 'dieselPremiumPrice', 'subsidizedDieselPrice', 'premiumFuelShare',
+          'fuelCode'].forEach(function (id) {
+          var input = $('#' + id);
+          if (!input) return;
+          input.readOnly = !manual;
+          input.disabled = id === 'fuelRatioLoaded' && normalizeMatch(getValue('returnCondition', '')).indexOf('kosong') !== -1;
+          input.classList.toggle('auto-field', !manual);
+        });
+        $('#fuelCode').readOnly = true;
+        $('#fuelCodeSelect').disabled = manual;
+        updateFuelRatioState();
+      }
+
+      function updateLeadTimeRecommendation() {
+        var kmOutRaw = String(getValue('kmOut', '')).trim();
+        var kmReturnRaw = String(getValue('kmReturn', '')).trim();
+        var speedRaw = String(getValue('speedKmh', '')).trim();
+        var kmOut = numberValue('kmOut');
+        var kmReturn = numberValue('kmReturn');
+        var speed = numberValue('speedKmh');
+        var standardInputs = Array.from(document.querySelectorAll('[data-lead-component]'));
+        var customInputs = Array.from(document.querySelectorAll('[data-custom-lead-hours]'));
+        var componentsReady = standardInputs.every(function (input) {
+          return input.value.trim() !== '' && Number.isFinite(Number(input.value)) && Number(input.value) >= 0;
+        }) && customInputs.every(function (input) {
+          return input.value.trim() !== '' && Number.isFinite(Number(input.value)) && Number(input.value) >= 0;
+        });
+        var componentHours = standardInputs.concat(customInputs).reduce(function (total, input) {
+          return total + (input.value.trim() === '' ? 0 : Number(input.value));
+        }, 0);
+        setText('leadTimeComponentSubtotal', componentHours + ' hours');
+        if (kmOutRaw === '' || kmReturnRaw === '' || speedRaw === '' || speed <= 0 || !componentsReady) {
+          setText('systemLeadTimeHours', '—');
+          setText('systemLeadTimeDays', '—');
+          setText('leadTimeComparison', 'System Recommendation: — · Final Lead Time: ' +
+            (getValue('finalLeadTime', '') || '—') + ' · Difference: —');
+          $('#leadTimeAdjustmentReason').required = false;
+          $('#leadTimeAdjustmentTag').textContent = 'Optional';
+          $('#leadTimeAdjustmentTag').className = 'tag optional';
+          return null;
+        }
+        var calculatedHours = ((kmOut + kmReturn) / speed) + componentHours;
+        var days = Number((calculatedHours / 24).toFixed(2));
+        setText('systemLeadTimeHours', String(calculatedHours));
+        setText('systemLeadTimeDays', String(days));
+        var finalRaw = String(getValue('finalLeadTime', '')).trim();
+        var finalDays = finalRaw === '' ? null : Number(finalRaw);
+        var differs = finalDays !== null && Number.isFinite(finalDays) && Math.abs(finalDays - days) > 0.000001;
+        var difference = finalDays === null ? null : finalDays - days;
+        setText('leadTimeComparison', 'System Recommendation: ' + days + ' days · Final Lead Time: ' +
+          (finalDays === null ? '—' : finalDays + ' days') + ' · Difference: ' +
+          (difference === null ? '—' : (difference > 0 ? '+' : '') + difference + ' day'));
+        $('#leadTimeAdjustmentReason').required = differs;
+        $('#leadTimeAdjustmentTag').textContent = differs ? 'Required' : 'Optional';
+        $('#leadTimeAdjustmentTag').className = differs ? 'tag required' : 'tag optional';
+        return { hours: calculatedHours, days: days, componentHours: componentHours, difference: difference };
+      }
+
+      function addMasterCostSelection(kind, direction) {
+        var config = {
+          toll: { selectId: direction === 'outbound' ? 'outboundTollSelect' : 'returnTollSelect',
+            listKey: direction + 'Toll', category: 'toll' },
+          crossing: { selectId: direction === 'outbound' ? 'outboundCrossingSelect' : 'returnCrossingSelect',
+            listKey: direction + 'Crossing', category: 'crossing' }
+        }[kind];
+        var select = $(config.selectId);
+        var record = activeBranchRecords(config.category).find(function (item) { return item.id === select.value; });
+        if (!record) {
+          showToast('Select an active tariff from the selected branch');
+          return;
+        }
+        var selection = state.costSelections[config.listKey];
+        if (selection.some(function (item) { return item.masterReferenceId === record.id; })) {
+          showToast('This tariff is already selected for this direction');
+          return;
+        }
+        selection.push({
+          componentType: kind,
+          masterReferenceId: record.id,
+          description: record.name,
+          vehicleType: record.vehicleClass || '',
+          direction: direction,
+          quantity: 1,
+          masterRate: Number(record.rate),
+          rate: Number(record.rate),
+          amount: Number(record.rate),
+          source: 'master',
+          effectiveStatus: record.status || (record.active === false ? 'Inactive' : 'Active'),
+          manualAdjustment: false,
+          adjustmentReason: ''
+        });
+        select.value = '';
+        renderCostSelections();
+        updateReadOnlyFields();
+      }
+
+      function renderCostSelectionList(listKey, listId, subtotalId) {
+        var container = $(listId);
+        if (!container) return;
+        container.replaceChildren();
+        var subtotal = 0;
+        state.costSelections[listKey].forEach(function (item) {
+          var rate = Number(item.rate) || 0;
+          var quantity = Number(item.quantity) || 0;
+          var amount = rate * quantity;
+          item.amount = amount;
+          subtotal += amount;
+          var row = document.createElement('div');
+          row.className = 'cost-item';
+          var description = document.createElement('div');
+          var vehicle = item.vehicleType ? ' · ' + item.vehicleType : '';
+          description.innerHTML = '<strong>' + escapeHtml(item.description) + '</strong><small>' +
+            escapeHtml(vehicle + ' · ' + item.effectiveStatus + ' · Master Ref: ' + item.masterReferenceId) +
+            '</small>';
+          var values = document.createElement('div');
+          values.style.display = 'flex';
+          values.style.gap = '8px';
+          values.style.alignItems = 'center';
+          var rateInput = document.createElement('input');
+          rateInput.className = 'control';
+          rateInput.type = 'number';
+          rateInput.min = '0';
+          rateInput.step = 'any';
+          rateInput.value = String(rate);
+          rateInput.setAttribute('aria-label', item.description + ' rate');
+          rateInput.style.width = '125px';
+          rateInput.addEventListener('input', function () {
+            item.rate = rateInput.value === '' ? '' : Number(rateInput.value);
+            item.manualAdjustment = Number(item.rate) !== Number(item.masterRate);
+            item.amount = (Number(item.rate) || 0) * quantity;
+            amountLabel.textContent = money(item.amount);
+            adjustmentReason.hidden = !item.manualAdjustment;
+            adjustmentReason.required = item.manualAdjustment;
+            updateReadOnlyFields();
+          });
+          values.appendChild(rateInput);
+          var amountLabel = document.createElement('strong');
+          amountLabel.textContent = money(amount);
+          values.appendChild(amountLabel);
+          var remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'btn btn-small';
+          remove.textContent = 'Remove';
+          remove.addEventListener('click', function () {
+            state.costSelections[listKey] = state.costSelections[listKey].filter(function (entry) {
+              return entry !== item;
+            });
+            renderCostSelections();
+            updateReadOnlyFields();
+          });
+          values.appendChild(remove);
+          row.appendChild(description);
+          row.appendChild(values);
+          container.appendChild(row);
+          var adjustmentReason = document.createElement('input');
+          adjustmentReason.className = 'control';
+          adjustmentReason.placeholder = 'Required reason for manual rate adjustment';
+          adjustmentReason.value = item.adjustmentReason || '';
+          adjustmentReason.required = item.manualAdjustment;
+          adjustmentReason.hidden = !item.manualAdjustment;
+          adjustmentReason.setAttribute('aria-label', 'Reason for ' + item.description + ' manual adjustment');
+          adjustmentReason.addEventListener('input', function () { item.adjustmentReason = adjustmentReason.value; });
+          container.appendChild(adjustmentReason);
+        });
+        setText(subtotalId, money(subtotal));
+      }
+
+      function renderCostSelections() {
+        renderCostSelectionList('outboundToll', 'outboundTollList', 'outboundTollSubtotal');
+        renderCostSelectionList('returnToll', 'returnTollList', 'returnTollSubtotal');
+        renderCostSelectionList('outboundCrossing', 'outboundCrossingList', 'outboundCrossingSubtotal');
+        renderCostSelectionList('returnCrossing', 'returnCrossingList', 'returnCrossingSubtotal');
+        renderExtraCostComponents();
+      }
+
+      function getCostTotals() {
+        function sum(list) {
+          return Math.round(state.costSelections[list].reduce(function (total, item) {
+            return total + (Number(item.quantity) || 0) * (Number(item.rate) || 0);
+          }, 0));
+        }
+        var meals = getMealRates();
+        var leadTime = numberValue('finalLeadTime');
+        var driverMeal = meals.driver ? Math.round(Number(meals.driver.rate) * leadTime) : 0;
+        var helperMeal = meals.helper ? Math.round(Number(meals.helper.rate) * leadTime) : 0;
+        return {
+          outboundToll: sum('outboundToll'),
+          returnToll: sum('returnToll'),
+          outboundCrossing: sum('outboundCrossing'),
+          returnCrossing: sum('returnCrossing'),
+          additionalCosts: Math.round(customCostTotal()),
+          driverMeal: driverMeal,
+          helperMeal: helperMeal,
+          mealTotal: driverMeal + helperMeal
+        };
+      }
+
+      function updateNonFuelSummary(totals) {
+        var additionalByType = {};
+        state.extraCostComponents.forEach(function (component) {
+          additionalByType[component.type] = (additionalByType[component.type] || 0) +
+            (Number(component.quantity) || 0) * (Number(component.rate) || 0);
+        });
+        setText('summaryOutboundToll', money(totals.outboundToll));
+        setText('summaryReturnToll', money(totals.returnToll));
+        setText('summaryOutboundCrossing', money(totals.outboundCrossing));
+        setText('summaryReturnCrossing', money(totals.returnCrossing));
+        setText('summaryPortal', money(Math.round(additionalByType.Portal || 0)));
+        setText('summaryParking', money(Math.round(additionalByType.Parking || 0)));
+        setText('summaryEscort', money(Math.round(additionalByType.Escort || 0)));
+        setText('summaryHandling', money(Math.round(additionalByType.Handling || 0)));
+        setText('summaryAccommodation', money(Math.round(additionalByType.Accommodation || 0)));
+        var otherCostTotal = Object.keys(additionalByType).reduce(function (sum, type) {
+          return ['Portal', 'Parking', 'Escort', 'Handling', 'Accommodation'].indexOf(type) === -1
+            ? sum + additionalByType[type] : sum;
+        }, 0);
+        setText('summaryOtherCosts', money(Math.round(otherCostTotal)));
+        setText('summaryDriverMeal', money(totals.driverMeal));
+        setText('summaryHelperMeal', money(totals.helperMeal));
+        setText('driverMealAmount', money(totals.driverMeal));
+        setText('helperMealAmount', money(totals.helperMeal));
+        setText('mealTotal', money(totals.mealTotal));
+        setText('mealFinalLeadTime', getValue('finalLeadTime', '') || '—');
+        setText('step3TotalNonFuel', money(totals.outboundToll + totals.returnToll +
+          totals.outboundCrossing + totals.returnCrossing + totals.additionalCosts + totals.mealTotal));
+        setText('extraCostSubtotal', money(totals.additionalCosts));
+      }
+
+      function calculateEstimates() {
+        var kmOut = numberValue('kmOut');
+        var kmReturn = numberValue('kmReturn');
+        var safety = numberValue('safetyFactor') / 100;
+        var includeFuel = $('#includeFuel').checked;
+        var fuelPrice = numberValue('dieselPremiumPrice') * numberValue('premiumFuelShare') / 100 +
+          numberValue('subsidizedDieselPrice') * (1 - numberValue('premiumFuelShare') / 100);
+        var ratioOut = numberValue('fuelRatioOut');
+        var ratioEmpty = numberValue('fuelRatioEmpty');
+        var ratioLoaded = numberValue('fuelRatioLoaded');
+        var totalKm = kmOut + kmReturn;
+        var fuelCodeCost = String(getValue('fuelCodeCost', '')).trim() === ''
+          ? null : numberValue('fuelCodeCost');
+        var emptyFuelLiters = (kmOut > 0 && ratioOut > 0 ? kmOut / ratioOut : 0) +
+          (kmReturn > 0 && ratioEmpty > 0 ? kmReturn / ratioEmpty : 0);
+        var loadedFuelLiters = (kmOut > 0 && ratioOut > 0 ? kmOut / ratioOut : 0) +
+          (kmReturn > 0 && ratioLoaded > 0 ? kmReturn / ratioLoaded : 0);
+        var fuelEmpty = !includeFuel ? 0 : (fuelCodeCost !== null
+          ? fuelCodeCost
+          : emptyFuelLiters * (1 + safety) * fuelPrice);
+        var fuelLoaded = !includeFuel ? 0 : (fuelCodeCost !== null
+          ? fuelCodeCost
+          : loadedFuelLiters * (1 + safety) * fuelPrice);
+        var returnIsEmpty = normalizeMatch(getValue('returnCondition', '')).indexOf('kosong') !== -1;
+        var selectedFuel = returnIsEmpty ? fuelEmpty : fuelLoaded;
+        var costs = getCostTotals();
+        var toll = costs.outboundToll + costs.returnToll;
+        var crossing = costs.outboundCrossing + costs.returnCrossing;
+        var meals = costs.mealTotal;
+        var extraCosts = costs.additionalCosts;
+        var standardFees = Math.round(toll + crossing + meals + extraCosts);
+        var emptyRaw = fuelEmpty + standardFees;
+        var loadedRaw = fuelLoaded + standardFees;
+        var standardRaw = returnIsEmpty ? emptyRaw : loadedRaw;
+        var rounding = function (amount) { return Math.ceil(amount / 10000) * 10000; };
+        var previous = numberValue('previousSujTotal');
+        var hasPrevious = String(getValue('previousSujTotal', '')).trim() !== '' && previous > 0;
+
+        return {
+          kmOut: kmOut,
+          kmReturn: kmReturn,
+          totalKm: totalKm,
+          fuelPrice: fuelPrice,
+          fuelEmpty: Math.round(fuelEmpty),
+          fuelLoaded: Math.round(fuelLoaded),
+          selectedFuel: Math.round(selectedFuel),
+          meals: Math.round(meals),
+          driverMeal: Math.round(costs.driverMeal),
+          helperMeal: Math.round(costs.helperMeal),
+          toll: Math.round(toll),
+          crossing: Math.round(crossing),
+          extraCosts: Math.round(extraCosts),
+          costTotals: costs,
+          standardFees: Math.round(standardFees),
+          standardRaw: standardRaw,
+          standardTotal: rounding(standardRaw),
+          returnEmptyTotal: rounding(emptyRaw),
+          returnLoadedTotal: rounding(loadedRaw),
+          loadedComponentAdjusted: rounding(standardFees),
+          loadedTotal: rounding(loadedRaw),
+          previous: previous,
+          hasPrevious: hasPrevious,
+          variance: hasPrevious ? rounding(standardRaw) - previous : null,
+          returnIsEmpty: returnIsEmpty,
+          includeFuel: includeFuel
+        };
+      }
+
+      function updateReadOnlyFields() {
+        estimates = calculateEstimates();
+        var leadTimeCalc = updateLeadTimeRecommendation();
+        var selectedTotal = estimates.standardTotal;
+        var selectedVariance = estimates.hasPrevious ? selectedTotal - estimates.previous : null;
+        setValue('totalKm', String(estimates.totalKm));
+        setValue('blendedFuelPrice', money(estimates.fuelPrice) + ' / L');
+        setText('summaryFuel', money(estimates.selectedFuel));
+        setText('summaryNonFuel', money(estimates.standardFees));
+        updateNonFuelSummary(estimates.costTotals);
+        setText('summaryLoadedTotal', money(estimates.loadedTotal));
+        setText('summaryTotal', money(selectedTotal));
+        setText('summaryApprovedTotal', money(selectedTotal));
+        setText('summaryPreviousVersion', estimates.hasPrevious ? money(estimates.previous) : 'Not provided');
+        setText('summaryVariance', estimates.hasPrevious ? money(selectedVariance) : 'Not available');
+
+        setText('reviewCustomer', getValue('customer', '') || 'Not provided');
+        setText('reviewBranchTrip', getValue('branch', 'Not selected') + ' / ' +
+          getValue('tripType', 'Not selected'));
+        var route = [getValue('origin', ''), getValue('destination1', ''), getValue('destination2', '')]
+          .filter(function (point) { return String(point).trim(); }).join(' → ');
+        setText('reviewRoute', route || 'Not provided');
+        setText('reviewVehicle', getValue('vehicleType', ''));
+        setText('reviewTerms', getValue('terms', ''));
+        setText('reviewRevisionOf', state.revisionOf || 'Not a revision');
+        setText('reviewRevisionReason', state.revisionOf
+          ? (getValue('revisionReason', '') || 'Required before submission')
+          : 'Not applicable');
+        setText('reviewFinalLT', getValue('finalLeadTime', '')
+          ? getValue('finalLeadTime', '') + ' days' : 'Not provided');
+        setText('reviewSystemLT', leadTimeCalc ? leadTimeCalc.days + ' days / ' +
+          leadTimeCalc.hours + ' hours' : 'Not calculated');
+        setText('reviewLeadTimeReason', getValue('leadTimeAdjustmentReason', '') || 'Not required');
+        setText('reviewReferenceSource', currentDistanceSource() === 'manual' ? 'Manual Entry' : 'Fuel Code');
+        setText('reviewFuelCode', getValue('fuelCode', '') || 'Not provided');
+        setText('reviewFuelAmount', estimates.includeFuel ? money(estimates.fuelEmpty) : 'BBM dilewati');
+        setText('reviewLoadedFuelAmount', estimates.includeFuel ? money(estimates.fuelLoaded) : 'BBM dilewati');
+        setText('reviewTollTotal', money(estimates.costTotals.outboundToll + estimates.costTotals.returnToll));
+        setText('reviewCrossingTotal', money(estimates.costTotals.outboundCrossing + estimates.costTotals.returnCrossing));
+        setText('reviewAdditionalTotal', money(estimates.costTotals.additionalCosts));
+        setText('reviewDriverMeal', money(estimates.costTotals.driverMeal));
+        setText('reviewHelperMeal', money(estimates.costTotals.helperMeal));
+        setText('reviewNonFuelTotal', money(estimates.standardFees));
+        setText('reviewPrevious', estimates.hasPrevious ? money(estimates.previous) : 'Not provided');
+        setText('reviewTotal', money(estimates.returnEmptyTotal));
+        setText('reviewLoadedTotal', money(estimates.loadedTotal));
+        setText('reviewSelectedTotal', money(selectedTotal) + ' · ' +
+          (estimates.returnIsEmpty ? 'pulang kosong' : 'pulang isi'));
+        setText('reviewVarianceAmount', estimates.hasPrevious
+          ? money(Math.abs(selectedVariance)) + (selectedVariance > 0 ? ' above previous' : ' below previous')
+          : 'Not available');
+        setText('reviewVariancePercent', estimates.hasPrevious
+          ? ((selectedVariance / estimates.previous) * 100).toFixed(1) + '%'
+          : 'Not available');
+        setText('requestNoDisplay', state.createdRequestNo || 'New SUJ request');
+        setText('statusDisplay', state.createdRequestNo ? 'Pending Internal Review' : 'Draft');
+
+        var statusBadge = $('#summaryStatusBadge');
+        if (statusBadge) {
+          statusBadge.className = 'status-badge';
+          statusBadge.textContent = estimates.hasPrevious ? 'Compared' : 'Estimate ready';
+        }
+      }
+
+      function showToast(message) {
+        var toast = $('#toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.style.display = 'block';
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(function () {
+          toast.style.display = 'none';
+        }, 1800);
+      }
+
+      function validateStep(step) {
+        if (step === 1) {
+          var requiredFields = [
+            ['branch', 'Branch is required'],
+            ['createdBy', 'Nama pembuat SUJ wajib diisi'],
+            ['tripType', 'Trip Type is required'],
+            ['origin', 'Origin is required'],
+            ['destination1', 'Destination is required'],
+            ['terms', 'Terms / Route Variant is required'],
+            ['vehicleType', 'Vehicle Type is required'],
+            ['outboundCondition', 'Outbound Condition is required'],
+            ['returnCondition', 'Return Condition is required']
+          ];
+          for (var i = 0; i < requiredFields.length; i++) {
+            var field = $(requiredFields[i][0]);
+            if (!field || !String(field.value).trim()) {
+              showToast(requiredFields[i][1]);
+              if (field) field.focus();
+              return false;
+            }
+          }
+          if (state.revisionOf && !String(getValue('revisionReason', '')).trim()) {
+            showToast('Revision Reason is required when revising an existing SUJ Code Version');
+            $('#revisionReason').focus();
+            return false;
+          }
+        }
+        if (step === 2) {
+          if (currentDistanceSource() === 'fuelCode') {
+            var selectedFuelRecord = loadFuelRecords().find(function (record) {
+              return record.fuelCode === getValue('fuelCodeSelect', '') && fuelRecordMatchesTrip(record);
+            });
+            if (!selectedFuelRecord) {
+              showToast('Select an active eligible Fuel Code or switch to Manual Entry');
+              $('#fuelCodeSelect').focus();
+              return false;
+            }
+          }
+          if (String(getValue('kmOut', '')).trim() === '' || numberValue('kmOut') < 0) {
+            showToast('Enter an outbound distance of zero or greater');
+            $('#kmOut').focus();
+            return false;
+          }
+          if (String(getValue('kmReturn', '')).trim() === '' || numberValue('kmReturn') < 0) {
+            showToast('Enter a return distance of zero or greater');
+            $('#kmReturn').focus();
+            return false;
+          }
+          if (numberValue('speedKmh') <= 0) {
+            showToast('Enter a valid average speed greater than zero');
+            $('#speedKmh').focus();
+            return false;
+          }
+          if ($('#includeFuel').checked) {
+            var hasFuelCost = String(getValue('fuelCodeCost', '')).trim() !== '' &&
+              Number.isFinite(numberValue('fuelCodeCost')) && numberValue('fuelCodeCost') >= 0;
+            if (String(getValue('fuelCodeCost', '')).trim() !== '' && numberValue('fuelCodeCost') < 0) {
+              showToast('Fuel Cost Reference cannot be negative');
+              $('#fuelCodeCost').focus();
+              return false;
+            }
+            var returnEmpty = normalizeMatch(getValue('returnCondition', '')).indexOf('kosong') !== -1;
+            var returnRatio = returnEmpty ? numberValue('fuelRatioEmpty') : numberValue('fuelRatioLoaded');
+            var ratiosReady = (numberValue('kmOut') === 0 || numberValue('fuelRatioOut') > 0) &&
+              (numberValue('kmReturn') === 0 || returnRatio > 0);
+            var noFuelDistance = numberValue('kmOut') === 0 && numberValue('kmReturn') === 0;
+            var fuelShareReady = String(getValue('premiumFuelShare', '')).trim() !== '' &&
+              numberValue('premiumFuelShare') >= 0 && numberValue('premiumFuelShare') <= 100;
+            var pricesReady = noFuelDistance ||
+              ((numberValue('dieselPremiumPrice') > 0 || numberValue('subsidizedDieselPrice') > 0) && fuelShareReady);
+            var hasFuelCalculation = ratiosReady && pricesReady;
+            if (!hasFuelCost && !hasFuelCalculation) {
+              showToast('Fuel references must include Fuel Cost or valid ratios and fuel prices');
+              return false;
+            }
+            if (!hasFuelCost && !noFuelDistance && (String(getValue('premiumFuelShare', '')).trim() === '' ||
+                numberValue('premiumFuelShare') < 0 || numberValue('premiumFuelShare') > 100)) {
+              showToast('Premium fuel share must be between 0 and 100 percent');
+              $('#premiumFuelShare').focus();
+              return false;
+            }
+          }
+          var missingComponent = Array.from(document.querySelectorAll('[data-lead-component]'))
+            .find(function (input) { return !input.value.trim() || Number(input.value) < 0; });
+          if (missingComponent) {
+            showToast('Complete all required lead-time components for ' + getValue('tripType', 'this trip type'));
+            missingComponent.focus();
+            return false;
+          }
+          var invalidCustomComponent = state.customLeadComponents.find(function (component) {
+            return component.hours === '' || !Number.isFinite(Number(component.hours)) ||
+              Number(component.hours) < 0;
+          });
+          if (invalidCustomComponent) {
+            showToast('Enter a valid non-negative duration for every added time component');
+            return false;
+          }
+          if (numberValue('finalLeadTime') <= 0) {
+            showToast('Final Lead Time must be greater than zero');
+            $('#finalLeadTime').focus();
+            return false;
+          }
+          var recommendation = updateLeadTimeRecommendation();
+          var finalLeadTime = numberValue('finalLeadTime');
+          if (recommendation && Math.abs(finalLeadTime - recommendation.days) > 0.000001 &&
+              !String(getValue('leadTimeAdjustmentReason', '')).trim()) {
+            showToast('Enter a Lead Time Adjustment Reason when the final value differs from the recommendation');
+            $('#leadTimeAdjustmentReason').focus();
+            return false;
+          }
+          if (numberValue('safetyFactor') < 0 || numberValue('safetyFactor') > 100) {
+            showToast('Safety factor must be between 0 and 100 percent');
+            $('#safetyFactor').focus();
+            return false;
+          }
+        }
+        if (step === 3) {
+          var mealRates = getMealRates();
+          if (!mealRates.driver || !mealRates.helper) {
+            showToast('Driver and Helper meal rates must be configured for ' + getValue('branch', 'the selected branch'));
+            setText('mealConfigurationNote', 'Configuration error: create exactly one applicable Driver and Helper meal rate in Master Data for ' +
+              (getValue('branch', '') || 'the selected branch') + '. Final submission is blocked until both are configured.');
+            return false;
+          }
+          var invalidCosts = ['previousSujTotal'].some(function (id) {
+            var raw = String(getValue(id, '')).trim();
+            return raw !== '' && (!Number.isFinite(Number(raw)) || Number(raw) < 0);
+          });
+          if (invalidCosts) {
+            showToast('Previous SUJ total must be a valid non-negative amount');
+            return false;
+          }
+          var invalidExtraCost = state.extraCostComponents.find(function (component) {
+            return !String(component.description || component.name || '').trim() ||
+              !String(component.adjustmentReason || '').trim() ||
+              String(component.quantity).trim() === '' || !Number.isFinite(Number(component.quantity)) ||
+              Number(component.quantity) < 0 || String(component.rate).trim() === '' ||
+              !Number.isFinite(Number(component.rate)) || Number(component.rate) < 0;
+          });
+          if (invalidExtraCost) {
+            showToast('Each manual additional cost needs a description, quantity, rate, and Manual Cost Reason');
+            return false;
+          }
+          var adjustedMasterCost = Object.keys(state.costSelections).some(function (listKey) {
+            return state.costSelections[listKey].some(function (item) {
+              var invalidRate = String(item.rate).trim() === '' ||
+                !Number.isFinite(Number(item.rate)) || Number(item.rate) < 0;
+              return invalidRate || (item.manualAdjustment && !String(item.adjustmentReason || '').trim());
+            });
+          });
+          if (adjustedMasterCost) {
+            showToast('Enter valid tariff rates and provide a reason for each manual adjustment');
+            return false;
+          }
+        }
+        if (step === 4) {
+          var effectiveFrom = $('#effectiveFrom').value;
+          var effectiveTo = $('#effectiveTo').value;
+          if (!effectiveFrom) {
+            showToast('Effective From is required for publication review');
+            $('#effectiveFrom').focus();
+            return false;
+          }
+          if (effectiveTo && effectiveTo < effectiveFrom) {
+            showToast('Effective To cannot be earlier than Effective From');
+            $('#effectiveTo').focus();
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function goToStep(target) {
+        if (target > state.step) {
+          for (var step = state.step; step < target; step++) {
+            if (!validateStep(step)) {
+              gotoStep(step);
+              return false;
+            }
+          }
+        }
+        gotoStep(target);
+        return true;
+      }
+
+      function gotoStep(nextStep) {
+        if (nextStep < 1 || nextStep > 4) return;
+        var panels = Array.from(document.querySelectorAll('.step-panel'));
+        var steps = Array.from(document.querySelectorAll('.step'));
+        panels.forEach(function (panel) {
+          panel.classList.toggle('hide', Number(panel.dataset.step) !== nextStep);
+        });
+        steps.forEach(function (item, index) {
+          var n = index + 1;
+          item.classList.toggle('active', n === nextStep);
+          item.classList.toggle('done', n < nextStep);
+        });
+        state.step = nextStep;
+      }
+
+      function collectFormData() {
+        var form = {};
+        document.querySelectorAll('.step-panel input[id], .step-panel select[id]').forEach(function (input) {
+          form[input.id] = input.type === 'checkbox' || input.type === 'radio'
+            ? input.checked
+            : input.multiple
+              ? Array.from(input.selectedOptions).map(function (option) { return option.value; })
+              : input.value;
+        });
+        form.leadTimeValues = {};
+        document.querySelectorAll('[data-lead-component]').forEach(function (input) {
+          form.leadTimeValues[input.dataset.leadComponent] = input.value;
+        });
+        form.customLeadComponents = state.customLeadComponents.map(function (component) {
+          return {
+            id: component.id,
+            type: component.type,
+            name: component.name,
+            description: component.description || '',
+            hours: component.hours,
+            required: component.required
+          };
+        });
+        form.extraCostComponents = state.extraCostComponents.map(function (component) {
+          return JSON.parse(JSON.stringify(component));
+        });
+        form.revisionOf = state.revisionOf;
+        form.fuelReference = state.fuelReference ? JSON.parse(JSON.stringify(state.fuelReference)) : null;
+        form.costSelections = JSON.parse(JSON.stringify(state.costSelections));
+        form.leadTimeCalculation = updateLeadTimeRecommendation();
+        return form;
+      }
+
+      function saveDraft(showMessage) {
+        if (showMessage === undefined) showMessage = true;
+        var payload = {
+          form: collectFormData(),
+          step: state.step,
+          submittedRequestNo: state.createdRequestNo || null,
+          revisionOf: state.revisionOf,
+          fuelReference: state.fuelReference,
+          costSelections: state.costSelections
+        };
+        try {
+          localStorage.setItem('sujCodeDraft', JSON.stringify(payload));
+          if (showMessage) showToast('Draft SUJ berhasil disimpan');
+          return true;
+        } catch (err) {
+          showToast('Draft SUJ belum dapat disimpan');
+          return false;
+        }
+      }
+
+      function loadDraft() {
+        try {
+          var draft = JSON.parse(localStorage.getItem('sujCodeDraft') || 'null');
+          if (!draft) return;
+          var form = draft.form || {};
+          if (typeof form.branch === 'string') setValue('branch', form.branch);
+          if (typeof form.tripType === 'string') setValue('tripType', form.tripType);
+          state.revisionOf = draft.revisionOf || form.revisionOf || null;
+          state.fuelReference = draft.fuelReference || form.fuelReference || null;
+          if (draft.costSelections || form.costSelections) {
+            var storedCosts = draft.costSelections || form.costSelections;
+            Object.keys(state.costSelections).forEach(function (key) {
+              state.costSelections[key] = Array.isArray(storedCosts[key]) ? storedCosts[key] : [];
+            });
+          } else {
+            [
+              ['tollMasterSelect', 'toll'],
+              ['crossingMasterSelect', 'crossing']
+            ].forEach(function (legacyMaster) {
+              var legacyIds = Array.isArray(form[legacyMaster[0]]) ? form[legacyMaster[0]] : [];
+              legacyIds.forEach(function (id) {
+                var record = readMasterRecords().find(function (entry) {
+                  return entry.id === id && entry.category === legacyMaster[1];
+                });
+                if (!record) return;
+                var direction = normalizeMatch(record.direction).indexOf('return') !== -1 ? 'return' : 'outbound';
+                var listKey = direction + (legacyMaster[1] === 'toll' ? 'Toll' : 'Crossing');
+                state.costSelections[listKey].push({
+                  componentType: legacyMaster[1],
+                  masterReferenceId: record.id,
+                  description: record.name,
+                  vehicleType: record.vehicleClass || '',
+                  direction: direction,
+                  quantity: 1,
+                  masterRate: Number(record.rate),
+                  rate: Number(record.rate),
+                  amount: Number(record.rate),
+                  source: 'master',
+                  effectiveStatus: record.status || 'Active',
+                  manualAdjustment: false,
+                  adjustmentReason: ''
+                });
+              });
+            });
+          }
+          renderMasterOptions();
+          renderLeadTimeComponents();
+          renderFuelCodeOptions();
+          if (Array.isArray(form.customLeadComponents)) {
+            state.customLeadComponents = form.customLeadComponents.filter(function (component) {
+              return component && typeof component.id === 'string' &&
+                typeof component.name === 'string' && typeof component.hours === 'string';
+            }).map(function (component) {
+              return {
+                id: component.id,
+                type: leadTimeComponentLabels[component.type] ? component.type : 'otherTime',
+                name: component.name || '',
+                description: component.description || '',
+                hours: component.hours,
+                required: component.required === true
+              };
+            });
+            state.nextCustomLeadComponent = state.customLeadComponents.length + 1;
+            renderCustomLeadComponents();
+          }
+          if (Array.isArray(form.extraCostComponents)) {
+            state.extraCostComponents = form.extraCostComponents.filter(function (component) {
+              return component && typeof component.id === 'string' && typeof component.type === 'string';
+            }).map(function (component) {
+              return {
+                ...component,
+                id: component.id,
+                type: component.type,
+                description: component.description || component.name || '',
+                quantity: component.quantity == null ? '1' : String(component.quantity),
+                rate: component.rate == null
+                  ? (component.amount == null ? '' : String(component.amount))
+                  : String(component.rate),
+                basis: component.basis || 'Per trip',
+                source: component.source || 'manual',
+                adjustmentReason: component.adjustmentReason || ''
+              };
+            });
+            state.nextExtraCostId = state.extraCostComponents.length + 1;
+            renderExtraCostComponents();
+          }
+          if (form.leadTimeValues && typeof form.leadTimeValues === 'object') {
+            state.leadTimeValues = form.leadTimeValues;
+            document.querySelectorAll('[data-lead-component]').forEach(function (input) {
+              if (Object.prototype.hasOwnProperty.call(state.leadTimeValues, input.dataset.leadComponent)) {
+                input.value = state.leadTimeValues[input.dataset.leadComponent];
+              }
+            });
+          }
+          Object.keys(form).forEach(function (key) {
+            var input = $('#' + key);
+            if (!input) return;
+            if ((input.type === 'checkbox' || input.type === 'radio') && typeof form[key] === 'boolean') {
+              input.checked = form[key];
+              return;
+            }
+            if (input.multiple && Array.isArray(form[key])) {
+              Array.from(input.options).forEach(function (option) {
+                option.selected = form[key].indexOf(option.value) !== -1;
+              });
+              return;
+            }
+            if (input.tagName === 'SELECT' &&
+                !Array.from(input.options).some(function (option) { return option.value === form[key]; })) {
+              return;
+            }
+            input.value = form[key];
+          });
+          if (Number.isInteger(draft.step) && draft.step >= 1 && draft.step <= 4) {
+            state.step = draft.step;
+          }
+          if (draft.submittedRequestNo) {
+            state.createdRequestNo = draft.submittedRequestNo;
+            setText('requestNoDisplay', state.createdRequestNo);
+            setText('statusDisplay', 'Pending Internal Review');
+            setText('reviewApprovalStatus', 'Pending Internal Review');
+            $('#submitBtn').hidden = true;
+            $('#newRequestBtn').hidden = false;
+            $('#finalSubmitBtn').disabled = true;
+            state.step = 4;
+          }
+          $('#revisionReasonField').hidden = !state.revisionOf;
+          updateDistanceSourceState();
+          renderCostSelections();
+          renderExtraCostComponents();
+        } catch (err) {
+          showToast('Draft SUJ belum dapat dimuat');
+        }
+      }
+
+      function nextRequestNumber(requests) {
+        var year = new Date().getFullYear();
+        var prefix = 'SUJ-REQ-' + year + '-';
+        var sequence = requests.reduce(function (max, request) {
+          if (!request || typeof request.requestNo !== 'string' || request.requestNo.indexOf(prefix) !== 0) return max;
+          var number = Number(request.requestNo.slice(prefix.length));
+          return Number.isInteger(number) ? Math.max(max, number) : max;
+        }, 0) + 1;
+        return prefix + String(sequence).padStart(3, '0');
+      }
+
+      function submitReview() {
+        for (var step = 1; step <= 4; step++) {
+          if (!validateStep(step)) {
+            gotoStep(step);
+            return;
+          }
+        }
+        if (state.createdRequestNo) {
+          showToast('This request has already been submitted');
+          return;
+        }
+
+        var requests;
+        try {
+          requests = JSON.parse(localStorage.getItem('sujCodeRequests') || '[]');
+          if (!Array.isArray(requests)) throw new Error('Stored request data is invalid');
+        } catch (err) {
+          showToast('Data pengajuan SUJ belum dapat dibaca');
+          return;
+        }
+
+        var estimate = calculateEstimates();
+        var formSnapshot = collectFormData();
+        var selectedTotal = estimate.standardTotal;
+        var request = {
+          requestNo: nextRequestNumber(requests),
+          createdBy: String(getValue('createdBy', '')).trim(),
+          status: 'Pending Internal Review',
+          submittedAt: new Date().toISOString(),
+          revisionOf: state.revisionOf,
+          versionStatus: state.revisionOf ? 'Revision Pending Review' : 'New SUJ Code Pending Review',
+          form: formSnapshot,
+          calculationSnapshot: {
+            distanceSource: currentDistanceSource(),
+            fuelReference: state.fuelReference ? JSON.parse(JSON.stringify(state.fuelReference)) : null,
+            leadTimeRecommendation: formSnapshot.leadTimeCalculation,
+            finalLeadTimeDays: numberValue('finalLeadTime'),
+            costComponents: {
+              outboundToll: JSON.parse(JSON.stringify(state.costSelections.outboundToll)),
+              returnToll: JSON.parse(JSON.stringify(state.costSelections.returnToll)),
+              outboundCrossing: JSON.parse(JSON.stringify(state.costSelections.outboundCrossing)),
+              returnCrossing: JSON.parse(JSON.stringify(state.costSelections.returnCrossing)),
+              additional: JSON.parse(JSON.stringify(state.extraCostComponents)),
+              meals: JSON.parse(JSON.stringify(getMealRates()))
+            },
+            fuelValues: {
+              includeFuel: $('#includeFuel').checked,
+              fuelCode: getValue('fuelCode', ''),
+              fuelCost: numberValue('fuelCodeCost'),
+              ratioOutbound: numberValue('fuelRatioOut'),
+              ratioReturnEmpty: numberValue('fuelRatioEmpty'),
+              ratioReturnLoaded: numberValue('fuelRatioLoaded')
+            }
+          },
+          selectedEstimate: estimate.returnIsEmpty ? 'return-empty' : 'return-loaded',
+          totals: {
+            fuelReturnEmpty: estimate.fuelEmpty,
+            fuelReturnLoaded: estimate.fuelLoaded,
+            nonFuel: estimate.standardFees,
+            nonFuelBreakdown: estimate.costTotals,
+            extraCosts: estimate.extraCosts,
+            returnEmptyTotal: estimate.returnEmptyTotal,
+            returnLoadedTotal: estimate.loadedTotal,
+            selectedTotal: selectedTotal,
+            previousPublished: estimate.hasPrevious ? estimate.previous : null,
+            variance: estimate.hasPrevious ? selectedTotal - estimate.previous : null
+          }
+        };
+        requests.push(request);
+        try {
+          localStorage.setItem('sujCodeRequests', JSON.stringify(requests));
+        } catch (err) {
+          showToast('Pengajuan SUJ belum dapat disimpan. Coba lagi atau hubungi administrator.');
+          return;
+        }
+
+        state.createdRequestNo = request.requestNo;
+        setText('requestNoDisplay', request.requestNo);
+        setText('statusDisplay', request.status);
+        setText('reviewApprovalStatus', request.status);
+        $('#submitBtn').hidden = true;
+        $('#finalSubmitBtn').disabled = true;
+        $('#newRequestBtn').hidden = false;
+        var draftSaved = saveDraft(false);
+        gotoStep(4);
+        showToast(draftSaved
+          ? request.requestNo + ' berhasil diajukan untuk review'
+          : request.requestNo + ' submitted; the active draft could not be updated');
+      }
+
+      function startNewRequest() {
+        if (!window.confirm('Start a new SUJ request? The submitted request will remain saved.')) return;
+        document.querySelectorAll('.step-panel input[id], .step-panel select[id]').forEach(function (input) {
+          if (Object.prototype.hasOwnProperty.call(initialForm, input.id)) {
+            if (input.multiple) {
+              Array.from(input.options).forEach(function (option) { option.selected = false; });
+            } else if (input.type === 'checkbox' || input.type === 'radio') {
+              input.checked = initialForm[input.id];
+            } else {
+              input.value = initialForm[input.id];
+            }
+          }
+        });
+        state.step = 1;
+        state.createdRequestNo = null;
+        state.distanceSource = 'fuelCode';
+        state.activeBranch = '';
+        state.revisionOf = null;
+        state.fuelReference = null;
+        state.costSelections = {
+          outboundToll: [],
+          returnToll: [],
+          outboundCrossing: [],
+          returnCrossing: []
+        };
+        state.leadTimeValues = {};
+        state.customLeadComponents = [];
+        state.nextCustomLeadComponent = 1;
+        state.extraCostComponents = [];
+        state.nextExtraCostId = 1;
+        try {
+          localStorage.removeItem('sujCodeDraft');
+        } catch (err) {
+          showToast('Unable to clear the local draft; the new request was not started');
+          return;
+        }
+        $('#submitBtn').hidden = false;
+        $('#finalSubmitBtn').disabled = false;
+        $('#newRequestBtn').hidden = true;
+        $('#revisionReasonField').hidden = true;
+        setText('requestNoDisplay', 'New SUJ request');
+        setText('statusDisplay', 'Draft');
+        setText('reviewApprovalStatus', 'Draft');
+        Object.keys(initialComponentValues).forEach(function (id) {
+          setValue(id, initialComponentValues[id]);
+        });
+        renderMasterOptions();
+        addFuelVehicleOptions();
+        renderFuelCodeOptions();
+        renderLeadTimeComponents();
+        renderCustomLeadComponents();
+        renderCostSelections();
+        renderExtraCostComponents();
+        updateReadOnlyFields();
+        gotoStep(1);
+      }
+
+      document.addEventListener('input', updateReadOnlyFields);
+      document.addEventListener('change', updateReadOnlyFields);
+
+      $('#branch').addEventListener('change', function () {
+        var nextBranch = getValue('branch', '');
+        if (state.activeBranch && state.activeBranch !== nextBranch &&
+            (hasSelectedRouteCosts() || state.fuelReference) &&
+            !window.confirm('Changing the branch clears route tariffs and distance/fuel references. Continue?')) {
+          setValue('branch', state.activeBranch);
+          return;
+        }
+        clearRouteCosts();
+        resetDistanceAndLeadTime();
+        state.activeBranch = nextBranch;
+        state.routeIdentity = currentRouteIdentity();
+        renderMasterOptions();
+        addFuelVehicleOptions();
+        renderFuelCodeOptions();
+        updateReadOnlyFields();
+      });
+
+      $('#tripType').addEventListener('change', function () {
+        renderLeadTimeComponents();
+        renderFuelCodeOptions();
+        updateReadOnlyFields();
+      });
+
+      $('#addLeadTimeComponent').addEventListener('click', function () {
+        addCustomLeadComponent();
+      });
+      $('#addExtraCost').addEventListener('click', addExtraCost);
+      $('#includeFuel').addEventListener('change', function () {
+        updateReadOnlyFields();
+      });
+      $('#fuelCodeSelect').addEventListener('change', function () {
+        applyFuelCode($('#fuelCodeSelect').value);
+        updateFuelRatioState();
+        updateReadOnlyFields();
+      });
+      [['addOutboundToll', 'toll', 'outbound'], ['addReturnToll', 'toll', 'return'],
+        ['addOutboundCrossing', 'crossing', 'outbound'], ['addReturnCrossing', 'crossing', 'return']]
+        .forEach(function (buttonConfig) {
+          $('#' + buttonConfig[0]).addEventListener('click', function () {
+            addMasterCostSelection(buttonConfig[1], buttonConfig[2]);
+          });
+        });
+      ['distanceSourceFuelCode', 'distanceSourceManual'].forEach(function (id) {
+        $('#' + id).addEventListener('change', function () {
+          var nextSource = currentDistanceSource();
+          if (state.distanceSource && state.distanceSource !== nextSource &&
+              !window.confirm('Changing the reference source will clear Fuel Code, distance, fuel references, lead time, and current calculation results. Continue?')) {
+            $('#distanceSourceFuelCode').checked = state.distanceSource === 'fuelCode';
+            $('#distanceSourceManual').checked = state.distanceSource === 'manual';
+            return;
+          }
+          state.distanceSource = nextSource;
+          resetDistanceAndLeadTime();
+          setText('fuelIntegrationNote', nextSource === 'manual'
+            ? 'Fuel Code reference cleared. Enter the approved distance and fuel-reference values manually.'
+            : 'Select an eligible active Fuel Code for this trip.');
+        });
+      });
+      $('#useLeadTimeRecommendation').addEventListener('click', function () {
+        var recommendation = updateLeadTimeRecommendation();
+        if (!recommendation) {
+          showToast('Complete distance, speed, and time components before using the recommendation');
+          return;
+        }
+        setValue('finalLeadTime', recommendation.days);
+        setValue('leadTimeAdjustmentReason', '');
+        updateReadOnlyFields();
+      });
+      ['origin', 'destination1', 'destination2', 'additionalStops', 'terms', 'vehicleType',
+        'outboundCondition', 'returnCondition'].forEach(function (id) {
+        $('#' + id).addEventListener('change', function () {
+          var nextRouteIdentity = currentRouteIdentity();
+          var routeChanged = state.routeIdentity && ['origin', 'destination1', 'destination2',
+            'additionalStops', 'terms', 'vehicleType'].some(function (key) {
+            return state.routeIdentity[key] !== nextRouteIdentity[key];
+          });
+          if (routeChanged && hasSelectedRouteCosts()) {
+            if (!window.confirm('Trip route changed. Clear the selected toll and crossing components to prevent stale charges?')) {
+              Object.keys(state.routeIdentity).forEach(function (key) {
+                setValue(key, state.routeIdentity[key]);
+              });
+              renderFuelCodeOptions();
+              updateReadOnlyFields();
+              return;
+            }
+            clearRouteCosts();
+            showToast('Route tariff selections were cleared after trip details changed');
+          }
+          state.routeIdentity = nextRouteIdentity;
+          updateFuelRatioState();
+          renderFuelCodeOptions();
+          if (state.fuelReference && !fuelRecordMatchesTrip(state.fuelReference)) {
+            resetDistanceAndLeadTime();
+            showToast('Trip details changed; Fuel Code references and lead time were cleared');
+          }
+          updateReadOnlyFields();
+        });
+        $('#' + id).addEventListener('input', renderFuelCodeOptions);
+      });
+      $('#returnCondition').addEventListener('change', function () {
+        updateDistanceSourceState();
+        updateReadOnlyFields();
+      });
+
+      window.addEventListener('storage', function (event) {
+        if (event.key === 'sujMasterDataRecords') {
+          state.masterRecordsLoaded = false;
+          state.masterDataError = false;
+          renderMasterOptions();
+        } else if (event.key === 'sujFuelCodeRecords') {
+          state.fuelRecordsLoaded = false;
+          renderFuelCodeOptions();
+        }
+      });
+
+      var saveDraftBtn = $('#saveDraftBtn');
+      if (saveDraftBtn) saveDraftBtn.addEventListener('click', saveDraft);
+
+      var duplicateBtn = $('#duplicateBtn');
+      if (duplicateBtn) duplicateBtn.addEventListener('click', function () {
+        var sourceVersion = window.prompt('Enter the existing SUJ Code Version ID to revise:');
+        if (!sourceVersion || !sourceVersion.trim()) return;
+        state.revisionOf = sourceVersion.trim();
+        $('#revisionReasonField').hidden = false;
+        setValue('revisionReason', '');
+        setText('reviewRevisionOf', state.revisionOf);
+        showToast('Revision source selected. Complete the Revision Reason before submission.');
+      });
+
+      var submitBtn = $('#submitBtn');
+      if (submitBtn) submitBtn.addEventListener('click', submitReview);
+
+      var finalSubmitBtn = $('#finalSubmitBtn');
+      if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', submitReview);
+
+      var newRequestBtn = $('#newRequestBtn');
+      if (newRequestBtn) newRequestBtn.addEventListener('click', startNewRequest);
+
+      var goBackBtn = $('#goBackBtn');
+      if (goBackBtn) goBackBtn.addEventListener('click', function () { gotoStep(Math.max(1, state.step - 1)); });
+
+      document.querySelectorAll('[data-next-step]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          goToStep(Number(button.getAttribute('data-next-step')));
+        });
+      });
+
+      document.querySelectorAll('[data-previous-step]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          gotoStep(Number(button.getAttribute('data-previous-step')));
+        });
+      });
+
+      Array.from(document.querySelectorAll('.step')).forEach(function (stepEl, index) {
+        stepEl.addEventListener('click', function () {
+          var target = index + 1;
+          goToStep(target);
+        });
+      });
+
+        renderMasterOptions();
+        addFuelVehicleOptions();
+        renderFuelCodeOptions();
+        renderLeadTimeComponents();
+        renderCustomLeadComponents();
+        renderCostSelections();
+        renderExtraCostComponents();
+        updateDistanceSourceState();
+        var initialForm = collectFormData();
+        loadDraft();
+        renderFuelCodeOptions();
+        state.distanceSource = currentDistanceSource();
+        state.activeBranch = getValue('branch', '');
+        state.routeIdentity = currentRouteIdentity();
+        updateDistanceSourceState();
+        renderCostSelections();
+        updateReadOnlyFields();
+        gotoStep(state.createdRequestNo ? 4 : state.step);
+      }());
+    });
+  </script>
+</body>
+</html>
