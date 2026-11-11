@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SUJ ILS | Review SUJ</title>
+  <style>
+    :root {
+      --ink:#14231b; --green:#006f68; --mint:#e8f5f3; --bg:#f5f8fa;
+      --surface:#fff; --line:#d7e2db; --muted:#697970; --amber:#8d5d13;
+      --red:#b42318; --shadow:0 12px 32px rgba(18,34,25,.07);
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 Inter,"Segoe UI",sans-serif; }
+    button,input { font:inherit; }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    .page { max-width:1420px; margin:auto; padding:24px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; }
+    .eyebrow { color:var(--green); font-size:12px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:4px 0; font-size:30px; }
+    .topbar p,.muted { color:var(--muted); margin:0; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:9px 14px; border:1px solid var(--line); border-radius:9px; background:#fff; color:var(--ink); text-decoration:none; font-weight:800; cursor:pointer; }
+    .btn.primary { color:#fff; border-color:var(--green); background:var(--green); }
+    .filters,.panel { background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); }
+    .filters { display:grid; grid-template-columns:minmax(220px,1fr) 220px; gap:10px; padding:14px; margin-bottom:14px; }
+    .filters input { width:100%; min-height:44px; padding:9px 12px; border:1px solid var(--line); border-radius:9px; background:#fff; color:var(--ink); }
+    .content { display:grid; grid-template-columns:minmax(360px,.85fr) minmax(0,1.55fr); gap:14px; align-items:start; }
+    .panel { overflow:hidden; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line); }
+    .panel-head h2 { margin:0; font-size:18px; }
+    .panel-head p { margin:3px 0 0; color:var(--muted); }
+    .count { color:var(--muted); font-size:13px; white-space:nowrap; }
+    .list { max-height:calc(100vh - 260px); overflow:auto; }
+    .request { display:block; width:100%; padding:15px 18px; border:0; border-bottom:1px solid #edf1ee; background:#fff; color:inherit; text-align:left; cursor:pointer; }
+    .request:hover,.request.selected { background:#f0f8f4; }
+    .request:last-child { border-bottom:0; }
+    .request-top,.request-route,.request-meta { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .request-top strong { font-size:15px; }
+    .request-route { justify-content:flex-start; margin:9px 0 5px; font-weight:800; }
+    .request-meta { justify-content:flex-start; flex-wrap:wrap; color:var(--muted); font-size:13px; }
+    .badge { display:inline-flex; padding:4px 8px; border-radius:999px; background:#fff3df; color:var(--amber); font-size:12px; font-weight:800; }
+    .badge.ok { background:#dff2e5; color:#247945; }
+    .badge.neutral { background:#edf1ee; color:#56645b; }
+    .empty { padding:30px 20px; color:var(--muted); text-align:center; }
+    .detail { min-height:360px; }
+    .detail-body { padding:18px; }
+    .hero { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:16px; }
+    .stat { min-width:0; padding:12px; border:1px solid var(--line); border-radius:10px; background:#f9fbfa; }
+    .stat span { display:block; color:var(--muted); font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+    .stat strong { display:block; margin-top:4px; overflow-wrap:anywhere; font-size:15px; }
+    .detail-section { margin-top:12px; border:1px solid var(--line); border-radius:11px; overflow:hidden; }
+    .detail-section h3 { margin:0; padding:11px 13px; background:#f5f8f6; font-size:14px; }
+    .section-body { padding:12px 13px; }
+    .kv-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 16px; }
+    .kv { min-width:0; }
+    .kv span { display:block; color:var(--muted); font-size:12px; }
+    .kv strong { display:block; margin-top:2px; overflow-wrap:anywhere; font-weight:700; white-space:pre-wrap; }
+    .subsection { margin-top:12px; padding-top:11px; border-top:1px solid #edf1ee; }
+    .subsection:first-child { margin-top:0; padding-top:0; border-top:0; }
+    .subsection h4 { margin:0 0 9px; font-size:13px; }
+    .list-value { margin:0; padding-left:20px; }
+    .list-value li { margin:4px 0; overflow-wrap:anywhere; }
+    .decision-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .decision-field { min-width:0; }
+    .decision-field.full { grid-column:1/-1; }
+    .decision-field label { display:block; margin-bottom:5px; font-size:13px; font-weight:800; }
+    .decision-field input,.decision-field textarea {
+      width:100%; min-height:42px; padding:9px 11px; border:1px solid var(--line);
+      border-radius:9px; background:#fff; color:var(--ink);
+    }
+    .decision-field textarea { min-height:88px; resize:vertical; }
+    .decision-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .btn.approve { color:#fff; border-color:#247945; background:#247945; }
+    .btn.deny { color:#fff; border-color:var(--red); background:var(--red); }
+    .btn.revision { color:#704b0d; border-color:#e7c77f; background:#fff5df; }
+    .decision-feedback { min-height:21px; margin:9px 0 0; color:var(--red); font-weight:700; }
+    .decision-summary { padding:11px 12px; border:1px solid var(--line); border-radius:9px; background:#f9fbfa; }
+    .decision-summary p { margin:4px 0 0; }
+    .decision-summary p:first-child { margin-top:0; }
+    .error { padding:14px 16px; border:1px solid #f3c7c2; border-radius:10px; background:#fff3f1; color:var(--red); }
+    @media(max-width:900px) { .content { grid-template-columns:1fr; } .list { max-height:420px; } }
+    @media(max-width:600px) {
+      .page { padding:13px; } .topbar { align-items:flex-start; flex-direction:column; }
+      .filters { grid-template-columns:1fr; } .hero { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .kv-grid,.decision-form { grid-template-columns:1fr; }
+      .decision-field.full { grid-column:auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">SUJ Governance · Review</div>
+        <h1>Review SUJ</h1>
+        <p>Daftar pengajuan SUJ beserta detail rute dan snapshot kalkulasinya, termasuk contoh Cakung–Cilegon.</p>
+      </div>
+      <nav class="actions" aria-label="Navigasi">
+        <a class="btn" href="SUJ-master.html">Data Master</a>
+      </nav>
+    </header>
+    <div id="storageError" class="error" hidden role="alert"></div>
+    <div class="filters">
+      <input id="search" type="search" placeholder="Cari nomor SUJ, pembuat, cabang, atau rute..." aria-label="Cari SUJ">
+      <input id="statusFilter" type="search" placeholder="Filter status..." aria-label="Filter status">
+    </div>
+    <div class="content">
+      <section class="panel" aria-labelledby="listTitle">
+        <div class="panel-head">
+          <div><h2 id="listTitle">Daftar SUJ</h2><p>Tiga contoh Cakung–Cilegon menggunakan Fuel Code ilustrasi untuk demo.</p></div>
+          <span class="count" id="requestCount"></span>
+        </div>
+        <div class="list" id="requestList" aria-live="polite"></div>
+      </section>
+      <section class="panel detail" id="detailPanel" aria-labelledby="detailTitle">
+        <div class="panel-head">
+          <div><h2 id="detailTitle">Detail SUJ</h2><p id="detailSubtitle">Pilih request dari daftar.</p></div>
+        </div>
+        <div class="detail-body" id="detailBody"><div class="empty">Informasi detail akan tampil di sini.</div></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    (function () {
+      'use strict';
+      var requests = [];
+      var readError = '';
+      var hardcodedRequests = [
+        {
+          requestNo:'SUJ-REQ-DEMO-CKG-CGN-001',
+          sujCode:'CAKUNG/FUEL-CKG-CGN-01/SUJ-CKG-CGN-001',
+          status:'Pending Internal Review',
+          submittedAt:'2026-11-10T02:15:00.000Z',
+          createdBy:'User Cabang JASUM',
+          versionStatus:'New SUJ Code Pending Review',
+          selectedEstimate:'return-empty',
+          form:{
+            branch:'JASUM',tripType:'Reguler',createdBy:'User Cabang JASUM',
+            origin:'Cakung',destination1:'Cilegon',terms:'Tol - Tol',
+            vehicleType:'CDD BAK - 4000 CC',outboundCondition:'PERGI ISI',
+            returnCondition:'PULANG KOSONG',fuelCode:'FUEL-CKG-CGN-01',
+            distanceSource:'fuelCode',kmOut:120,kmReturn:120,speedKmh:40,
+            fuelRatioOut:5,fuelRatioEmpty:6,finalLeadTime:0.5,
+            effectiveFrom:'2026-11-15'
+          },
+          calculationSnapshot:{
+            distanceSource:'fuelCode',
+            fuelReference:{fuelCode:'FUEL-CKG-CGN-01',origin:'Cakung',destination:'Cilegon'},
+            finalLeadTimeDays:0.5,
+            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-01',ratioOutbound:5,ratioReturnEmpty:6}
+          },
+          totals:{fuelReturnEmpty:850000,fuelReturnLoaded:900000,nonFuel:1250000,
+            returnEmptyTotal:2110000,returnLoadedTotal:2160000,selectedTotal:2110000}
+        },
+        {
+          requestNo:'SUJ-REQ-DEMO-CKG-CGN-002',
+          sujCode:'CAKUNG/FUEL-CKG-CGN-02/SUJ-CKG-CGN-002',
+          status:'Pending Internal Review',
+          submittedAt:'2026-11-10T04:30:00.000Z',
+          createdBy:'User Cabang JASUM',
+          versionStatus:'New SUJ Code Pending Review',
+          selectedEstimate:'return-loaded',
+          form:{
+            branch:'JASUM',tripType:'SLA Luar Kota',createdBy:'User Cabang JASUM',
+            origin:'Cakung',destination1:'Cilegon',terms:'Tol - Non Tol',
+            vehicleType:'FUSO BAK - 7000 CC',outboundCondition:'PERGI ISI',
+            returnCondition:'PULANG ISI',fuelCode:'FUEL-CKG-CGN-02',
+            distanceSource:'fuelCode',kmOut:120,kmReturn:120,speedKmh:35,
+            fuelRatioOut:4.5,fuelRatioLoaded:4,finalLeadTime:0.75,
+            effectiveFrom:'2026-11-15'
+          },
+          calculationSnapshot:{
+            distanceSource:'fuelCode',
+            fuelReference:{fuelCode:'FUEL-CKG-CGN-02',origin:'Cakung',destination:'Cilegon'},
+            finalLeadTimeDays:0.75,
+            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-02',ratioOutbound:4.5,ratioReturnLoaded:4}
+          },
+          totals:{fuelReturnEmpty:920000,fuelReturnLoaded:980000,nonFuel:1480000,
+            returnEmptyTotal:2400000,returnLoadedTotal:2460000,selectedTotal:2460000}
+        },
+        {
+          requestNo:'SUJ-REQ-DEMO-CKG-CGN-003',
+          sujCode:'CAKUNG/FUEL-CKG-CGN-03/SUJ-CKG-CGN-003',
+          status:'Pending Internal Review',
+          submittedAt:'2026-11-10T06:45:00.000Z',
+          createdBy:'User Cabang JASUM',
+          versionStatus:'New SUJ Code Pending Review',
+          selectedEstimate:'return-empty',
+          form:{
+            branch:'JASUM',tripType:'Adhoc',createdBy:'User Cabang JASUM',
+            origin:'Cakung',destination1:'Cilegon',terms:'Sekali jalan',
+            vehicleType:'TRONTON BAK - 7800 CC',outboundCondition:'PERGI ISI',
+            returnCondition:'PULANG KOSONG',fuelCode:'FUEL-CKG-CGN-03',
+            distanceSource:'fuelCode',kmOut:120,kmReturn:120,speedKmh:32,
+            fuelRatioOut:3.5,fuelRatioEmpty:4,finalLeadTime:1,
+            effectiveFrom:'2026-11-15'
+          },
+          calculationSnapshot:{
+            distanceSource:'fuelCode',
+            fuelReference:{fuelCode:'FUEL-CKG-CGN-03',origin:'Cakung',destination:'Cilegon'},
+            finalLeadTimeDays:1,
+            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-03',ratioOutbound:3.5,ratioReturnEmpty:4}
+          },
+          totals:{fuelReturnEmpty:1150000,fuelReturnLoaded:1230000,nonFuel:1720000,
+            returnEmptyTotal:2880000,returnLoadedTotal:2960000,selectedTotal:2880000}
+        }
+      ];
+      var labels = {
+        requestNo:'Nomor pengajuan', sujCode:'Kode SUJ', status:'Status', submittedAt:'Waktu pengajuan', createdBy:'Dibuat oleh',
+        branch:'Cabang', tripType:'Tipe trip', customer:'Customer / Deployment', origin:'Origin',
+        destination1:'Destination', destination2:'Destination tambahan', additionalStops:'Additional stops',
+        terms:'Terms / route variant', vehicleType:'Jenis kendaraan', outboundCondition:'Kondisi outbound',
+        returnCondition:'Kondisi return', routeNotes:'Catatan rute', revisionOf:'Revisi dari',
+        revisionReason:'Alasan revisi', effectiveFrom:'Berlaku mulai', effectiveTo:'Berlaku sampai',
+        distanceSource:'Sumber jarak / fuel', fuelCode:'Fuel Code', fuelTypeReference:'Jenis BBM',
+        fuelCodeCost:'Referensi biaya BBM', kmOut:'Jarak outbound (KM)', kmReturn:'Jarak return (KM)',
+        speedKmh:'Kecepatan (KM/jam)', fuelRatioOut:'Rasio outbound', fuelRatioEmpty:'Rasio return kosong',
+        fuelRatioLoaded:'Rasio return isi', premiumFuelShare:'Porsi BBM premium (%)',
+        finalLeadTime:'Final lead time (hari)', leadTimeAdjustmentReason:'Alasan penyesuaian lead time',
+        manualEntryReason:'Alasan input manual', manualEntryReasonDetail:'Detail alasan input manual',
+        includeFuel:'BBM disertakan', safetyFactor:'Faktor keselamatan', dieselPremiumPrice:'Harga BBM premium',
+        subsidizedDieselPrice:'Harga BBM subsidi', selectedEstimate:'Skenario yang dipilih',
+        fuelReturnEmpty:'Estimasi BBM return kosong', fuelReturnLoaded:'Estimasi BBM return isi',
+        nonFuel:'Total non-BBM', returnEmptyTotal:'Total return kosong', returnLoadedTotal:'Total return isi',
+        selectedTotal:'Total skenario terpilih', previousPublished:'Publikasi sebelumnya', variance:'Selisih',
+        fuelReference:'Referensi Fuel Code', leadTimeRecommendation:'Rekomendasi lead time',
+        finalLeadTimeDays:'Final lead time (hari)', costComponents:'Komponen biaya tersimpan',
+        fuelValues:'Nilai BBM tersimpan', costSelections:'Master biaya terpilih',
+        leadTimeValues:'Komponen lead time', customLeadComponents:'Komponen lead time tambahan',
+        extraCostComponents:'Biaya tambahan', leadTimeCalculation:'Kalkulasi lead time',
+        outboundToll:'Tol outbound', returnToll:'Tol return', outboundCrossing:'Penyeberangan outbound',
+        returnCrossing:'Penyeberangan return', additional:'Komponen tambahan', meals:'Tarif meals',
+        nonFuelBreakdown:'Rincian biaya non-BBM', extraCosts:'Total biaya tambahan',
+        driverMeal:'Uang makan driver', helperMeal:'Uang makan helper', mealTotal:'Total uang makan',
+        returnIsEmpty:'Return kosong', rate:'Tarif', amount:'Jumlah', quantity:'Kuantitas',
+        name:'Nama', description:'Deskripsi', type:'Tipe', basis:'Basis tarif', reason:'Alasan',
+        routeUsage:'Rute penggunaan', direction:'Arah', vehicleClass:'Kelas kendaraan',
+        effectivePeriod:'Periode berlaku', fuelCost:'Biaya BBM', ratioOutbound:'Rasio outbound',
+        ratioReturnEmpty:'Rasio return kosong', ratioReturnLoaded:'Rasio return isi',
+        recommendedDays:'Rekomendasi (hari)', totalHours:'Total jam', distanceKm:'Jarak (KM)',
+        hours:'Jam', required:'Wajib', id:'ID', category:'Kategori', area:'Area / keterangan',
+        unit:'Satuan', tariffId:'ID tarif', statusLabel:'Status tarif'
+      };
+      var currencyKeys = {
+        rate:true, amount:true, fuelCost:true, fuelCodeCost:true, dieselPremiumPrice:true,
+        subsidizedDieselPrice:true, fuelReturnEmpty:true, fuelReturnLoaded:true, nonFuel:true,
+        returnEmptyTotal:true, returnLoadedTotal:true, selectedTotal:true, previousPublished:true,
+        variance:true, driverMeal:true, helperMeal:true, mealTotal:true, extraCosts:true,
+        driverMealAmount:true, helperMealAmount:true
+      };
+      var $ = function (id) { return document.getElementById(id); };
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (char) {
+          return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];
+        });
+      }
+      function titleFor(key) {
+        if (labels[key]) return labels[key];
+        return String(key).replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/[_-]+/g,' ')
+          .replace(/\b\w/g,function (letter) { return letter.toUpperCase(); });
+      }
+      function formatDate(value) {
+        var date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value || '—') : date.toLocaleString('id-ID', {
+          day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+        });
+      }
+      function formatValue(key, value) {
+        if (value === null || value === undefined || value === '') return '—';
+        if (currencyKeys[key] && typeof value === 'number') {
+          return 'Rp ' + value.toLocaleString('id-ID');
+        }
+        if (key === 'submittedAt' || key === 'updatedAt' || key === 'createdAt') return formatDate(value);
+        if (typeof value === 'boolean') return value ? 'Ya' : 'Tidak';
+        if (typeof value === 'number') return value.toLocaleString('id-ID');
+        return String(value);
+      }
+      function isPlainObject(value) {
+        return value !== null && typeof value === 'object' && !Array.isArray(value);
+      }
+      function renderValue(key, value) {
+        if (value === null || value === undefined || value === '') {
+          return '<div class="kv"><span>' + escapeHtml(titleFor(key)) + '</span><strong>—</strong></div>';
+        }
+        if (Array.isArray(value)) {
+          if (!value.length) return '<div class="kv"><span>' + escapeHtml(titleFor(key)) + '</span><strong>—</strong></div>';
+          return '<div class="subsection"><h4>' + escapeHtml(titleFor(key)) + '</h4>' +
+            '<ol class="list-value">' + value.map(function (item) {
+              return '<li>' + (isPlainObject(item)
+                ? '<div class="kv-grid">' + Object.keys(item).map(function (child) { return renderValue(child,item[child]); }).join('') + '</div>'
+                : escapeHtml(formatValue(key,item))) + '</li>';
+            }).join('') + '</ol></div>';
+        }
+        if (isPlainObject(value)) {
+          var childKeys = Object.keys(value);
+          if (!childKeys.length) return '<div class="kv"><span>' + escapeHtml(titleFor(key)) + '</span><strong>—</strong></div>';
+          return '<div class="subsection"><h4>' + escapeHtml(titleFor(key)) + '</h4><div class="kv-grid">' +
+            childKeys.map(function (child) { return renderValue(child,value[child]); }).join('') + '</div></div>';
+        }
+        return '<div class="kv"><span>' + escapeHtml(titleFor(key)) + '</span><strong>' +
+          escapeHtml(formatValue(key,value)) + '</strong></div>';
+      }
+      function selectedRequestNo() {
+        return new URLSearchParams(location.search).get('requestNo') || '';
+      }
+      function setSelected(requestNo) {
+        var url = new URL(location.href);
+        url.searchParams.set('requestNo',requestNo);
+        history.replaceState(null,'',url);
+        render();
+      }
+      function routeOf(request) {
+        var form = request.form || {};
+        return [form.origin,form.destination1,form.destination2].filter(Boolean).join(' → ') || 'Rute belum dicatat';
+      }
+      function creatorOf(request) {
+        return request.createdBy || (request.form && request.form.createdBy) || 'Belum dicatat pada saat pengajuan';
+      }
+      function isPendingReview(request) {
+        return /^pending internal review$/i.test(String(request.status || '').trim());
+      }
+      function renderDecisionSection(request) {
+        var decision = request.reviewDecision;
+        if (!isPendingReview(request)) {
+          if (!decision) {
+            return '<section class="detail-section"><h3>Keputusan Review</h3><div class="section-body">' +
+              '<div class="decision-summary"><p>Permintaan ini tidak lagi berada pada status review aktif.</p></div></div></section>';
+          }
+          return '<section class="detail-section"><h3>Keputusan Review</h3><div class="section-body">' +
+            '<div class="decision-summary">' +
+            '<p><b>Keputusan:</b> ' + escapeHtml(decision.status || request.status || '—') + '</p>' +
+            '<p><b>Waktu:</b> ' + escapeHtml(decision.reviewedAt ? formatDate(decision.reviewedAt) : '—') + '</p>' +
+            '<p><b>Catatan:</b> ' + escapeHtml(decision.comments || 'Tidak ada catatan.') + '</p>' +
+            '</div></div></section>';
+        }
+        return '<section class="detail-section"><h3>Keputusan Review</h3><div class="section-body">' +
+          '<p class="muted">Pilih keputusan setelah meninjau detail dan kalkulasi SUJ. Catatan wajib untuk Deny dan Reject for Revision.</p>' +
+          '<div class="decision-form">' +
+          '<div class="decision-field full"><label for="reviewComments">Catatan review</label>' +
+          '<textarea id="reviewComments" maxlength="1000" placeholder="Wajib diisi untuk Deny atau Reject for Revision"></textarea></div>' +
+          '</div><div class="decision-actions">' +
+          '<button type="button" class="btn approve" data-decision="approve">Approve</button>' +
+          '<button type="button" class="btn deny" data-decision="deny">Deny</button>' +
+          '<button type="button" class="btn revision" data-decision="revision">Reject for Revision</button>' +
+          '</div><p id="decisionFeedback" class="decision-feedback" role="alert" aria-live="polite"></p>' +
+          '</div></section>';
+      }
+      function renderList() {
+        var query = $('search').value.trim().toLowerCase();
+        var status = $('statusFilter').value.trim().toLowerCase();
+        var selected = selectedRequestNo();
+        var filtered = requests.filter(function (request) {
+          var form = request.form || {};
+          var searchable = [request.requestNo,request.sujCode,creatorOf(request),request.status,form.branch,form.tripType,
+            form.origin,form.destination1,form.customer].join(' ').toLowerCase();
+          return (!query || searchable.indexOf(query) !== -1) &&
+            (!status || String(request.status || '').toLowerCase().indexOf(status) !== -1);
+        }).sort(function (a,b) { return String(b.submittedAt || '').localeCompare(String(a.submittedAt || '')); });
+        $('requestCount').textContent = filtered.length + ' dari ' + requests.length + ' request';
+        if (readError) {
+          $('requestList').innerHTML = '<div class="empty">Data SUJ belum dapat ditampilkan. Muat ulang halaman atau hubungi administrator.</div>';
+          return;
+        }
+        if (!filtered.length) {
+          $('requestList').innerHTML = '<div class="empty">' + (requests.length
+            ? 'Tidak ada request yang cocok dengan filter.'
+            : 'Belum ada pengajuan SUJ. Pilih “Buat SUJ” untuk memulai pengajuan baru.') + '</div>';
+          return;
+        }
+        $('requestList').innerHTML = filtered.map(function (request) {
+          var form = request.form || {};
+          var current = request.requestNo === selected;
+          var badgeClass = /approved|published/i.test(request.status || '') ? 'badge ok'
+            : /pending|review/i.test(request.status || '') ? 'badge' : 'badge neutral';
+          return '<button type="button" class="request ' + (current ? 'selected' : '') +
+            '" data-request="' + escapeHtml(request.requestNo || '') + '">' +
+            '<div class="request-top"><strong>' + escapeHtml(request.sujCode || request.requestNo || 'SUJ tanpa nomor') +
+            '</strong><span class="' + badgeClass + '">' + escapeHtml(request.status || 'Status tidak dicatat') + '</span></div>' +
+            '<div class="request-route">' + escapeHtml(routeOf(request)) + '</div>' +
+            '<div class="request-meta"><span>' + escapeHtml(form.branch || 'Cabang —') + '</span><span>·</span><span>' +
+            escapeHtml(request.requestNo || 'Nomor pengajuan —') + '</span><span>·</span><span>' +
+            escapeHtml(creatorOf(request)) + '</span><span>·</span><span>' + escapeHtml(request.submittedAt ? formatDate(request.submittedAt) : 'Waktu tidak dicatat') +
+            '</span></div></button>';
+        }).join('');
+        $('requestList').querySelectorAll('[data-request]').forEach(function (button) {
+          button.addEventListener('click',function () { setSelected(button.dataset.request); });
+        });
+      }
+      function renderDetail() {
+        var selected = selectedRequestNo();
+        var request = requests.find(function (item) { return item.requestNo === selected; });
+        if (!request) {
+          $('detailTitle').textContent = 'Detail SUJ';
+          $('detailSubtitle').textContent = 'Pilih request dari daftar.';
+          $('detailBody').innerHTML = '<div class="empty">Informasi detail akan tampil di sini.</div>';
+          return;
+        }
+        var form = request.form || {};
+        var snapshot = request.calculationSnapshot || {};
+        var totals = request.totals || {};
+        $('detailTitle').textContent = request.sujCode || request.requestNo || 'Detail SUJ';
+        $('detailSubtitle').textContent = 'Informasi pengajuan, rute, komponen, dan snapshot kalkulasi.';
+        var identityKeys = ['branch','tripType','customer','origin','destination1','destination2','additionalStops',
+          'terms','vehicleType','outboundCondition','returnCondition','routeNotes','revisionOf','revisionReason',
+          'effectiveFrom','effectiveTo'];
+        var identity = identityKeys.filter(function (key) { return Object.prototype.hasOwnProperty.call(form,key); })
+          .map(function (key) { return renderValue(key,form[key]); }).join('');
+        var formDetails = Object.keys(form).filter(function (key) {
+          return identityKeys.indexOf(key) === -1 && ['costSelections','fuelReference','leadTimeCalculation',
+            'leadTimeValues','customLeadComponents','extraCostComponents','revisionOf'].indexOf(key) === -1;
+        }).map(function (key) { return renderValue(key,form[key]); }).join('');
+        var savedSelections = snapshot.costComponents || form.costSelections;
+        var detailHtml = '<div class="hero">' +
+          '<div class="stat"><span>Dibuat oleh</span><strong>' + escapeHtml(creatorOf(request)) + '</strong></div>' +
+          '<div class="stat"><span>Diajukan</span><strong>' + escapeHtml(request.submittedAt ? formatDate(request.submittedAt) : 'Tidak dicatat') + '</strong></div>' +
+          '<div class="stat"><span>Status</span><strong>' + escapeHtml(request.status || 'Tidak dicatat') + '</strong></div>' +
+          '<div class="stat"><span>Total terpilih</span><strong>' + escapeHtml(formatValue('selectedTotal',totals.selectedTotal)) + '</strong></div>' +
+          '</div>' +
+          '<section class="detail-section"><h3>Identitas dan rute</h3><div class="section-body"><div class="kv-grid">' + (identity || '<div class="muted">Detail identitas tidak tersedia.</div>') + '</div></div></section>' +
+          '<section class="detail-section"><h3>Jarak, fuel, dan lead time</h3><div class="section-body">' +
+            '<div class="kv-grid">' + formDetails + '</div>' +
+            (form.fuelReference ? renderValue('fuelReference',form.fuelReference) : '') +
+            (!form.fuelReference && snapshot.fuelReference ? renderValue('fuelReference',snapshot.fuelReference) : '') +
+            (form.leadTimeCalculation ? renderValue('leadTimeCalculation',form.leadTimeCalculation) : '') +
+            (snapshot.leadTimeRecommendation ? renderValue('leadTimeRecommendation',snapshot.leadTimeRecommendation) : '') +
+            (snapshot.finalLeadTimeDays !== undefined ? renderValue('finalLeadTimeDays',snapshot.finalLeadTimeDays) : '') +
+            (form.leadTimeValues && Object.keys(form.leadTimeValues).length ? renderValue('leadTimeValues',form.leadTimeValues) : '') +
+            (form.customLeadComponents && form.customLeadComponents.length ? renderValue('customLeadComponents',form.customLeadComponents) : '') +
+            (snapshot.fuelValues ? renderValue('fuelValues',snapshot.fuelValues) : '') +
+          '</div></section>' +
+          '<section class="detail-section"><h3>Komponen biaya dan total kalkulasi</h3><div class="section-body">' +
+            (savedSelections ? renderValue('costComponents',savedSelections) : '<div class="muted">Rincian komponen biaya tidak tersedia pada snapshot request ini.</div>') +
+            (!snapshot.costComponents && form.extraCostComponents && form.extraCostComponents.length ? renderValue('extraCostComponents',form.extraCostComponents) : '') +
+            renderValue('totals',totals) +
+          '</div></section>' +
+          renderDecisionSection(request) +
+          '<section class="detail-section"><h3>Informasi pengajuan</h3><div class="section-body"><div class="kv-grid">' +
+          renderValue('requestNo',request.requestNo) + renderValue('status',request.status) +
+          renderValue('sujCode',request.sujCode) +
+          renderValue('submittedAt',request.submittedAt) + renderValue('createdBy',creatorOf(request)) +
+          renderValue('versionStatus',request.versionStatus) + renderValue('selectedEstimate',request.selectedEstimate) +
+          '</div></div></section>';
+        $('detailBody').innerHTML = detailHtml;
+        $('detailBody').querySelectorAll('[data-decision]').forEach(function (button) {
+          button.addEventListener('click',function () {
+            applyDecision(request.requestNo,button.dataset.decision);
+          });
+        });
+      }
+      function applyDecision(requestNo, action) {
+        var request = requests.find(function (item) { return item.requestNo === requestNo; });
+        if (!request || !isPendingReview(request)) return;
+        var comments = $('reviewComments').value.trim();
+        var feedback = $('decisionFeedback');
+        if (action !== 'approve' && !comments) {
+          feedback.textContent = 'Catatan wajib diisi untuk Deny atau Reject for Revision.';
+          $('reviewComments').focus();
+          return;
+        }
+        var outcomes = {
+          approve:{status:'Approved',label:'Approve'},
+          deny:{status:'Denied',label:'Deny'},
+          revision:{status:'Rejected for Revision',label:'Reject for Revision'}
+        };
+        var outcome = outcomes[action];
+        if (!outcome) return;
+        if (!window.confirm(outcome.label + ' ' + request.requestNo + '?')) return;
+        var now = new Date().toISOString();
+        var updatedRequest = Object.assign({},request,{
+          status:outcome.status,
+          updatedAt:now,
+          reviewDecision:{
+            action:action,
+            status:outcome.status,
+            reviewedAt:now,
+            comments:comments
+          }
+        });
+        var updatedRequests = requests.map(function (item) {
+          return item.requestNo === requestNo ? updatedRequest : item;
+        });
+        try {
+          localStorage.setItem('sujCodeRequests',JSON.stringify(updatedRequests));
+        } catch (error) {
+          feedback.textContent = 'Keputusan belum dapat disimpan. Coba lagi atau hubungi administrator.';
+          return;
+        }
+        requests = updatedRequests;
+        render();
+      }
+      function render() { renderList(); renderDetail(); }
+      function load() {
+        var storedRequests = [];
+        try {
+          var stored = localStorage.getItem('sujCodeRequests');
+          storedRequests = stored ? JSON.parse(stored) : [];
+          if (!Array.isArray(storedRequests)) throw new Error('Stored SUJ requests are not a list');
+          storedRequests = storedRequests.filter(function (request) { return request && typeof request === 'object'; });
+        } catch (error) {
+          readError = 'Data SUJ tidak dapat dibaca: ' + error.message;
+          $('storageError').textContent = readError;
+          $('storageError').hidden = false;
+          storedRequests = [];
+        }
+        var storedByRequestNo = {};
+        storedRequests.forEach(function (request) {
+          if (request.requestNo) storedByRequestNo[request.requestNo] = request;
+        });
+        var hardcodedRequestNos = {};
+        requests = hardcodedRequests.map(function (request) {
+          hardcodedRequestNos[request.requestNo] = true;
+          return storedByRequestNo[request.requestNo] || request;
+        }).concat(storedRequests.filter(function (request) {
+          return !hardcodedRequestNos[request.requestNo];
+        }));
+        render();
+        if (selectedRequestNo() && !requests.some(function (request) { return request.requestNo === selectedRequestNo(); })) {
+          history.replaceState(null,'',location.pathname);
+        }
+      }
+      $('search').addEventListener('input',render);
+      $('statusFilter').addEventListener('input',render);
+      window.addEventListener('storage',function (event) {
+        if (event.key === 'sujCodeRequests' || event.key === null) load();
+      });
+      load();
+    }());
+  </script>
+</body>
+</html>
