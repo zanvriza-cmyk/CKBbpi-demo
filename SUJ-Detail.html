@@ -14,7 +14,7 @@
     body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 Inter,"Segoe UI",sans-serif; }
     button,input { font:inherit; }
     button,a { -webkit-tap-highlight-color:transparent; }
-    .page { max-width:1420px; margin:auto; padding:24px; }
+    .page { max-width:1840px; margin:auto; padding:14px; }
     .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; }
     .eyebrow { color:var(--green); font-size:12px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
     h1 { margin:4px 0; font-size:30px; }
@@ -25,7 +25,7 @@
     .filters,.panel { background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); }
     .filters { display:grid; grid-template-columns:minmax(220px,1fr) 220px; gap:10px; padding:14px; margin-bottom:14px; }
     .filters input { width:100%; min-height:44px; padding:9px 12px; border:1px solid var(--line); border-radius:9px; background:#fff; color:var(--ink); }
-    .content { display:grid; grid-template-columns:minmax(360px,.85fr) minmax(0,1.55fr); gap:14px; align-items:start; }
+    .content { display:grid; grid-template-columns:minmax(245px,.55fr) minmax(0,2.45fr); gap:12px; align-items:start; }
     .panel { overflow:hidden; }
     .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line); }
     .panel-head h2 { margin:0; font-size:18px; }
@@ -43,13 +43,14 @@
     .badge.ok { background:#dff2e5; color:#247945; }
     .badge.neutral { background:#edf1ee; color:#56645b; }
     .empty { padding:30px 20px; color:var(--muted); text-align:center; }
-    .detail { min-height:360px; }
-    .detail-body { padding:18px; }
+    .detail { min-height:360px; container-type:inline-size; }
+    .detail-body { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:14px; align-items:start; }
     .hero { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:16px; }
+    .hero,.detail-section.full { grid-column:1/-1; }
     .stat { min-width:0; padding:12px; border:1px solid var(--line); border-radius:10px; background:#f9fbfa; }
     .stat span { display:block; color:var(--muted); font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
     .stat strong { display:block; margin-top:4px; overflow-wrap:anywhere; font-size:15px; }
-    .detail-section { margin-top:12px; border:1px solid var(--line); border-radius:11px; overflow:hidden; }
+    .detail-section { min-width:0; margin-top:0; border:1px solid var(--line); border-radius:11px; overflow:hidden; }
     .detail-section h3 { margin:0; padding:11px 13px; background:#f5f8f6; font-size:14px; }
     .section-body { padding:12px 13px; }
     .kv-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 16px; }
@@ -59,6 +60,9 @@
     .subsection { margin-top:12px; padding-top:11px; border-top:1px solid #edf1ee; }
     .subsection:first-child { margin-top:0; padding-top:0; border-top:0; }
     .subsection h4 { margin:0 0 9px; font-size:13px; }
+    .cost-snapshot { border:1px solid var(--line); border-radius:9px; background:#fff; }
+    .cost-snapshot summary { padding:10px 12px; color:var(--green); font-weight:800; cursor:pointer; }
+    .cost-snapshot-content { padding:0 12px 12px; }
     .list-value { margin:0; padding-left:20px; }
     .list-value li { margin:4px 0; overflow-wrap:anywhere; }
     .decision-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
@@ -79,11 +83,19 @@
     .decision-summary p { margin:4px 0 0; }
     .decision-summary p:first-child { margin-top:0; }
     .error { padding:14px 16px; border:1px solid #f3c7c2; border-radius:10px; background:#fff3f1; color:var(--red); }
-    @media(max-width:900px) { .content { grid-template-columns:1fr; } .list { max-height:420px; } }
+    @container(max-width:700px) {
+      .detail-body { grid-template-columns:1fr; }
+      .hero,.detail-section.full { grid-column:auto; }
+    }
+    @media(max-width:900px) {
+      .content { grid-template-columns:1fr; }
+      .list { max-height:420px; }
+    }
     @media(max-width:600px) {
       .page { padding:13px; } .topbar { align-items:flex-start; flex-direction:column; }
       .filters { grid-template-columns:1fr; } .hero { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .kv-grid,.decision-form { grid-template-columns:1fr; }
+      .detail-body,.kv-grid,.decision-form { grid-template-columns:1fr; }
+      .hero,.detail-section.full { grid-column:auto; }
       .decision-field.full { grid-column:auto; }
     }
   </style>
@@ -136,22 +148,38 @@
           versionStatus:'New SUJ Code Pending Review',
           selectedEstimate:'return-empty',
           form:{
-            branch:'JASUM',tripType:'Reguler',createdBy:'User Cabang JASUM',
+            branch:'JASUM',tripType:'SLA Luar Kota',createdBy:'User Cabang JASUM',
             origin:'Cakung',destination1:'Cilegon',terms:'Tol - Tol',
             vehicleType:'CDD BAK - 4000 CC',outboundCondition:'PERGI ISI',
             returnCondition:'PULANG KOSONG',fuelCode:'FUEL-CKG-CGN-01',
-            distanceSource:'fuelCode',kmOut:120,kmReturn:120,speedKmh:40,
-            fuelRatioOut:5,fuelRatioEmpty:6,finalLeadTime:0.5,
+            distanceSource:'fuelCode',kmOut:120,kmReturn:120,totalKm:240,speedKmh:40,
+            fuelRatioOut:5,fuelRatioEmpty:6,finalLeadTime:0.55,
+            leadTimeValues:{crossingQueue:1,crossingDuration:2,loadingTime:2,unloadingTime:1,
+              loadingQueue:0.5,unloadingQueue:0.5,fuelQueue:0.25},
+            leadTimeCalculation:{hours:13.25,days:0.55,componentHours:7.25},
             effectiveFrom:'2026-11-15'
           },
           calculationSnapshot:{
             distanceSource:'fuelCode',
             fuelReference:{fuelCode:'FUEL-CKG-CGN-01',origin:'Cakung',destination:'Cilegon'},
-            finalLeadTimeDays:0.5,
-            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-01',ratioOutbound:5,ratioReturnEmpty:6}
+            leadTimeRecommendation:{hours:13.25,days:0.55,componentHours:7.25},
+            finalLeadTimeDays:0.55,
+            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-01',fuelCost:850000,
+              ratioOutbound:5,ratioReturnEmpty:6},
+            costComponents:{
+              outboundToll:[{description:'Tol Cakung - Tangerang',quantity:1,rate:300000,amount:300000,source:'Demo Master Tarif'}],
+              returnToll:[{description:'Tol Tangerang - Cakung',quantity:1,rate:300000,amount:300000,source:'Demo Master Tarif'}],
+              outboundCrossing:[{description:'ASDP Merak - Bakauheni',quantity:1,rate:450000,amount:450000,source:'Demo Master Tarif'}],
+              returnCrossing:[{description:'ASDP Bakauheni - Merak',quantity:1,rate:450000,amount:450000,source:'Demo Master Tarif'}],
+              additional:[],
+              meals:{driver:{mealRole:'Driver',rate:200000,amount:110000,source:'Demo Master JASUM'},
+                helper:{mealRole:'Helper',rate:150000,amount:82500,source:'Demo Master JASUM'}}
+            }
           },
-          totals:{fuelReturnEmpty:850000,fuelReturnLoaded:900000,nonFuel:1250000,
-            returnEmptyTotal:2110000,returnLoadedTotal:2160000,selectedTotal:2110000}
+          totals:{fuelReturnEmpty:850000,fuelReturnLoaded:900000,nonFuel:1692500,
+            nonFuelBreakdown:{outboundToll:300000,returnToll:300000,outboundCrossing:450000,returnCrossing:450000,
+              additionalCosts:0,driverMeal:110000,helperMeal:82500,mealTotal:192500},
+            returnEmptyTotal:2550000,returnLoadedTotal:2600000,selectedTotal:2550000}
         },
         {
           requestNo:'SUJ-REQ-DEMO-CKG-CGN-002',
@@ -160,24 +188,40 @@
           submittedAt:'2026-11-10T04:30:00.000Z',
           createdBy:'User Cabang JASUM',
           versionStatus:'New SUJ Code Pending Review',
-          selectedEstimate:'return-loaded',
+          selectedEstimate:'return-empty',
           form:{
             branch:'JASUM',tripType:'SLA Luar Kota',createdBy:'User Cabang JASUM',
             origin:'Cakung',destination1:'Cilegon',terms:'Tol - Non Tol',
             vehicleType:'FUSO BAK - 7000 CC',outboundCondition:'PERGI ISI',
-            returnCondition:'PULANG ISI',fuelCode:'FUEL-CKG-CGN-02',
-            distanceSource:'fuelCode',kmOut:120,kmReturn:120,speedKmh:35,
-            fuelRatioOut:4.5,fuelRatioLoaded:4,finalLeadTime:0.75,
+            returnCondition:'PULANG KOSONG',fuelCode:'FUEL-CKG-CGN-02',
+            distanceSource:'fuelCode',kmOut:120,kmReturn:120,totalKm:240,speedKmh:35,
+            fuelRatioOut:4.5,fuelRatioEmpty:5.5,finalLeadTime:0.64,
+            leadTimeValues:{crossingQueue:1.5,crossingDuration:2,loadingTime:2,unloadingTime:1,
+              loadingQueue:0.75,unloadingQueue:0.75,fuelQueue:0.5},
+            leadTimeCalculation:{hours:15.36,days:0.64,componentHours:8.5},
             effectiveFrom:'2026-11-15'
           },
           calculationSnapshot:{
             distanceSource:'fuelCode',
             fuelReference:{fuelCode:'FUEL-CKG-CGN-02',origin:'Cakung',destination:'Cilegon'},
-            finalLeadTimeDays:0.75,
-            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-02',ratioOutbound:4.5,ratioReturnLoaded:4}
+            finalLeadTimeDays:0.64,
+            leadTimeRecommendation:{hours:15.36,days:0.64,componentHours:8.5},
+            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-02',fuelCost:920000,
+              ratioOutbound:4.5,ratioReturnEmpty:5.5},
+            costComponents:{
+              outboundToll:[{description:'Tol Cakung - Tangerang',quantity:1,rate:350000,amount:350000,source:'Demo Master Tarif'}],
+              returnToll:[{description:'Tol Tangerang - Cakung',quantity:1,rate:350000,amount:350000,source:'Demo Master Tarif'}],
+              outboundCrossing:[{description:'ASDP Merak - Bakauheni',quantity:1,rate:450000,amount:450000,source:'Demo Master Tarif'}],
+              returnCrossing:[{description:'ASDP Bakauheni - Merak',quantity:1,rate:450000,amount:450000,source:'Demo Master Tarif'}],
+              additional:[],
+              meals:{driver:{mealRole:'Driver',rate:200000,amount:128000,source:'Demo Master JASUM'},
+                helper:{mealRole:'Helper',rate:150000,amount:96000,source:'Demo Master JASUM'}}
+            }
           },
-          totals:{fuelReturnEmpty:920000,fuelReturnLoaded:980000,nonFuel:1480000,
-            returnEmptyTotal:2400000,returnLoadedTotal:2460000,selectedTotal:2460000}
+          totals:{fuelReturnEmpty:920000,fuelReturnLoaded:980000,nonFuel:1824000,
+            nonFuelBreakdown:{outboundToll:350000,returnToll:350000,outboundCrossing:450000,returnCrossing:450000,
+              additionalCosts:0,driverMeal:128000,helperMeal:96000,mealTotal:224000},
+            returnEmptyTotal:2750000,returnLoadedTotal:2810000,selectedTotal:2750000}
         },
         {
           requestNo:'SUJ-REQ-DEMO-CKG-CGN-003',
@@ -188,22 +232,38 @@
           versionStatus:'New SUJ Code Pending Review',
           selectedEstimate:'return-empty',
           form:{
-            branch:'JASUM',tripType:'Adhoc',createdBy:'User Cabang JASUM',
+            branch:'JASUM',tripType:'SLA Luar Kota',createdBy:'User Cabang JASUM',
             origin:'Cakung',destination1:'Cilegon',terms:'Sekali jalan',
             vehicleType:'TRONTON BAK - 7800 CC',outboundCondition:'PERGI ISI',
             returnCondition:'PULANG KOSONG',fuelCode:'FUEL-CKG-CGN-03',
-            distanceSource:'fuelCode',kmOut:120,kmReturn:120,speedKmh:32,
-            fuelRatioOut:3.5,fuelRatioEmpty:4,finalLeadTime:1,
+            distanceSource:'fuelCode',kmOut:120,kmReturn:120,totalKm:240,speedKmh:32,
+            fuelRatioOut:3.5,fuelRatioEmpty:4,finalLeadTime:0.69,
+            leadTimeValues:{crossingQueue:1.5,crossingDuration:2.5,loadingTime:2,unloadingTime:1,
+              loadingQueue:0.75,unloadingQueue:0.75,fuelQueue:0.5},
+            leadTimeCalculation:{hours:16.5,days:0.69,componentHours:9},
             effectiveFrom:'2026-11-15'
           },
           calculationSnapshot:{
             distanceSource:'fuelCode',
             fuelReference:{fuelCode:'FUEL-CKG-CGN-03',origin:'Cakung',destination:'Cilegon'},
-            finalLeadTimeDays:1,
-            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-03',ratioOutbound:3.5,ratioReturnEmpty:4}
+            finalLeadTimeDays:0.69,
+            leadTimeRecommendation:{hours:16.5,days:0.69,componentHours:9},
+            fuelValues:{includeFuel:true,fuelCode:'FUEL-CKG-CGN-03',fuelCost:1150000,
+              ratioOutbound:3.5,ratioReturnEmpty:4},
+            costComponents:{
+              outboundToll:[{description:'Tol Cakung - Tangerang',quantity:1,rate:400000,amount:400000,source:'Demo Master Tarif'}],
+              returnToll:[{description:'Tol Tangerang - Cakung',quantity:1,rate:400000,amount:400000,source:'Demo Master Tarif'}],
+              outboundCrossing:[{description:'ASDP Merak - Bakauheni',quantity:1,rate:450000,amount:450000,source:'Demo Master Tarif'}],
+              returnCrossing:[{description:'ASDP Bakauheni - Merak',quantity:1,rate:450000,amount:450000,source:'Demo Master Tarif'}],
+              additional:[],
+              meals:{driver:{mealRole:'Driver',rate:200000,amount:138000,source:'Demo Master JASUM'},
+                helper:{mealRole:'Helper',rate:150000,amount:103500,source:'Demo Master JASUM'}}
+            }
           },
-          totals:{fuelReturnEmpty:1150000,fuelReturnLoaded:1230000,nonFuel:1720000,
-            returnEmptyTotal:2880000,returnLoadedTotal:2960000,selectedTotal:2880000}
+          totals:{fuelReturnEmpty:1150000,fuelReturnLoaded:1230000,nonFuel:1941500,
+            nonFuelBreakdown:{outboundToll:400000,returnToll:400000,outboundCrossing:450000,returnCrossing:450000,
+              additionalCosts:0,driverMeal:138000,helperMeal:103500,mealTotal:241500},
+            returnEmptyTotal:3100000,returnLoadedTotal:3180000,selectedTotal:3100000}
         }
       ];
       var labels = {
@@ -223,7 +283,8 @@
         subsidizedDieselPrice:'Harga BBM subsidi', selectedEstimate:'Skenario yang dipilih',
         fuelReturnEmpty:'Estimasi BBM return kosong', fuelReturnLoaded:'Estimasi BBM return isi',
         nonFuel:'Total non-BBM', returnEmptyTotal:'Total return kosong', returnLoadedTotal:'Total return isi',
-        selectedTotal:'Total skenario terpilih', previousPublished:'Publikasi sebelumnya', variance:'Selisih',
+        selectedTotal:'Total uang jalan', totalUangJalan:'Total uang jalan',
+        previousPublished:'Publikasi sebelumnya', variance:'Selisih',
         fuelReference:'Referensi Fuel Code', leadTimeRecommendation:'Rekomendasi lead time',
         finalLeadTimeDays:'Final lead time (hari)', costComponents:'Komponen biaya tersimpan',
         fuelValues:'Nilai BBM tersimpan', costSelections:'Master biaya terpilih',
@@ -246,7 +307,7 @@
         rate:true, amount:true, fuelCost:true, fuelCodeCost:true, dieselPremiumPrice:true,
         subsidizedDieselPrice:true, fuelReturnEmpty:true, fuelReturnLoaded:true, nonFuel:true,
         returnEmptyTotal:true, returnLoadedTotal:true, selectedTotal:true, previousPublished:true,
-        variance:true, driverMeal:true, helperMeal:true, mealTotal:true, extraCosts:true,
+        variance:true, driverMeal:true, helperMeal:true, mealTotal:true, totalUangJalan:true, extraCosts:true,
         driverMealAmount:true, helperMealAmount:true
       };
       var $ = function (id) { return document.getElementById(id); };
@@ -317,6 +378,19 @@
       function creatorOf(request) {
         return request.createdBy || (request.form && request.form.createdBy) || 'Belum dicatat pada saat pengajuan';
       }
+      function selectedTotalOf(request) {
+        var totals = request.totals || {};
+        if (typeof totals.selectedTotal === 'number') return totals.selectedTotal;
+        return request.selectedEstimate === 'return-loaded'
+          ? totals.returnLoadedTotal : totals.returnEmptyTotal;
+      }
+      function driverMealOf(request) {
+        var totals = request.totals || {};
+        var breakdown = totals.nonFuelBreakdown || {};
+        if (typeof breakdown.driverMeal === 'number') return breakdown.driverMeal;
+        if (typeof totals.driverMeal === 'number') return totals.driverMeal;
+        return null;
+      }
       function isPendingReview(request) {
         return /^pending internal review$/i.test(String(request.status || '').trim());
       }
@@ -378,6 +452,10 @@
             '<div class="request-top"><strong>' + escapeHtml(request.sujCode || request.requestNo || 'SUJ tanpa nomor') +
             '</strong><span class="' + badgeClass + '">' + escapeHtml(request.status || 'Status tidak dicatat') + '</span></div>' +
             '<div class="request-route">' + escapeHtml(routeOf(request)) + '</div>' +
+            '<div class="request-route"><span>Total Uang Jalan: ' +
+            escapeHtml(formatValue('totalUangJalan',selectedTotalOf(request))) +
+            '</span><span>Uang Makan Driver: ' +
+            escapeHtml(formatValue('driverMeal',driverMealOf(request))) + '</span></div>' +
             '<div class="request-meta"><span>' + escapeHtml(form.branch || 'Cabang —') + '</span><span>·</span><span>' +
             escapeHtml(request.requestNo || 'Nomor pengajuan —') + '</span><span>·</span><span>' +
             escapeHtml(creatorOf(request)) + '</span><span>·</span><span>' + escapeHtml(request.submittedAt ? formatDate(request.submittedAt) : 'Waktu tidak dicatat') +
@@ -411,14 +489,33 @@
             'leadTimeValues','customLeadComponents','extraCostComponents','revisionOf'].indexOf(key) === -1;
         }).map(function (key) { return renderValue(key,form[key]); }).join('');
         var savedSelections = snapshot.costComponents || form.costSelections;
+        var breakdown = totals.nonFuelBreakdown || {};
+        var selectedFuelTotal = request.selectedEstimate === 'return-loaded'
+          ? totals.fuelReturnLoaded : totals.fuelReturnEmpty;
+        var uangJalanDetails = [
+          renderValue('fuelCost',selectedFuelTotal),
+          renderValue('returnEmptyTotal',totals.returnEmptyTotal),
+          renderValue('returnLoadedTotal',totals.returnLoadedTotal),
+          renderValue('outboundToll',breakdown.outboundToll),
+          renderValue('returnToll',breakdown.returnToll),
+          renderValue('outboundCrossing',breakdown.outboundCrossing),
+          renderValue('returnCrossing',breakdown.returnCrossing),
+          renderValue('extraCosts',breakdown.additionalCosts),
+          renderValue('driverMeal',driverMealOf(request)),
+          renderValue('helperMeal',breakdown.helperMeal),
+          renderValue('nonFuel',totals.nonFuel),
+          renderValue('totalUangJalan',selectedTotalOf(request))
+        ].join('');
         var detailHtml = '<div class="hero">' +
           '<div class="stat"><span>Dibuat oleh</span><strong>' + escapeHtml(creatorOf(request)) + '</strong></div>' +
           '<div class="stat"><span>Diajukan</span><strong>' + escapeHtml(request.submittedAt ? formatDate(request.submittedAt) : 'Tidak dicatat') + '</strong></div>' +
           '<div class="stat"><span>Status</span><strong>' + escapeHtml(request.status || 'Tidak dicatat') + '</strong></div>' +
-          '<div class="stat"><span>Total terpilih</span><strong>' + escapeHtml(formatValue('selectedTotal',totals.selectedTotal)) + '</strong></div>' +
+          '<div class="stat"><span>Total Uang Jalan</span><strong>' + escapeHtml(formatValue('totalUangJalan',selectedTotalOf(request))) + '</strong></div>' +
           '</div>' +
           '<section class="detail-section"><h3>Identitas dan rute</h3><div class="section-body"><div class="kv-grid">' + (identity || '<div class="muted">Detail identitas tidak tersedia.</div>') + '</div></div></section>' +
-          '<section class="detail-section"><h3>Jarak, fuel, dan lead time</h3><div class="section-body">' +
+          '<section class="detail-section"><h3>Rincian Uang Jalan</h3><div class="section-body"><div class="kv-grid">' + uangJalanDetails + '</div></div></section>' +
+          '<section class="detail-section full"><h3>Jarak, fuel, dan lead time</h3><div class="section-body">' +
+            '<details class="cost-snapshot"><summary>Buka detail jarak, fuel, dan kalkulasi lead time</summary><div class="cost-snapshot-content">' +
             '<div class="kv-grid">' + formDetails + '</div>' +
             (form.fuelReference ? renderValue('fuelReference',form.fuelReference) : '') +
             (!form.fuelReference && snapshot.fuelReference ? renderValue('fuelReference',snapshot.fuelReference) : '') +
@@ -428,19 +525,21 @@
             (form.leadTimeValues && Object.keys(form.leadTimeValues).length ? renderValue('leadTimeValues',form.leadTimeValues) : '') +
             (form.customLeadComponents && form.customLeadComponents.length ? renderValue('customLeadComponents',form.customLeadComponents) : '') +
             (snapshot.fuelValues ? renderValue('fuelValues',snapshot.fuelValues) : '') +
+            '</div></details>' +
           '</div></section>' +
-          '<section class="detail-section"><h3>Komponen biaya dan total kalkulasi</h3><div class="section-body">' +
+          '<section class="detail-section full"><h3>Rincian komponen tarif</h3><div class="section-body">' +
+            '<details class="cost-snapshot"><summary>Buka rincian tarif tol, ASDP, biaya tambahan, dan meal</summary><div class="cost-snapshot-content">' +
             (savedSelections ? renderValue('costComponents',savedSelections) : '<div class="muted">Rincian komponen biaya tidak tersedia pada snapshot request ini.</div>') +
             (!snapshot.costComponents && form.extraCostComponents && form.extraCostComponents.length ? renderValue('extraCostComponents',form.extraCostComponents) : '') +
-            renderValue('totals',totals) +
+            '</div></details>' +
           '</div></section>' +
-          renderDecisionSection(request) +
           '<section class="detail-section"><h3>Informasi pengajuan</h3><div class="section-body"><div class="kv-grid">' +
           renderValue('requestNo',request.requestNo) + renderValue('status',request.status) +
           renderValue('sujCode',request.sujCode) +
           renderValue('submittedAt',request.submittedAt) + renderValue('createdBy',creatorOf(request)) +
           renderValue('versionStatus',request.versionStatus) + renderValue('selectedEstimate',request.selectedEstimate) +
-          '</div></div></section>';
+          '</div></div></section>' +
+          renderDecisionSection(request);
         $('detailBody').innerHTML = detailHtml;
         $('detailBody').querySelectorAll('[data-decision]').forEach(function (button) {
           button.addEventListener('click',function () {
