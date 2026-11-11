@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SUJ ILS | Master Data</title>
+  <style>
+    :root {
+      --ink: #14231b;
+      --green: #006f68;
+      --green-2: #00857d;
+      --mint: #e8f5f3;
+      --bg: #f5f8fa;
+      --surface: #fff;
+      --line: #d7e2db;
+      --muted: #697970;
+      --amber: #a9650d;
+      --red: #b42318;
+      --blue: #2867a5;
+      --shadow: 0 12px 32px rgba(18,34,25,.07);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.5 Inter, "Segoe UI", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .page { max-width: 1500px; margin: auto; padding: 22px; }
+    .head {
+      display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 16px;
+    }
+    .head h1 { margin: 0; font-size: 27px; }
+    .head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .eyebrow {
+      color: var(--green); font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .14em;
+    }
+    .layout {
+      display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 14px; align-items: start;
+    }
+    .panel {
+      background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden;
+    }
+    .side { position: sticky; top: 14px; }
+    .side-head { padding: 16px; border-bottom: 1px solid var(--line); }
+    .side-head b { display: block; }
+    .side-head span { font-size: 9px; color: var(--muted); }
+    .group { padding: 12px 11px 5px; color: var(--muted); font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
+    .nav {
+      width: calc(100% - 18px); margin: 2px 9px; padding: 10px 11px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); display: flex; align-items: center; gap: 9px; text-align: left; font-size: 11px; font-weight: 800;
+    }
+    .nav.active { background: var(--mint); color: var(--green); }
+    .ico {
+      width: 22px; height: 22px; border-radius: 7px; background: #f6f8f7; display: grid; place-items: center;
+    }
+    .content { display: grid; gap: 13px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .metric {
+      background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px; box-shadow: var(--shadow);
+    }
+    .metric span { font-size: 8px; color: var(--muted); font-weight: 900; text-transform: uppercase; }
+    .metric b { display: block; font-size: 23px; margin-top: 8px; }
+    .metric small { font-size: 8.5px; color: var(--muted); }
+    .panel-head { padding: 15px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
+    .body { padding: 15px 16px; }
+    .status { display: inline-flex; padding: 4px 7px; border-radius: 999px; font-size: 8px; font-weight: 900; }
+    .active { background: #dff2e5; color: #247945; }
+    .draft { background: #e9edeb; color: #66766c; }
+    .inactive { background: #ffe5e1; color: var(--red); }
+    .tag { display: inline-flex; padding: 4px 7px; border-radius: 7px; background: var(--mint); color: var(--green); font-size: 8px; font-weight: 800; margin: 2px; }
+    .tag.blue { background: #edf4fa; color: var(--blue); }
+    .tag.amber { background: #fff3df; color: var(--amber); }
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 11px; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th { padding: 10px 11px; text-align: left; background: #f5f8f6; color: var(--muted); font-size: 8px; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    td { padding: 10px 11px; border-bottom: 1px solid #edf1ee; font-size: 10px; vertical-align: middle; }
+    .money { font-weight: 900; }
+    .note-box {
+      border: 1px solid #d9e9dc; border-radius: 12px; background: #f4faf6; padding: 14px 16px; color: #2f5240;
+    }
+    .note-box b { display: block; margin-bottom: 6px; }
+    .muted { color: var(--muted); }
+    .two-col {
+      display: grid; grid-template-columns: 1.3fr .7fr; gap: 12px;
+    }
+    .kpis {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    }
+    .kpi {
+      border: 1px solid var(--line); border-radius: 12px; padding: 11px; background: #f9fbfa;
+    }
+    .kpi span { display: block; font-size: 8px; color: var(--muted); font-weight: 900; text-transform: uppercase; }
+    .kpi b { display: block; margin-top: 4px; font-size: 16px; }
+    .page { display: none; }
+    .master-app { max-width: 1440px; margin: auto; padding: 22px; }
+    .master-top { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
+    .master-top h1 { margin:4px 0; font-size:30px; }
+    .master-top p { margin:0; color:var(--muted); font-size:14px; }
+    .master-actions { display:flex; gap:8px; align-items:center; }
+    .master-btn { border:1px solid var(--line); border-radius:9px; background:#fff; color:var(--ink); padding:11px 15px; font-size:14px; font-weight:800; text-decoration:none; }
+    .master-btn.primary { background:var(--green); color:#fff; border-color:var(--green); }
+    .master-grid { display:grid; grid-template-columns:260px minmax(0,1fr); gap:14px; align-items:start; }
+    .master-sidebar,.master-panel { background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; }
+    .master-sidebar { padding:14px; }
+    .master-sidebar h2 { font-size:16px; margin:0 0 4px; }
+    .master-sidebar p { font-size:13px; color:var(--muted); margin:0 0 14px; }
+    .branch-picker { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 18px; }
+    .branch-chip { border:1px solid var(--line); background:#fff; color:var(--muted); padding:8px 10px; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; }
+    .branch-chip.active { background:var(--mint); border-color:#cfe3d5; color:var(--green); }
+    .master-category { width:100%; display:flex; gap:8px; padding:11px 10px; border:0; border-radius:8px; margin:4px 0; background:#fff; color:var(--muted); text-align:left; font-size:14px; font-weight:800; cursor:pointer; }
+    .master-category.active { background:var(--mint); color:var(--green); }
+    .master-content { display:grid; gap:12px; }
+    .master-panel-head { padding:15px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .master-panel-head h2 { margin:0; font-size:18px; }
+    .master-panel-head p { margin:3px 0 0; color:var(--muted); font-size:13px; }
+    .master-panel-body { padding:16px; }
+    .master-notice { border:1px solid #d9e9dc; border-radius:10px; background:#f4faf6; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#2f5240; }
+    .master-table-wrap { overflow:auto; border:1px solid var(--line); border-radius:10px; }
+    .master-table { width:100%; border-collapse:collapse; min-width:1100px; }
+    .master-table th,.master-table td { text-align:left; padding:12px 11px; border-bottom:1px solid #edf1ee; font-size:13px; vertical-align:middle; }
+    .master-table th { background:#f5f8f6; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+    .master-form { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:12px; margin-bottom:14px; padding:16px; border:1px solid var(--line); background:#fafcfb; border-radius:10px; }
+    .master-form:not(.master-hidden) { position:fixed; z-index:1001; top:50%; left:50%; transform:translate(-50%,-50%); width:min(1020px,calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto; margin:0; background:#fff; border-radius:16px; box-shadow:0 24px 80px rgba(18,34,25,.25); padding:0 22px 18px; }
+    .master-backdrop { position:fixed; inset:0; z-index:1000; background:rgba(13,25,18,.48); backdrop-filter:blur(2px); }
+    .master-form-head { grid-column:1/-1; display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:17px 0 14px; margin-bottom:4px; border-bottom:1px solid var(--line); }
+    .master-form-head h3 { margin:0; color:var(--ink); font-size:22px; }
+    .master-form-head p { margin:4px 0 0; color:var(--muted); font-size:13px; font-weight:400; }
+    .master-close { width:40px; height:40px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--muted); font-size:20px; }
+    .master-field { grid-column:span 4; display:grid; gap:6px; font-size:12px; color:var(--muted); font-weight:800; }
+    .master-field.w6 { grid-column:span 6; }
+    .master-field.w12 { grid-column:span 12; }
+    .master-field input,.master-field select,.master-field textarea { min-height:44px; width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 12px; color:var(--ink); background:#fff; font:inherit; font-size:15px; }
+    .master-field textarea { min-height:76px; resize:vertical; }
+    .master-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .master-toolbar input,.master-toolbar select { min-height:44px; border:1px solid var(--line); border-radius:10px; padding:9px 12px; background:#fff; color:var(--ink); font-size:15px; }
+    .master-toolbar input { flex:1; min-width:180px; }
+    .master-toolbar .master-toolbar-spacer { flex:1; }
+    .master-form-actions { grid-column:1/-1; display:flex; justify-content:flex-end; gap:8px; padding-top:12px; border-top:1px solid var(--line); }
+    .master-empty { text-align:center; color:var(--muted); padding:28px 12px; font-size:14px; }
+    .master-status { font-size:12px; color:var(--muted); white-space:nowrap; }
+    .master-row-actions { display:flex; gap:5px; }
+    .master-row-actions button { width:36px; height:36px; border:1px solid var(--line); border-radius:8px; background:#fff; font-size:15px; font-weight:800; cursor:pointer; }
+    .tariff-badge { display:inline-block; padding:5px 9px; border-radius:999px; background:#e9f2fb; color:#276ca3; font-size:11px; font-weight:800; white-space:nowrap; }
+    .tariff-badge.return { background:#fff3df; color:var(--amber); }
+    .record-status { display:inline-block; padding:5px 9px; border-radius:999px; background:#dff2e5; color:#247945; font-size:11px; font-weight:800; }
+    .record-status.inactive { background:#ffe5e1; color:var(--red); }
+    .master-hidden { display:none !important; }
+    @media(max-width:850px){.master-grid{grid-template-columns:1fr}.master-sidebar{position:static}.master-top{align-items:flex-start;flex-direction:column}.master-field,.master-field.w6{grid-column:span 6}.master-toolbar{flex-wrap:wrap}.master-toolbar input{flex-basis:100%}}
+    @media(max-width:560px){.master-app{padding:12px}.master-field,.master-field.w6{grid-column:span 12}.master-actions{width:100%;flex-wrap:wrap}.master-toolbar>*{flex:1}.master-toolbar .master-toolbar-spacer{display:none}}
+    @media (max-width: 950px){ .layout{grid-template-columns:1fr;} .side{position:static;} .metrics{grid-template-columns:1fr 1fr;} .two-col{grid-template-columns:1fr;} }
+    @media (max-width: 650px){ .page{padding:12px;} .head{align-items:start;flex-direction:column;} .metrics{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <main class="master-app">
+    <header class="master-top">
+      <div>
+        <div class="eyebrow">SUJ Governance · Master Data</div>
+        <h1>Master Data SUJ</h1>
+        <p>Kelola tarif cabang dan referensi Fuel Code untuk perhitungan SUJ.</p>
+      </div>
+      <div class="master-actions">
+        <a class="master-btn" href="SUJ-Detail.html">Review SUJ</a>
+        <a class="master-btn" href="SUJ-Create.html">Buat SUJ</a>
+        <button class="master-btn primary" id="addMasterRecord" type="button">+ Tambah Master</button>
+      </div>
+    </header>
+    <div class="master-grid">
+      <aside class="master-sidebar">
+        <div id="masterBranchFilters">
+          <h2>Filter cabang</h2>
+          <p>Data yang dikelola dan dipakai Create SUJ mengikuti cabang ini.</p>
+          <div class="branch-picker" id="masterBranchPicker"></div>
+        </div>
+        <h2>Jenis master</h2>
+        <button class="master-category active" type="button" data-category="meals">Meals Driver &amp; Helper</button>
+        <button class="master-category" type="button" data-category="toll">Tarif Tol</button>
+        <button class="master-category" type="button" data-category="crossing">Tarif Penyeberangan</button>
+        <button class="master-category" type="button" data-category="fuelCode">Fuel Code</button>
+      </aside>
+      <section class="master-content">
+        <div class="master-panel">
+          <div class="master-panel-head">
+            <div>
+              <h2 id="masterTitle">Uang Makan Driver</h2>
+              <p id="masterSubtitle">Tarif per hari untuk cabang terpilih.</p>
+            </div>
+            <span class="master-status" id="masterCount"></span>
+          </div>
+          <div class="master-panel-body">
+          <div class="master-notice" id="masterNotice">Master cabang dipetakan ke Create SUJ berdasarkan cabang terpilih. Masukkan tarif yang telah dikonfirmasi dan isi arah serta kelas kendaraan untuk Tol/Penyeberangan.</div>
+            <div class="master-backdrop master-hidden" id="masterModalBackdrop"></div>
+            <form class="master-form master-hidden" id="masterForm" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="masterFormTitle">
+              <div class="master-form-head">
+                <div>
+                  <h3 id="masterFormTitle">Tambah Master</h3>
+                  <p id="masterFormSubtitle">Lengkapi tarif dan pemetaan cabang.</p>
+                </div>
+                <button class="master-close" id="closeMasterForm" type="button" aria-label="Close form">×</button>
+              </div>
+              <input type="hidden" id="masterRecordId">
+              <label class="master-field">Cabang
+                <select id="masterBranch" required>
+                  <option value="JASUM">JASUM</option><option value="SUB EI">SUB EI</option><option value="KAL">KAL</option>
+                </select>
+              </label>
+            <label class="master-field w6" id="masterNameField">Nama / Rute
+              <input id="masterName" required maxlength="120" placeholder="Contoh: Uang makan luar kota">
+              </label>
+            <div id="tariffFields" class="master-hidden" style="display:contents">
+              <label class="master-field">Tariff ID
+                <input id="masterTariffId" readonly placeholder="Dibuat otomatis">
+              </label>
+              <label class="master-field">Arah
+                <select id="masterDirection">
+                  <option value="Outbound">Outbound</option>
+                  <option value="Return">Return</option>
+                </select>
+              </label>
+              <label class="master-field">Vehicle Type / Toll Class
+                <select id="masterVehicleClass">
+                  <option>LOWBED 30 TON - Class V</option>
+                  <option>TRAILER 40FT - Class V</option>
+                  <option>TRAILER 40FT - Class IV</option>
+                  <option>Trailer 40</option>
+                  <option>Trailer 20</option>
+                  <option>Tronton</option>
+                  <option>Trinton</option>
+                  <option>Fuso</option>
+                  <option>CDD</option>
+                  <option>CDE</option>
+                  <option>L300 Box</option>
+                </select>
+              </label>
+              <label class="master-field">Status
+                <select id="masterTariffStatus">
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </label>
+              <label class="master-field" id="masterSegmentField">Toll Segment / Crossing Route
+                <input id="masterNameTariff" maxlength="120" placeholder="Contoh: Balikpapan - Samboja">
+              </label>
+              <label class="master-field">Tariff Amount (Rp)
+                <input id="masterTariffRate" type="number" min="0" step="1">
+              </label>
+              <label class="master-field">Effective From
+                <input id="masterTariffFrom" type="date">
+              </label>
+              <label class="master-field">Effective To
+                <input id="masterTariffTo" type="date">
+              </label>
+              <label class="master-field w12">Route Usage
+                <input id="masterRouteUsage" maxlength="240" placeholder="Contoh: Balikpapan → Pangkalan Bun">
+              </label>
+              <label class="master-field w12">Remarks
+                <textarea id="masterRemarks" maxlength="500" placeholder="Opsional"></textarea>
+              </label>
+            </div>
+            <label class="master-field w6 master-meal-field" id="masterAreaField">Area / Keterangan
+              <input id="masterArea" maxlength="160" placeholder="Opsional">
+            </label>
+            <label class="master-field master-meal-field" id="masterRateField">Tarif (Rp)
+              <input id="masterRate" type="number" min="0" step="1" required>
+            </label>
+            <label class="master-field master-meal-field" id="masterMealRoleField">Berlaku untuk
+              <select id="masterMealRole">
+                <option value="Driver">Driver</option>
+                <option value="Helper">Helper</option>
+                <option value="Driver & Helper">Driver &amp; Helper</option>
+              </select>
+            </label>
+            <label class="master-field master-meal-field" id="masterUnitField">Satuan
+              <select id="masterUnit" required></select>
+            </label>
+            <label class="master-field master-meal-field" id="masterEffectiveField">Berlaku mulai
+              <input id="masterEffectiveFrom" type="date" required>
+            </label>
+            <div class="master-form-actions">
+                <button class="master-btn" id="cancelMasterEdit" type="button">Batal</button>
+                <button class="master-btn primary" type="submit">Simpan Master</button>
+              </div>
+            </form>
+            <div class="master-toolbar master-hidden" id="tariffToolbar">
+              <input id="tariffSearch" type="search" placeholder="Search record or route...">
+              <select id="tariffDirectionFilter" aria-label="Filter direction">
+                <option value="">All Directions</option><option value="Outbound">Outbound</option><option value="Return">Return</option>
+              </select>
+              <select id="tariffStatusFilter" aria-label="Filter status">
+                <option value="">All Statuses</option><option value="Active">Active</option><option value="Inactive">Inactive</option>
+              </select>
+              <span class="master-toolbar-spacer"></span>
+              <button class="master-btn" id="resetTariffFilters" type="button">Reset Filters</button>
+              <button class="master-btn primary" id="tariffAddRecord" type="button">+ Add Tariff</button>
+            </div>
+            <div class="master-table-wrap">
+              <table class="master-table">
+                <thead id="masterTableHead"></thead>
+                <tbody id="masterRows"></tbody>
+              </table>
+            </div>
+            <div class="master-empty master-hidden" id="masterEmpty">Belum ada data master untuk cabang dan kategori ini. Tambahkan tarif yang sudah dikonfirmasi.</div>
+          </div>
+        </div>
+        <div class="master-panel">
+          <div class="master-panel-head"><div><h2>Catatan penggunaan</h2><p>Master cabang adalah referensi kalkulasi, bukan persetujuan otomatis.</p></div></div>
+          <div class="master-panel-body">
+            <p class="muted" style="font-size:13px;margin:0">Tarif efektif menjadi referensi perhitungan SUJ. Status persetujuan ditentukan melalui proses review pengajuan.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <div class="page">
+    <header class="head">
+      <div>
+        <div class="eyebrow">SUJ Governance</div>
+        <h1>SUJ Master Data</h1>
+        <p>Master configuration for lead time, fuel, cost references, and governance controls.</p>
+      </div>
+      <button class="btn primary" type="button">+ New Master Record</button>
+    </header>
+
+    <div class="layout">
+      <aside class="panel side">
+        <div class="side-head">
+          <b>Master Data Hub</b>
+          <span>Operational control and reference data</span>
+        </div>
+        <div class="group">Core Modules</div>
+        <button class="nav active" type="button"><span class="ico">◈</span>Overview</button>
+        <button class="nav" type="button"><span class="ico">⏱</span>Lead Time Profiles</button>
+        <button class="nav" type="button"><span class="ico">⛽</span>Fuel Code</button>
+        <button class="nav" type="button"><span class="ico">🛣</span>Toll & Crossing</button>
+        <button class="nav" type="button"><span class="ico">📍</span>Site / Parking</button>
+        <button class="nav" type="button"><span class="ico">✅</span>Governance</button>
+      </aside>
+
+      <main class="content">
+        <div class="metrics">
+          <div class="metric">
+            <span>Lead time profiles</span>
+            <b>12</b>
+            <small>active / validated</small>
+          </div>
+          <div class="metric">
+            <span>Fuel references</span>
+            <b>08</b>
+            <small>approved versions</small>
+          </div>
+          <div class="metric">
+            <span>Cost components</span>
+            <b>57</b>
+            <small>toll + crossing + site</small>
+          </div>
+          <div class="metric">
+            <span>Governance status</span>
+            <b>Healthy</b>
+            <small>last audit 7 days ago</small>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Lead Time Profile master</h2>
+              <p>Lead time is treated as a controlled master reference, not a route dependency.</p>
+            </div>
+          </div>
+          <div class="body">
+            <div class="two-col">
+              <div class="note-box">
+                <b>Governance rule</b>
+                Route Master is no longer a required prerequisite for SUJ creation. Every SUJ request stores route configuration and cost snapshot as part of versioned request data. Lead time profile remains a master reference used for recommended timing and override justification.
+              </div>
+              <div class="kpis">
+                <div class="kpi"><span>Recommended LT</span><b>3.5d</b></div>
+                <div class="kpi"><span>Override count</span><b>02</b></div>
+                <div class="kpi"><span>Approved profile</span><b>LT-01</b></div>
+                <div class="kpi"><span>Approval state</span><b>Locked</b></div>
+              </div>
+            </div>
+            <div style="height:12px"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Profile ID</th>
+                    <th>Origin</th>
+                    <th>Route Type</th>
+                    <th>Recommended LT</th>
+                    <th>Max Hours / Day</th>
+                    <th>Meal Trigger</th>
+                    <th>Status</th>
+                    <th>Owner</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>LT-Profile-01</b></td>
+                    <td>Balikpapan</td>
+                    <td>Toll to Toll</td>
+                    <td>3.5 days</td>
+                    <td>10 hrs</td>
+                    <td>4 meals</td>
+                    <td><span class="status active">Approved</span></td>
+                    <td>Ops Planning</td>
+                  </tr>
+                  <tr>
+                    <td><b>LT-Profile-02</b></td>
+                    <td>Surabaya</td>
+                    <td>Via Crossing</td>
+                    <td>4.0 days</td>
+                    <td>10 hrs</td>
+                    <td>4 meals</td>
+                    <td><span class="status active">Approved</span></td>
+                    <td>Ops Planning</td>
+                  </tr>
+                  <tr>
+                    <td><b>LT-Profile-03</b></td>
+                    <td>Jakarta</td>
+                    <td>Partial Toll</td>
+                    <td>5.0 days</td>
+                    <td>12 hrs</td>
+                    <td>5 meals</td>
+                    <td><span class="status draft">Draft</span></td>
+                    <td>Ops Planning</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Governance alignment</h2>
+              <p>Versioning, approvals, and route ownership are checked at SUJ request level.</p>
+            </div>
+          </div>
+          <div class="body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Control area</th>
+                    <th>Latest rule</th>
+                    <th>Owner</th>
+                    <th>State</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>SUJ Request</td>
+                    <td>Request → scenario → compare → review → approval → publish</td>
+                    <td>Commercial Ops</td>
+                    <td><span class="status active">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>Versioning</td>
+                    <td>Immutable version snapshots with effective period and variance report</td>
+                    <td>Governance</td>
+                    <td><span class="status active">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>Fuel Code</td>
+                    <td>Fuel amount remains required in SUJ snapshot and historical comparison</td>
+                    <td>Finance &amp; Fuel</td>
+                    <td><span class="status active">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>Override handling</td>
+                    <td>Any lead-time override requires explicit reason with reviewer approval</td>
+                    <td>Ops Planning</td>
+                    <td><span class="status draft">Needs review</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="SUJ-Fuel-Code.js"></script>
+  <script>
+    (function () {
+      var branches = ['JASUM', 'SUB EI', 'KAL'];
+      var categories = {
+        meals: { title: 'Meals Driver & Helper', subtitle: 'Tarif meals per orang per hari untuk driver dan/atau helper.', units: ['Rp / orang / hari'] },
+        toll: { title: 'Tarif Tol', subtitle: 'Tarif per segmen, arah, kelas kendaraan, dan periode berlaku.', units: ['Rp / kendaraan / segmen'] },
+        crossing: { title: 'Tarif Penyeberangan', subtitle: 'Tarif per lintasan, arah, kelas kendaraan, dan periode berlaku.', units: ['Rp / kendaraan / lintasan'] },
+        fuelCode: { title: 'Fuel Code', subtitle: 'Referensi Fuel Code berdasarkan rute, kondisi, dan jenis kendaraan.', units: [] }
+      };
+      var mealCategories = ['meals', 'meal-driver', 'meal-helper'];
+      var tariffCategories = ['toll', 'crossing'];
+      var branch = 'JASUM';
+      var category = 'meals';
+      var key = 'sujMasterDataRecords';
+      var form = document.getElementById('masterForm');
+      var $ = function (id) { return document.getElementById(id); };
+      var readRecords = function () {
+        var stored = localStorage.getItem(key);
+        if (!stored) return [];
+        var parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed)) throw new Error('Stored master data is not a list');
+        return parsed.map(function (record) {
+          if (record.category === 'meal-driver' || record.category === 'meal-helper') {
+            return Object.assign({}, record, {
+              category: 'meals',
+              mealRole: record.category === 'meal-driver' ? 'Driver' : 'Helper'
+            });
+          }
+          return record;
+        });
+      };
+      var records;
+      try { records = readRecords(); }
+      catch (error) {
+        records = [];
+        $('masterEmpty').textContent = 'Data master belum dapat ditampilkan. Muat ulang halaman atau hubungi administrator.';
+        $('masterEmpty').classList.remove('master-hidden');
+        $('masterForm').classList.add('master-hidden');
+        $('addMasterRecord').disabled = true;
+      }
+      function money(value) { return 'Rp ' + Number(value).toLocaleString('id-ID'); }
+      function renderBranches() {
+        $('masterBranchPicker').innerHTML = branches.map(function (item) {
+          return '<button type="button" class="branch-chip ' + (branch === item ? 'active' : '') + '" data-branch="' + item + '">' + item + '</button>';
+        }).join('');
+        $('masterBranchPicker').querySelectorAll('[data-branch]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            closeForm();
+            branch = button.dataset.branch;
+            render();
+          });
+        });
+      }
+      function isTariffCategory() { return tariffCategories.indexOf(category) !== -1; }
+      function formatDate(value) {
+        if (!value) return 'Open-ended';
+        var date = new Date(value + 'T00:00:00');
+        return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('en-GB', {
+          day: '2-digit', month: 'short', year: 'numeric'
+        });
+      }
+      function effectivePeriod(record) {
+        return formatDate(record.effectiveFrom) + ' to ' + formatDate(record.effectiveTo);
+      }
+      function nextTariffId(forCategory) {
+        var prefix = forCategory === 'toll' ? 'TOL-ILS-' : 'ASDP-ILS-';
+        var number = 1;
+        var candidate;
+        do {
+          candidate = prefix + String(number).padStart(3, '0');
+          number++;
+        } while (records.some(function (record) { return record.tariffId === candidate; }));
+        return candidate;
+      }
+      function render() {
+        renderBranches();
+        var meta = categories[category];
+        var fuelCodeView = category === 'fuelCode';
+        var fuelCodeRecords = Array.isArray(window.SUJ_FUEL_CODE_MASTER) ? window.SUJ_FUEL_CODE_MASTER : [];
+        $('masterTitle').textContent = meta.title;
+        $('masterSubtitle').textContent = meta.subtitle + (fuelCodeView ? '' : ' Cabang: ' + branch + '.');
+        document.querySelectorAll('.master-category').forEach(function (button) {
+          button.classList.toggle('active', button.dataset.category === category);
+        });
+        $('masterBranchFilters').classList.toggle('master-hidden', fuelCodeView);
+        $('masterNotice').textContent = fuelCodeView
+          ? 'Fuel Code dari referensi dapat dipilih untuk mengisi rute, jarak, rasio, dan biaya BBM. Cabang tidak dicantumkan pada sumber data; satu jenis BBM tertulis "z" dan perlu diverifikasi.'
+          : 'Master cabang dipetakan ke Create SUJ berdasarkan cabang terpilih. Masukkan tarif yang telah dikonfirmasi dan isi arah serta kelas kendaraan untuk Tol/Penyeberangan.';
+        var filtered = fuelCodeView ? fuelCodeRecords : records.filter(function (record) {
+          return record.branch === branch && record.category === category;
+        });
+        $('masterUnit').innerHTML = meta.units.map(function (unit) {
+          return '<option value="' + unit + '">' + unit + '</option>';
+        }).join('');
+        var tariffView = isTariffCategory();
+        $('masterNameField').classList.toggle('master-hidden', tariffView || fuelCodeView);
+        $('masterNameTariff').required = tariffView;
+        $('masterTariffRate').required = tariffView;
+        $('masterTariffFrom').required = tariffView;
+        $('masterRate').required = !tariffView && !fuelCodeView;
+        $('masterEffectiveFrom').required = !tariffView && !fuelCodeView;
+        $('masterUnit').required = !tariffView && !fuelCodeView;
+        $('masterName').required = !fuelCodeView && !tariffView;
+        $('masterAreaField').classList.toggle('master-hidden', tariffView || fuelCodeView);
+        $('masterRateField').classList.toggle('master-hidden', tariffView || fuelCodeView);
+        $('masterUnitField').classList.toggle('master-hidden', tariffView || fuelCodeView);
+        $('masterEffectiveField').classList.toggle('master-hidden', tariffView || fuelCodeView);
+        $('masterMealRoleField').classList.toggle('master-hidden', tariffView || fuelCodeView || category !== 'meals');
+        $('tariffFields').classList.toggle('master-hidden', !tariffView || fuelCodeView);
+        $('tariffToolbar').classList.toggle('master-hidden', !tariffView && !fuelCodeView);
+        $('addMasterRecord').classList.toggle('master-hidden', tariffView || fuelCodeView);
+        $('tariffAddRecord').classList.toggle('master-hidden', !tariffView || fuelCodeView);
+        $('tariffAddRecord').textContent = category === 'toll' ? '+ Add Toll Tariff' : '+ Add ASDP Tariff';
+        $('masterEmpty').textContent = fuelCodeView
+          ? 'Tidak ada Fuel Code yang sesuai dengan pencarian.'
+          : tariffView
+            ? 'No tariff records for this branch. Add an approved toll/crossing tariff.'
+            : 'Belum ada data master untuk cabang dan kategori ini. Tambahkan tarif yang sudah dikonfirmasi.';
+        var tableHead = fuelCodeView
+          ? '<tr><th>Fuel Code</th><th>Origin</th><th>Destination</th><th>Vehicle Type</th><th>Trip Condition</th><th>Fuel Type</th><th>Fuel Cost</th><th>KM Out / Return</th><th>Ratio Loaded / Empty</th><th>Status</th></tr>'
+          : tariffView
+          ? '<tr><th>Tariff ID</th><th>' + (category === 'toll' ? 'Toll Segment' : 'Crossing Route') +
+            '</th><th>Direction</th><th>Vehicle / Class</th><th>Tariff</th><th>Effective Period</th><th>Status</th><th>Used in Route</th><th>Actions</th></tr>'
+          : '<tr><th>Cabang</th><th>Nama / Rute</th><th>Berlaku untuk</th><th>Area / Keterangan</th><th>Tarif</th><th>Satuan</th><th>Berlaku Mulai</th><th>Aksi</th></tr>';
+        $('masterTableHead').innerHTML = tableHead;
+        var search = $('tariffSearch').value.trim().toLowerCase();
+        var direction = $('tariffDirectionFilter').value;
+        var status = $('tariffStatusFilter').value;
+        var visible = fuelCodeView ? filtered.filter(function (record) {
+          var searchable = [record.fuelCode, record.origin, record.destination, record.vehicleType,
+            record.condition, record.fuelType].join(' ').toLowerCase();
+          return (!search || searchable.indexOf(search) !== -1) &&
+            (!status || (record.status || 'Active') === status);
+        }) : tariffView ? filtered.filter(function (record) {
+          var recordStatus = record.status || (record.active === false ? 'Inactive' : 'Active');
+          var searchable = [record.tariffId, record.name, record.vehicleClass, record.routeUsage, record.remarks]
+            .join(' ').toLowerCase();
+          return (!search || searchable.indexOf(search) !== -1) &&
+            (!direction || (record.direction || 'Outbound') === direction) &&
+            (!status || recordStatus === status);
+        }) : filtered;
+        var filtersActive = Boolean(search || status || direction);
+        $('masterCount').textContent = filtersActive
+          ? visible.length + ' dari ' + filtered.length + ' data'
+          : visible.length + ' data';
+        $('masterRows').innerHTML = visible.map(function (record) {
+          if (fuelCodeView) {
+            return '<tr><td><strong>' + escapeHtml(record.fuelCode) + '</strong></td><td>' +
+              escapeHtml(record.origin || '—') + '</td><td>' + escapeHtml(record.destination || '—') +
+              '</td><td>' + escapeHtml(record.vehicleType || '—') + '</td><td>' +
+              escapeHtml(record.condition || '—') + '</td><td>' +
+              escapeHtml(record.fuelType === 'z' ? 'z · Perlu verifikasi' : record.fuelType || '—') +
+              '</td><td><strong class="money">' + money(record.fuelCost) + '</strong></td><td>' +
+              escapeHtml(String(record.kmOut) + ' / ' + String(record.kmReturn)) + '</td><td>' +
+              escapeHtml(String(record.ratioIsi) + ' / ' + String(record.ratioKosong)) +
+              '</td><td><span class="record-status">' + escapeHtml(record.status || 'Active') + '</span></td></tr>';
+          }
+          if (tariffView) {
+            var recordStatus = record.status || (record.active === false ? 'Inactive' : 'Active');
+            var id = escapeHtml(record.id);
+            return '<tr><td><strong>' + escapeHtml(record.tariffId || '—') + '</strong></td><td>' +
+              escapeHtml(record.name) + '</td><td><span class="tariff-badge ' +
+              ((record.direction || 'Outbound') === 'Return' ? 'return' : '') + '">' +
+              escapeHtml(record.direction || 'Outbound') + '</span></td><td>' +
+              escapeHtml(record.vehicleClass || '—') + '</td><td><strong class="money">' +
+              money(record.rate) + '</strong></td><td>' + escapeHtml(effectivePeriod(record)) +
+              '</td><td><span class="record-status ' + (recordStatus === 'Inactive' ? 'inactive' : '') +
+              '">' + escapeHtml(recordStatus) + '</span></td><td>' +
+              (record.routeUsage ? '<span class="tag">' + escapeHtml(record.routeUsage) + '</span>' : '—') +
+              '</td><td><div class="master-row-actions">' +
+              '<button type="button" data-edit="' + id + '" aria-label="Edit tariff" title="Edit">✎</button>' +
+              '<button type="button" data-duplicate="' + id + '" aria-label="Duplicate tariff" title="Duplicate">▢</button>' +
+              '<button type="button" data-toggle-status="' + id + '" aria-label="Toggle tariff status" title="Toggle status">○</button>' +
+              '</div></td></tr>';
+          }
+          return '<tr><td>' + escapeHtml(record.branch) + '</td><td>' + escapeHtml(record.name) + '</td><td>' +
+            escapeHtml(record.mealRole || 'Driver & Helper') + '</td><td>' +
+            escapeHtml(record.area || '—') + '</td><td><strong>' + money(record.rate) + '</strong></td><td>' +
+            escapeHtml(record.unit) + '</td><td>' + escapeHtml(formatDate(record.effectiveFrom)) +
+            '</td><td><div class="master-row-actions"><button type="button" data-edit="' +
+            escapeHtml(record.id) + '" aria-label="Edit master">✎</button><button type="button" data-delete="' +
+            escapeHtml(record.id) + '" aria-label="Delete master">×</button></div></td></tr>';
+        }).join('');
+        $('masterEmpty').classList.toggle('master-hidden', visible.length > 0);
+        $('masterRows').classList.toggle('master-hidden', visible.length === 0);
+        $('masterRows').querySelectorAll('[data-edit]').forEach(function (button) {
+          button.addEventListener('click', function () { editRecord(button.dataset.edit); });
+        });
+        $('masterRows').querySelectorAll('[data-delete]').forEach(function (button) {
+          button.addEventListener('click', function () { deleteRecord(button.dataset.delete); });
+        });
+        $('masterRows').querySelectorAll('[data-duplicate]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            var record = records.find(function (item) { return item.id === button.dataset.duplicate; });
+            if (record) showForm(record, true);
+          });
+        });
+        $('masterRows').querySelectorAll('[data-toggle-status]').forEach(function (button) {
+          button.addEventListener('click', function () { toggleStatus(button.dataset.toggleStatus); });
+        });
+      }
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (char) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+        });
+      }
+      function showForm(record, duplicate) {
+        form.classList.remove('master-hidden');
+        $('masterModalBackdrop').classList.remove('master-hidden');
+        form.setAttribute('aria-hidden', 'false');
+        var tariffView = isTariffCategory();
+        $('masterBranch').value = record ? record.branch : branch;
+        $('masterName').value = record ? record.name : '';
+        $('masterArea').value = record ? record.area : '';
+        $('masterRate').value = record ? record.rate : '';
+        $('masterMealRole').value = record ? (record.mealRole || 'Driver') : 'Driver';
+        $('masterEffectiveFrom').value = record ? record.effectiveFrom : new Date().toISOString().slice(0, 10);
+        $('masterRecordId').value = record && !duplicate ? record.id : '';
+        $('masterUnit').value = record ? record.unit : categories[category].units[0];
+        $('masterTariffId').value = record && !duplicate && tariffView
+          ? (record.tariffId || nextTariffId(category)) : (tariffView ? nextTariffId(category) : '');
+        $('masterDirection').value = record ? (record.direction || 'Outbound') : 'Outbound';
+        if (record && record.vehicleClass && !Array.from($('masterVehicleClass').options).some(function (option) {
+          return option.value === record.vehicleClass;
+        })) {
+          var legacyVehicleOption = document.createElement('option');
+          legacyVehicleOption.value = record.vehicleClass;
+          legacyVehicleOption.textContent = record.vehicleClass;
+          $('masterVehicleClass').appendChild(legacyVehicleOption);
+        }
+        $('masterVehicleClass').value = record && record.vehicleClass
+          ? record.vehicleClass : $('masterVehicleClass').options[0].value;
+        $('masterTariffStatus').value = record
+          ? (record.status || (record.active === false ? 'Inactive' : 'Active')) : 'Active';
+        $('masterNameTariff').value = record ? record.name : '';
+        $('masterTariffRate').value = record ? record.rate : '';
+        $('masterTariffFrom').value = record ? (record.effectiveFrom || '') : new Date().toISOString().slice(0, 10);
+        $('masterTariffTo').value = record ? (record.effectiveTo || '') : '';
+        $('masterRouteUsage').value = record ? (record.routeUsage || '') : '';
+        $('masterRemarks').value = record ? (record.remarks || '') : '';
+        $('masterName').required = !tariffView;
+        $('masterTariffRate').required = tariffView;
+        $('masterTariffFrom').required = tariffView;
+        var action = record && !duplicate ? 'Edit' : 'Add';
+        var label = tariffView
+          ? (category === 'toll' ? 'Toll Tariff' : 'ASDP Tariff')
+          : categories[category].title;
+        $('masterFormTitle').textContent = action + ' ' + label;
+        $('masterFormSubtitle').textContent = tariffView
+          ? 'Create a direction-specific tariff record with controlled validity.'
+          : 'Kelola tarif master untuk cabang yang dipilih.';
+        (tariffView ? $('masterNameTariff') : $('masterName')).focus();
+      }
+      function closeForm() {
+        form.classList.add('master-hidden');
+        $('masterModalBackdrop').classList.add('master-hidden');
+        form.setAttribute('aria-hidden', 'true');
+        form.reset();
+        $('masterRecordId').value = '';
+      }
+      function editRecord(id) {
+        var record = records.find(function (item) { return item.id === id; });
+        if (!record) return;
+        category = record.category;
+        branch = record.branch;
+        render();
+        showForm(record);
+      }
+      function persist() {
+        try {
+          localStorage.setItem(key, JSON.stringify(records));
+          return true;
+        } catch (error) {
+          alert('Data master belum dapat disimpan. Coba lagi atau hubungi administrator.');
+          return false;
+        }
+      }
+      function toggleStatus(id) {
+        var previous = records;
+        records = records.map(function (record) {
+          if (record.id !== id) return record;
+          var status = (record.status || (record.active === false ? 'Inactive' : 'Active')) === 'Active'
+            ? 'Inactive' : 'Active';
+          return Object.assign({}, record, {
+            status: status,
+            active: status === 'Active',
+            updatedAt: new Date().toISOString()
+          });
+        });
+        if (!persist()) records = previous;
+        render();
+      }
+      function deleteRecord(id) {
+        if (!confirm('Hapus master ini?')) return;
+        var previous = records;
+        records = records.filter(function (record) { return record.id !== id; });
+        if (!persist()) records = previous;
+        render();
+      }
+      document.querySelectorAll('.master-category').forEach(function (button) {
+        button.addEventListener('click', function () {
+          closeForm();
+          category = button.dataset.category;
+          render();
+        });
+      });
+      $('addMasterRecord').addEventListener('click', function () { showForm(null); });
+      $('tariffAddRecord').addEventListener('click', function () { showForm(null); });
+      $('cancelMasterEdit').addEventListener('click', closeForm);
+      $('closeMasterForm').addEventListener('click', closeForm);
+      $('masterModalBackdrop').addEventListener('click', closeForm);
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !form.classList.contains('master-hidden')) closeForm();
+      });
+      $('tariffSearch').addEventListener('input', render);
+      $('tariffDirectionFilter').addEventListener('change', render);
+      $('tariffStatusFilter').addEventListener('change', render);
+      $('resetTariffFilters').addEventListener('click', function () {
+        $('tariffSearch').value = '';
+        $('tariffDirectionFilter').value = '';
+        $('tariffStatusFilter').value = '';
+        render();
+      });
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var id = $('masterRecordId').value;
+        var existing = id ? records.find(function (record) { return record.id === id; }) : null;
+        var tariffView = isTariffCategory();
+        var rate = Number(tariffView ? $('masterTariffRate').value : $('masterRate').value);
+        var effectiveFrom = tariffView ? $('masterTariffFrom').value : $('masterEffectiveFrom').value;
+        var effectiveTo = tariffView ? $('masterTariffTo').value : '';
+        if (!effectiveFrom || !Number.isFinite(rate) || rate < 0 ||
+            (effectiveTo && effectiveTo < effectiveFrom)) {
+          alert('Periksa tarif dan periode berlaku. Tanggal akhir tidak boleh sebelum tanggal mulai.');
+          return;
+        }
+        var tariffStatus = tariffView ? $('masterTariffStatus').value : 'Active';
+        var updated = {
+          id: id || 'MD-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+          category: existing && mealCategories.indexOf(existing.category) !== -1
+            ? 'meals' : (existing ? existing.category : category),
+          branch: $('masterBranch').value,
+          name: (tariffView ? $('masterNameTariff').value : $('masterName').value).trim(),
+          area: tariffView ? '' : $('masterArea').value.trim(),
+          rate: rate,
+          unit: tariffView ? categories[category].units[0] : $('masterUnit').value,
+          tariffId: tariffView ? ($('masterTariffId').value || nextTariffId(category)) : '',
+          direction: tariffView ? $('masterDirection').value : '',
+          vehicleClass: tariffView ? $('masterVehicleClass').value : '',
+          status: tariffStatus,
+          effectiveFrom: effectiveFrom,
+          effectiveTo: effectiveTo,
+          routeUsage: tariffView ? $('masterRouteUsage').value.trim() : '',
+          remarks: tariffView ? $('masterRemarks').value.trim() : '',
+          mealRole: !tariffView ? $('masterMealRole').value : '',
+          active: tariffStatus === 'Active',
+          updatedAt: new Date().toISOString()
+        };
+        if (!updated.name) {
+          alert(tariffView ? 'Toll Segment / Crossing Route wajib diisi.' : 'Nama master wajib diisi.');
+          return;
+        }
+        var previous = records;
+        records = existing
+          ? records.map(function (record) { return record.id === id ? updated : record; })
+          : records.concat(updated);
+        if (!persist()) { records = previous; return; }
+        branch = updated.branch;
+        closeForm();
+        render();
+      });
+      render();
+    }());
+  </script>
+</body>
+</html>
